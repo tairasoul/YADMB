@@ -766,4 +766,8 @@ client.once("ready", async ()=>{
     client.editStatus(null, [{type: oceanic.ActivityTypes.WATCHING, name: (client.guilds.size).toString() + ' servers'}]);
 })
 
+client.on("error", (err) => {
+    console.error(`something broke, ${err}`);  
+})
+
 client.connect();
