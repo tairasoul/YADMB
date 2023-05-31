@@ -17,6 +17,11 @@ this bot no longer stores it locally.
 
 if you want it to store locally, easiest way is to go to an earlier commit
 
+# changelog
+
+- now uses youtube-dlsr
+- fix issue with not sending a message correctly if the user's already in a vc
+
 # commands
 
 ## addqueue
