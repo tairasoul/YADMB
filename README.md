@@ -5,6 +5,10 @@ a music bot because why not
 
 simply install all the required packages, change your-token to your bot's token in config.json, and run node bot.mjs
 
+### notes
+
+seems to sometimes skip a song for no reason or replay it, got no idea why
+
 ### extra information
 
 ~~this bot stores all music played in a local folder, so it doesn't have to keep streaming to youtube.~~
