@@ -10,7 +10,7 @@
 
 # in progress
 
-- change libraries from ytdl to use [youtube-stream-url](https://www.npmjs.com/package/youtube-stream-url)
+
 
 # finished
 
@@ -19,3 +19,5 @@
 # cancelled + reason
 
 
+- change libraries from ytdl to use [youtube-stream-url](https://www.npmjs.com/package/youtube-stream-url)
+  - the resulting url doesn't work
