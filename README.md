@@ -54,3 +54,9 @@ resumes the currently playing track
 ## skip
 
 skips the currently playing track
+
+# other features
+
+## multi server
+
+this bot will in fact work in multiple servers. the old original source was only for 1 server with me and my friends, after that i adapted it to be multi server, and now i've moved it over to using oceanic.js
