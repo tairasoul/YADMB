@@ -10,7 +10,7 @@
 
 # in progress
 
-- change libraries from ytdl to Shoukaku (what [SpaceAce](https://github.com/The0n1y5pace4ce) recommended)
+- change libraries from ytdl to use [youtube-stream-url](https://www.npmjs.com/package/youtube-stream-url)
 
 # finished
 
