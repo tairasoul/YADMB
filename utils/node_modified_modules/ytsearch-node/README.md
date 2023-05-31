@@ -2,7 +2,7 @@
 
 [![NPM version](https://img.shields.io/npm/v/ytsearch-node.svg?maxAge=3600)](https://www.npmjs.com/package/ytsearch-node)
 
-
+modified version, original is [here](https://github.com/only1drhex/ytsearch-node/tree/main)
 
 ytsearch-node is a js only package that allows you make typical YouTube search. It doesn't require any API keys or account login.
 
