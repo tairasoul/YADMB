@@ -9,7 +9,7 @@ const { token } = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
 import * as oceanic from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 const Client = oceanic.Client;
-import ytsr from 'ytsr';
+import ytsr from './utils/node_modified_modules/ytsearch-node/src/parsedata.js';
 import utils from './utils/utils.js';
 import * as voice from "@discordjs/voice";
 import ytdl from 'ytdl-core';
@@ -268,33 +268,32 @@ const cmdArray = [
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {
             await interaction.defer()
             const term = interaction.data.options.getString('term');
-            const filter = (await ytsr.getFilters(term)).get('Type').get('Video')
-            const searchResults = await ytsr(filter.url, {pages: 1})
+            const searchResults = await ytsr(term);
             const searches = [];
             const names = {};
             let res;
             let currentVideo;
             async function add() {
-                for (const item of searchResults.items) {
+                for (const item of searchResults) {
                     if (item.type != 'video') return
                     try {
-                        const url = item.bestThumbnail.url
+                        const url = item.thumbnail.url
                         const embed = new builders.EmbedBuilder()
                         embed.setThumbnail(url);
                         embed.setTitle(item.title);
                         embed.addFields(
-                            {name: 'Uploaded at', value: item.uploadedAt},
+                            {name: 'Uploaded', value: item.publishedAt},
                             {name: 'Author', value: item.author.name},
-                            {name: 'Views', value: item.views.toString()},
+                            {name: 'Views', value: item.viewCount.toString()},
                             {name : "Length", value: item.duration}
                         )
                         names[item.title] = {
                             embed: embed,
-                            url: item.url
+                            url: item.watchUrl
                         }
                         if (!currentVideo) currentVideo = {
                             embed: embed,
-                            url: item.url
+                            url: item.watchUrl
                         }
                         if (!res) res = embed
                         const toPush = {
@@ -764,10 +763,6 @@ client.once("ready", async ()=>{
         }
     }
     client.editStatus(null, [{type: oceanic.ActivityTypes.WATCHING, name: (client.guilds.size).toString() + ' servers'}]);
-})
-
-client.on("error", (err) => {
-    console.error(`something broke, ${err}`);  
 })
 
 client.connect();
