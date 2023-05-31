@@ -1,0 +1,31 @@
+{
+  "name": "ytsearch-node",
+  "version": "2.0.5",
+  "description": "make anon youtube search.",
+  "main": "parsedata.js",
+  "dependencies": {
+    "axios": "^0.26.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/only1drhex/ytsearch-node.git"
+  },
+  "keywords": [
+    "Youtube",
+    "search",
+    "videos",
+    "ytsearch",
+    "ytsearch-node",
+    "song uber"
+  ],
+  "author": "drhex <lordrhexx@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/only1drhex/ytsearch-node/issues"
+  },
+  "homepage": "https://github.com/only1drhex/ytsearch-node#readme"
+}
