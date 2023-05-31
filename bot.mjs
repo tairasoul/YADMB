@@ -445,7 +445,7 @@ const cmdArray = [
                         await i.editOriginal({content: 'Results for **' + term + '**:', components: [actionRow, actionRow2], embeds: [embed.json]})
                     } catch {}
                 })
-                interaction.editOriginal({content: 'Search has timed out. (times out after 4 minutes for performance and stability.)', embeds: [], components: []})
+                interaction.editOriginal({content: 'Search has timed out. (times out after 4 minutes.)', embeds: [], components: []})
             }, 240000)
         }
     },
