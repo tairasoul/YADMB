@@ -9,7 +9,7 @@
 # in progress
 
 - figure out what alternative libraries i can use instead of yt-stream because it's a bit wonky
-  - current considerations: [create-music-stream](https://www.npmjs.com/package/create-music-stream), [@discord-player/downloader](https://www.npmjs.com/package/@discord-player/downloader), [youtube-audio-stream](https://www.npmjs.com/package/youtube-audio-stream)
+  - current considerations: [youtube-dlsr](https://www.npmjs.com/package/youtube-dlsr), [video-extractor](https://www.npmjs.com/package/video-extractor)
 
 # finished + comments
 
