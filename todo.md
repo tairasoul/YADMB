@@ -10,7 +10,7 @@
 
 # in progress
 
-- change libraries from ytdl to whatever [SpaceAce](https://github.com/The0n1y5pace4ce) ends up recommending as he said that ytdl is prone to bugs (waiting for a response from him in discord)
+- change libraries from ytdl to Shoukaku (what [SpaceAce](https://github.com/The0n1y5pace4ce) recommended)
 
 # finished
 
