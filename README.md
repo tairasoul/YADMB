@@ -21,7 +21,7 @@ adds a link to the queue
 
 ## add-search
 
-searches for the specific term provided, and creates an embed with different pages in a select menu, containing each video returned. there are times where it'll return different videos.
+searches for the specific term provided, and creates an embed with different pages in a select menu, containing each video returned. it gets the same videos as you would when searching for it manually.
 
 ## add-playlist
 
