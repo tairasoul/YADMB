@@ -12,9 +12,11 @@
 
 
 
-# finished
+# finished + comments
 
-
+- no longer uses ytdl, instead uses yt-stream
+  - sometimes seems to skip songs and buffers a bit before playing the next song
+  - not sure why, if you have any idea why it sometimes skips songs or buffers please create an issue
 
 # cancelled + reason
 
