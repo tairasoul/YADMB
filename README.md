@@ -7,11 +7,11 @@ simply install all the required packages, change your-token to your bot's token 
 
 ### extra information
 
-~~this bot stores all music played in a local folder, so it doesn't have to keep streaming to youtube.
+~~this bot stores all music played in a local folder, so it doesn't have to keep streaming to youtube.~~
 
-~~if you have a workaround that works universally, feel free to implement it and create a pull request
+~~if you have a workaround that works universally, feel free to implement it and create a pull request~~
 
-~~if you have a workaround that only works on your end, feel free to try to implement it on your local files
+~~if you have a workaround that only works on your end, feel free to try to implement it on your local files~~
 
 this bot no longer stores it locally.
 
