@@ -9,7 +9,7 @@ const { token } = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
 import * as oceanic from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 const Client = oceanic.Client;
-import ytsr from './utils/node_modified_modules/ytsearch-node/src/parsedata.js';
+import ytsr from 'ytsearch-node/src/parsedata.js';
 import utils from './utils/utils.js';
 import * as voice from "@discordjs/voice";
 import ytdl from 'ytdl-core';
@@ -102,7 +102,7 @@ const client = new Client({
 
 client.on('voiceStateUpdate', (oldState, newState) => {
     if (!oldState.voiceState || !newState) return;
-    if (oldState.voiceState && guilds[oldState.guild.id].connection && oldState.voiceState.channel.voiceMembers.size == 1) {
+    if (oldState.voiceState.channel && guilds[oldState.guild.id].connection && oldState.voiceState.channel?.voiceMembers.size == 1) {
         guilds[oldState.guild.id].connection.removeAllListeners(); guilds[oldState.guild.id].connection.disconnect();guilds[oldState.guild.id].connection = null;
     }
     if (oldState && !newState.channelID && guilds[oldState.guild.id].connection && oldState.user.bot) {
@@ -206,7 +206,7 @@ const cmdArray = [
                     author = info.videoDetails.author.name
                     res = vid
                     let newVideoName = title.removeChar('/')
-                    if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`)
+                    if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
                     if (!fs.existsSync(`${parent}/data/${author}/${newVideoName}.mp3`) || !(fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000)) {
                         const viddl = ytdl(res, {quality: 'highestaudio', IPV6Block: 'fe80::/16'})
                         viddl.pipe(fs.createWriteStream(`${parent}/data/${author}/${newVideoName}.mp3`))
@@ -347,7 +347,7 @@ const cmdArray = [
                     author = info.videoDetails.author.name
                     res = vid
                     let newVideoName = title.removeChar('/')
-                    if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`)
+                    if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
                     if (!fs.existsSync(`${parent}/data/${author}/${newVideoName}.mp3`) || !(fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000)) {
                         const viddl = ytdl(res, {quality: 'highestaudio', IPV6Block: 'fe80::/16'})
                         viddl.pipe(fs.createWriteStream(`${parent}/data/${author}/${newVideoName}.mp3`))
@@ -445,7 +445,7 @@ const cmdArray = [
                         await i.editOriginal({content: 'Results for **' + term + '**:', components: [actionRow, actionRow2], embeds: [embed.json]})
                     } catch {}
                 })
-                interaction.editOriginal({content: 'Search has timed out. (times out after 4 minutes.)', embeds: [], components: []})
+                interaction.editOriginal({content: 'Search has timed out. (times out after 4 minutes for performance and stability.)', embeds: [], components: []})
             }, 240000)
         }
     },
@@ -550,8 +550,7 @@ const cmdArray = [
                 choices: [
                     {name: "song", value: "song"},
                     {name: "queue", value: "queue"}
-                ],
-                required: true
+                ]
             }
         ).setDMPermission(false),
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {await interaction.defer()
@@ -646,7 +645,7 @@ const cmdArray = [
                     author = info.videoDetails.author.name
                     res = vid
                     let newVideoName = title.removeChar('/')
-                    if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`)
+                    if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
                     if (!fs.existsSync(`${parent}/data/${author}/${newVideoName}.mp3`) || !(fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000)) {
                         const viddl = ytdl(res, {quality: 'highestaudio', IPV6Block: 'fe80::/16'})
                         viddl.pipe(fs.createWriteStream(`${parent}/data/${author}/${newVideoName}.mp3`))
