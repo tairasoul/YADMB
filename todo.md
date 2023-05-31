@@ -8,17 +8,12 @@
 
 # in progress
 
-- figure out what alternative libraries i can use instead of yt-stream because it's a bit wonky
-  - current considerations: [youtube-dlsr](https://www.npmjs.com/package/youtube-dlsr), [video-extractor](https://www.npmjs.com/package/video-extractor)
-
 # finished + comments
 
 - migrate from local filesystem to directly streaming from youtube 
   - i am not sure if it still gets rate-limited, we'll have to fuck around and find out to see
 
-- no longer uses ytdl, instead uses yt-stream
-  - sometimes seems to skip songs and buffers a bit before playing the next song
-  - not sure why, if you have any idea why it sometimes skips songs or buffers please create an issue
+- no longer uses ytdl, instead uses youtube-dlsr
 
 # cancelled + reason
 
