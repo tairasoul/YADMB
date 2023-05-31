@@ -6,11 +6,9 @@
 
 - migrate from local filesystem to directly streaming from youtube (if i can figure out how to not get ratelimited)
 
-- change libraries from ytdl to whatever [SpaceAce](https://github.com/The0n1y5pace4ce) ends up recommending as he said that ytdl is prone to bugs
-
 # in progress
 
-
+- change libraries from ytdl to whatever [SpaceAce](https://github.com/The0n1y5pace4ce) ends up recommending as he said that ytdl is prone to bugs (waiting for a response from him in discord)
 
 # finished
 
