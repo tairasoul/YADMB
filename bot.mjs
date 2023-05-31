@@ -11,8 +11,8 @@ import * as builders from "@oceanicjs/builders";
 const Client = oceanic.Client;
 import ytsr from 'ytsearch-node/src/parsedata.js';
 import utils from './utils/utils.js';
-import ytstream from 'yt-stream';
 import * as voice from "@discordjs/voice";
+import {default as dlsr} from 'youtube-dlsr';
 import ytdl from 'ytdl-core';
 import { createAudioPlayer, NoSubscriberBehavior, createAudioResource } from "@discordjs/voice";
 const guilds = {
@@ -32,12 +32,8 @@ async function playNextSong(guild) {
         console.log(guilds[guild].queuedTracks);
         const currentTrack = guilds[guild].currentTrack;
         guilds[guild].currentlyPlayingTrackObject = guilds[guild].queuedTracks[currentTrack];
-        const get = await ytstream.stream(guilds[guild].queuedTracks[currentTrack].url, {
-            type: 'audio',
-            quality: 'highest',
-            highWaterMark: 1048576 * 32
-        });
-        const a = createAudioResource(get.stream, {
+        const get = await dlsr.download(guilds[guild].queuedTracks[currentTrack].url);
+        const a = createAudioResource(get, {
             inlineVolume: true
         })
         guilds[guild].currentAudioResource = a;
@@ -599,7 +595,8 @@ const cmdArray = [
                 choices: [
                     {name: "song", value: "song"},
                     {name: "queue", value: "queue"}
-                ]
+                ],
+                required: true
             }
         ).setDMPermission(false),
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {await interaction.defer()
