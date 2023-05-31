@@ -550,7 +550,8 @@ const cmdArray = [
                 choices: [
                     {name: "song", value: "song"},
                     {name: "queue", value: "queue"}
-                ]
+                ],
+                required: true
             }
         ).setDMPermission(false),
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {await interaction.defer()
