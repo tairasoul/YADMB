@@ -25,6 +25,17 @@ run `npm i && cd utils && npm i && cd ..` to install packages for utils folder a
 
 run `node bot.mjs` to start the bot
 
+full thing:
+
+```
+sudo apt-get install nodejs git
+git clone https://github.com/fheahdythdr/discord-music-bot
+cd discord-music-bot
+npm i && cd utils && npm i && cd ..
+```
+
+after running this, change your-token to your bot's token in config.json and run `node bot.mjs`
+
 ### notes
 
 seems to sometimes skip a song for no reason or replay it, got no idea why
