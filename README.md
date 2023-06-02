@@ -11,11 +11,11 @@ linux and windows are now supported with [the latest release](https://github.com
 
 download discord-music-bot-installer-linux if on linux, otherwise discord-music-bot-installer-windows.rar
 
-### notes
+# notes
 
 seems to sometimes skip a song for no reason or replay it, got no idea why
 
-### extra information
+# extra information
 
 ~~this bot stores all music played in a local folder, so it doesn't have to keep streaming to youtube.~~
 
