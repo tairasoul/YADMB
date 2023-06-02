@@ -29,55 +29,57 @@ Array.prototype.clear = function() {
 
 async function playNextSong(guild) {
     if (guilds[guild].queuedTracks[0]) {
-        console.log(guilds[guild].queuedTracks);
-        const currentTrack = guilds[guild].currentTrack;
-        guilds[guild].currentlyPlayingTrackObject = guilds[guild].queuedTracks[currentTrack];
-        const get = await dlsr.download(guilds[guild].queuedTracks[currentTrack].url);
-        const a = createAudioResource(get, {
-            inlineVolume: true
-        })
-        guilds[guild].currentAudioResource = a;
-        a.volume.setVolume(currentVolume);
-        guilds[guild].currentlyPlayingTrack = guilds[guild].queuedTracks[currentTrack].songName;
-        guilds[guild].audioPlayer.play(a);
-        if (guilds[guild].connection) guilds[guild].connection.subscribe(guilds[guild].audioPlayer);
-        function oncething() {
-            guilds[guild].audioPlayer.once('stateChange', (oldState, newState) => {
-                if (newState.status == 'idle') {
-                    if (guilds[guild].playing) {
-                        if ((!guilds[guild].looping && !guilds[guild].loopqueue)) {
-                            guilds[guild].queuedTracks.splice(0, 1);
-                            if (guilds[guild].currentTrack >= guilds[guild].queuedTracks.length) {
-                                guilds[guild].currentTrack = 0;
+        try {
+            console.log(guilds[guild].queuedTracks);
+            const currentTrack = guilds[guild].currentTrack;
+            guilds[guild].currentlyPlayingTrackObject = guilds[guild].queuedTracks[currentTrack];
+            const get = await dlsr.download(guilds[guild].queuedTracks[currentTrack].url);
+            const a = createAudioResource(get, {
+                inlineVolume: true
+            })
+            guilds[guild].currentAudioResource = a;
+            a.volume.setVolume(currentVolume);
+            guilds[guild].currentlyPlayingTrack = guilds[guild].queuedTracks[currentTrack].songName;
+            guilds[guild].audioPlayer.play(a);
+            if (guilds[guild].connection) guilds[guild].connection.subscribe(guilds[guild].audioPlayer);
+            function oncething() {
+                guilds[guild].audioPlayer.once('stateChange', (oldState, newState) => {
+                    if (newState.status == 'idle') {
+                        if (guilds[guild].playing) {
+                            if ((!guilds[guild].looping && !guilds[guild].loopqueue)) {
+                                guilds[guild].queuedTracks.splice(0, 1);
+                                if (guilds[guild].currentTrack >= guilds[guild].queuedTracks.length) {
+                                    guilds[guild].currentTrack = 0;
+                                }
                             }
+                            if (guilds[guild].skip) {
+                                guilds[guild].skip = false;
+                                guilds[guild].queuedTracks.splice(guilds[guild].currentTrack, 1);
+                                if (guilds[guild].currentTrack >= guilds[guild].queuedTracks.length) {
+                                    guilds[guild].currentTrack = 0;
+                                }
+                            }
+                            if (guilds[guild].loopqueue && !guilds[guild].skip) {
+                                guilds[guild].currentTrack += 1;
+                                if (guilds[guild].currentTrack >= guilds[guild].queuedTracks.length) {
+                                    guilds[guild].currentTrack = 0;
+                                }
+                            }
+                            playNextSong(guild);
                         }
-                        if (guilds[guild].skip) {
+                        else if (guilds[guild].skip) {
                             guilds[guild].skip = false;
                             guilds[guild].queuedTracks.splice(guilds[guild].currentTrack, 1);
-                            if (guilds[guild].currentTrack >= guilds[guild].queuedTracks.length) {
-                                guilds[guild].currentTrack = 0;
-                            }
+                            playNextSong(guild);
                         }
-                        if (guilds[guild].loopqueue && !guilds[guild].skip) {
-                            guilds[guild].currentTrack += 1;
-                            if (guilds[guild].currentTrack >= guilds[guild].queuedTracks.length) {
-                                guilds[guild].currentTrack = 0;
-                            }
-                        }
-                        playNextSong(guild);
                     }
-                    else if (guilds[guild].skip) {
-                        guilds[guild].skip = false;
-                        guilds[guild].queuedTracks.splice(guilds[guild].currentTrack, 1);
-                        playNextSong(guild);
+                    else {
+                        oncething();
                     }
-                }
-                else {
-                    oncething();
-                }
-            })
-        }
-        oncething();
+                })
+            }
+            oncething();
+        } catch {}
     }
 }
 
@@ -501,6 +503,7 @@ const cmdArray = [
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {
             await interaction.defer()
             guilds[interaction.guildID].queuedTracks.splice(0, 5000)
+            guilds[interaction.guildID].currentTrack = 0;
             const embed = new builders.EmbedBuilder()
             embed.setDescription("Cleared queue.")
             await interaction.editOriginal({content: '', embeds: [embed.json]})
