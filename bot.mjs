@@ -1,8 +1,8 @@
 import { Collection } from 'discord.js';
 import fs from "node:fs"
 import path from 'path';
-// add .substring(1) if you're on windows
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 const parent = path.join(__dirname + "/..");
 if (!fs.existsSync(parent + "/data")) fs.mkdirSync(parent + "/data");
 const { token } = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
