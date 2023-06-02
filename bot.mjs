@@ -1,15 +1,15 @@
 import { Collection } from 'discord.js';
 import fs from "node:fs"
 import path from 'path';
-import { fileURLToPath } from 'url';
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
+// add .substring(1) if you're on windows
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const parent = path.join(__dirname + "/..");
 if (!fs.existsSync(parent + "/data")) fs.mkdirSync(parent + "/data");
 const { token } = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
 import * as oceanic from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 const Client = oceanic.Client;
-import ytsr from './utils/node_modified_modules/ytsearch-node/src/parsedata.js';
+import ytsr from 'ytsearch-node/src/parsedata.js';
 import utils from './utils/utils.js';
 import * as voice from "@discordjs/voice";
 import {default as dlsr} from 'youtube-dlsr';
@@ -674,9 +674,9 @@ const cmdArray = [
             }
         ),
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {await interaction.defer()
-            const playlist = interaction.options.getString('playlist');
+            const playlist = interaction.data.options.getString('playlist');
             const videos = await ytpl(playlist)
-            const videoLength = videos.items.length - 1
+            const videonames = [];
             async function addvid(vid) {
                 if (!ytdl.validateURL(vid)) {
                     return await interaction.editOriginal({content: "Invalid link."})
@@ -690,9 +690,6 @@ const cmdArray = [
                     title = info.videoDetails.title
                     author = info.videoDetails.author.name
                     res = vid
-                    const get = await streamurl.getInfo({
-                        url: vid
-                    })
                     //let newVideoName = title.removeChar('/');
                     /*const obj = {
                         path: `${parent}/data/${author}/${newVideoName}.mp3`,
@@ -702,10 +699,11 @@ const cmdArray = [
                         url: vid,
                         songName: title
                     }
+                    videonames.push(title);
                     guilds[interaction.guildID].queuedTracks.push(obj)
                     const embed = new builders.EmbedBuilder()
-                    embed.setDescription("Added **"+ title + "** to queue.")
-                    await i.editOriginal({content: '', embeds: [embed.json]})
+                    embed.setDescription("Added **"+ videonames.join(', ') + "** to queue.")
+                    await interaction.editOriginal({content: '', embeds: [embed.json]})
                     if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                     /*let newVideoName = title.removeChar('/')
                     if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
@@ -744,9 +742,6 @@ const cmdArray = [
             for (const video of videos.items) {
                 await addvid(video.url)
             }
-            const embed = new builders.EmbedBuilder()
-            embed.setDescription("Added "+ videoLength + " tracks to queue.")
-            await interaction.editOriginal({content: '', embeds: [embed.json]})
         }
     }
 ]
