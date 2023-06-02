@@ -263,11 +263,11 @@ const cmdArray = [
             if (video.includes(' ')) {
                 const a = video.split(' ')
                 for (const vid of a) {
-                    await addvid(vid)
+                    addvid(vid)
                 }
             }
             else {
-                await addvid(video)
+                addvid(video)
             }
         }
     },
@@ -351,26 +351,19 @@ const cmdArray = [
                 if (i.user.id != interaction.user.id) return
                 if (i.data.customID != interaction.user.id + 'Add' + term) return
                 await i.defer()
-                const vid = currentVideo.url
-                if (!ytdl.validateURL(vid)) {
-                    return await i.createFollowup({content: "Invalid link."})
+                const vid = currentVideo
+                if (!ytdl.validateURL(vid.url)) {
+                    return await interaction.editOriginal({content: "Invalid link."})
                 }
                 try {
-                    let info;
-                    let title;
-                    let res;
-                    let author;
-                    info = await ytdl.getInfo(vid);
-                    title = info.videoDetails.title
-                    author = info.videoDetails.author.name
-                    res = vid
+                    const title = vid.title;
                     //let newVideoName = title.removeChar('/');
                     /*const obj = {
                         path: `${parent}/data/${author}/${newVideoName}.mp3`,
                         songName: title
                     }*/
                     const obj = {
-                        url: vid,
+                        url: vid.url,
                         songName: title
                     }
                     guilds[interaction.guildID].queuedTracks.push(obj)
@@ -419,28 +412,25 @@ const cmdArray = [
                     if (i.user.id != interaction.user.id) return
                     if (i.data.customID != interaction.user.id + 'Add' + term) return
                     await i.defer()
-                    const vid = currentVideo.url
-                    if (!ytdl.validateURL(vid)) {
-                        return await i.createFollowup({content: "Invalid link."})
+                    if (!ytdl.validateURL(currentVideo.url)) {
+                        return await interaction.editOriginal({content: "Invalid link."})
                     }
                     try {
-                        let info;
-                        let title;
-                        let res;
-                        let author;
-                        info = await ytdl.getInfo(vid);
-                        title = info.videoDetails.title
-                        author = info.videoDetails.author.name
-                        res = vid
+                        const title = currentVideo.title;
                         //let newVideoName = title.removeChar('/');
                         /*const obj = {
                             path: `${parent}/data/${author}/${newVideoName}.mp3`,
                             songName: title
                         }*/
                         const obj = {
-                            url: vid,
+                            url: currentVideo.url,
                             songName: title
                         }
+                        //let newVideoName = title.removeChar('/');
+                        /*const obj = {
+                            path: `${parent}/data/${author}/${newVideoName}.mp3`,
+                            songName: title
+                        }*/
                         guilds[interaction.guildID].queuedTracks.push(obj)
                         const embed = new builders.EmbedBuilder()
                         embed.setDescription("Added **"+ title + "** to queue.")
@@ -680,26 +670,19 @@ const cmdArray = [
             const playlist = interaction.data.options.getString('playlist');
             const videos = await ytpl(playlist)
             const videonames = [];
-            async function addvid(vid) {
-                if (!ytdl.validateURL(vid)) {
+            async function addvid(/** @type {ytpl.Result}*/vid) {
+                if (!ytdl.validateURL(vid.url)) {
                     return await interaction.editOriginal({content: "Invalid link."})
                 }
                 try {
-                    let info;
-                    let title;
-                    let res;
-                    let author;
-                    info = await ytdl.getInfo(vid);
-                    title = info.videoDetails.title
-                    author = info.videoDetails.author.name
-                    res = vid
+                    const title = vid.title;
                     //let newVideoName = title.removeChar('/');
                     /*const obj = {
                         path: `${parent}/data/${author}/${newVideoName}.mp3`,
                         songName: title
                     }*/
                     const obj = {
-                        url: vid,
+                        url: vid.url,
                         songName: title
                     }
                     videonames.push(title);
@@ -743,7 +726,7 @@ const cmdArray = [
                 }
             }
             for (const video of videos.items) {
-                await addvid(video.url)
+                await addvid(video)
             }
         }
     }
