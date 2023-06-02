@@ -7,34 +7,9 @@ simply install all the required packages, change your-token to your bot's token 
 
 # installers
 
-if you're on windows, i made [this one](https://github.com/fheahdythdr/discord-music-bot-setup/releases/tag/v1.0.0)
+linux and windows are now supported with [the latest release](https://github.com/fheahdythdr/discord-music-bot-setup/releases/tag/v1.1.0)
 
-if you're on linux, no luck, but it should be pretty easy
-
-run `sudo apt-get install nodejs git`
-
-make a new directory (optional)
-
-run `git clone https://github.com/fheahdythdr/discord-music-bot`
-
-run `cd discord-music-bot`
-
-open config.json and change your-token to your bot's token
-
-run `npm i && cd utils && npm i && cd ..` to install packages for utils folder and main folder
-
-run `node bot.mjs` to start the bot
-
-full thing:
-
-```
-sudo apt-get install nodejs git
-git clone https://github.com/fheahdythdr/discord-music-bot
-cd discord-music-bot
-npm i && cd utils && npm i && cd ..
-```
-
-after running this, change your-token to your bot's token in config.json and run `node bot.mjs`
+download discord-music-bot-installer-linux if on linux, otherwise discord-music-bot-installer-windows.rar
 
 ### notes
 
