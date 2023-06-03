@@ -4,6 +4,12 @@
   - if DJ role is not specified, everyone can use commands
   - if DJ role is specified, give admins capability to specify which commands only DJ's can use and which commands everyone can use
 
+- add a progress command
+  - updates live, stops updating when someone uses it again (or just deletes and sends it again if a music commands channel is specified)
+  - shows how long is remaining
+  - shows the thumbnail (if possible)
+  - shows song name, author, likes, views
+
 # in progress
 
 # finished + comments
