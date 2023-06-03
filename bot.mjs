@@ -9,7 +9,7 @@ const { token } = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
 import * as oceanic from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 const Client = oceanic.Client;
-import ytsr from 'ytsearch-node/src/parsedata.js';
+import ytsr from './utils/node_modified_modules/ytsearch-node/src/parsedata.js';
 import utils from './utils/utils.js';
 import * as voice from "@discordjs/voice";
 import {default as dlsr} from 'youtube-dlsr';
