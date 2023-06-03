@@ -21,6 +21,8 @@ const guilds = {
 
 import ytpl from 'ytpl';
 
+// change to your liking
+
 const currentVolume = 0.05
 
 Array.prototype.clear = function() {
@@ -64,6 +66,9 @@ async function playNextSong(guild) {
                     else {
                         oncething();
                     }
+                })
+                guilds[guild].audioPlayer.once('error', (error) => {
+                    console.log(`an audio player error occured in ${guild}, error: ${error}`)
                 })
             }
             oncething();
@@ -191,12 +196,8 @@ const cmdArray = [
                 try {
                     let info;
                     let title;
-                    let res;
-                    let author;
                     info = await ytdl.getInfo(vid);
                     title = info.videoDetails.title
-                    author = info.videoDetails.author.name
-                    res = vid
                     //let newVideoName = title.removeChar('/');
                     /*const obj = {
                         path: `${parent}/data/${author}/${newVideoName}.mp3`,
@@ -295,11 +296,13 @@ const cmdArray = [
                         )
                         names[item.title] = {
                             embed: embed,
-                            url: item.watchUrl
+                            url: item.watchUrl,
+                            title: item.title
                         }
                         if (!currentVideo) currentVideo = {
                             embed: embed,
-                            url: item.watchUrl
+                            url: item.watchUrl,
+                            title: item.title
                         }
                         if (!res) res = embed
                         const toPush = {
