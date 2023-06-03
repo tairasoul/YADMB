@@ -30,3 +30,8 @@
 
 - change libraries from ytdl to use [youtube-stream-url](https://www.npmjs.com/package/youtube-stream-url)
   - the resulting url doesn't work
+
+# known issues + potential fixes
+
+- cannot skip after clearing queue with no songs left
+  - may make clear-queue stop the audio player
