@@ -13,6 +13,9 @@
 - shuffle command
   - randomly shuffles each song in the list
 
+- make it so you can skip a whole playlist or just a single song
+  - may require a full rework of the music system
+
 # in progress
 
 # finished + comments
