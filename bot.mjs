@@ -52,24 +52,12 @@ async function playNextSong(guild) {
                                     guilds[guild].currentTrack = 0;
                                 }
                             }
-                            if (guilds[guild].skip) {
-                                guilds[guild].skip = false;
-                                guilds[guild].queuedTracks.splice(guilds[guild].currentTrack, 1);
-                                if (guilds[guild].currentTrack >= guilds[guild].queuedTracks.length) {
-                                    guilds[guild].currentTrack = 0;
-                                }
-                            }
-                            if (guilds[guild].loopqueue && !guilds[guild].skip) {
+                            if (guilds[guild].loopqueue) {
                                 guilds[guild].currentTrack += 1;
                                 if (guilds[guild].currentTrack >= guilds[guild].queuedTracks.length) {
                                     guilds[guild].currentTrack = 0;
                                 }
                             }
-                            playNextSong(guild);
-                        }
-                        else if (guilds[guild].skip) {
-                            guilds[guild].skip = false;
-                            guilds[guild].queuedTracks.splice(guilds[guild].currentTrack, 1);
                             playNextSong(guild);
                         }
                     }
@@ -177,7 +165,7 @@ const cmdArray = [
             guilds[interaction.guildID].audioPlayer.unpause();
             const embed = new builders.EmbedBuilder()
             embed.setDescription("Resumed playing " + guilds[interaction.guildID].currentlyPlayingTrack + ".");
-            await interaction.editOriginal({embeds: [embed.data]})
+            await interaction.editOriginal({embeds: [embed.json]})
         }
     },
     {
@@ -572,8 +560,11 @@ const cmdArray = [
             const embed = new builders.EmbedBuilder()
             embed.setDescription("Skipped song " + guilds[interaction.guildID].queuedTracks[guilds[interaction.guildID].currentTrack].songName + '.')
             await interaction.editOriginal({content: '', embeds: [embed.json]})
-            guilds[interaction.guildID].skip = true
+            guilds[interaction.guildID].audioPlayer.removeAllListeners();
             guilds[interaction.guildID].audioPlayer.stop(true);
+            guilds[interaction.guildID].queuedTracks.splice(guilds[interaction.guildID].currentTrack, 1);
+            playNextSong(interaction.guildID);
+            
         }
     },
     {
