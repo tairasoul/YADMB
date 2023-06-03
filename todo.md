@@ -7,7 +7,7 @@
 - add a progress command
   - updates live, stops updating when someone uses it again (or just deletes and sends it again if a music commands channel is specified)
   - shows how long is remaining
-  - shows the thumbnail (if possible)
+  - shows the thumbnail (if possible, i'm having issues with showing thumbnail in add-search)
   - shows song name, author, likes, views
 
 # in progress
