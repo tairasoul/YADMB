@@ -4,8 +4,6 @@
   - if DJ role is not specified, everyone can use commands
   - if DJ role is specified, give admins capability to specify which commands only DJ's can use and which commands everyone can use
 
-- (maybe) make a c++ program that'll guide you through each step of getting this to run
-
 # in progress
 
 # finished + comments
@@ -14,6 +12,9 @@
   - i am not sure if it still gets rate-limited, we'll have to fuck around and find out to see
 
 - no longer uses ytdl, instead uses youtube-dlsr
+
+- (maybe) make a c++ program that'll guide you through each step of getting this to run
+  - available at [this repo](https://github.com/fheahdythdr/discord-music-bot-setup)
 
 # cancelled + reason
 
