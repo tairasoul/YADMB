@@ -563,6 +563,9 @@ const cmdArray = [
             guilds[interaction.guildID].audioPlayer.removeAllListeners();
             guilds[interaction.guildID].audioPlayer.stop(true);
             guilds[interaction.guildID].queuedTracks.splice(guilds[interaction.guildID].currentTrack, 1);
+            if (guilds[interaction.guildID].currentTrack >= guilds[interaction.guildID].queuedTracks.length && guilds[interaction.guildID].loopqueue) {
+                guilds[interaction.guildID].currentTrack = 0;
+            }
             playNextSong(interaction.guildID);
             
         }
