@@ -10,6 +10,9 @@
   - shows the thumbnail (if possible, i'm having issues with showing thumbnail in add-search)
   - shows song name, author, likes, views
 
+- shuffle command
+  - randomly shuffles each song in the list
+
 # in progress
 
 # finished + comments
