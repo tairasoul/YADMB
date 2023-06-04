@@ -16,6 +16,9 @@
 - make it so you can skip a whole playlist or just a single song
   - may require a full rework of the music system
 
+- add capability to filter with regex to add-playlist and add-search
+  - won't be too hard as then i just have to add an optional argument
+
 # in progress
 
 # finished + comments
