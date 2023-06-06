@@ -4,7 +4,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 const parent = path.join(__dirname + "/..");
-if (!fs.existsSync(parent + "/data")) fs.mkdirSync(parent + "/data");
 const { token } = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
 import * as oceanic from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
