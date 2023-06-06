@@ -21,8 +21,6 @@
 
 # in progress
 
-- shuffle command
-  - randomly shuffles each song in the list
 
 # finished + comments
 
@@ -33,6 +31,9 @@
 
 - (maybe) make a c++ program that'll guide you through each step of getting this to run
   - available at [this repo](https://github.com/fheahdythdr/discord-music-bot-setup)
+
+- shuffle command
+  - randomly shuffles each song in the list
 
 # cancelled + reason
 
