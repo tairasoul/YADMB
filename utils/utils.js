@@ -1,5 +1,6 @@
 const fs = require('fs');
 const oceanic = require('oceanic.js');
+const { ActionRowBuilder, SelectMenuBuilder, SelectMenuOptionBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const randomstring = require('randomstring');
 const { Client, ApplicationCommandOptionTypes, ApplicationCommandTypes } = require('oceanic.js');
 const builders = require("@oceanicjs/builders");
@@ -27,10 +28,16 @@ function selectmenu(options, customId) {
     actionRow.addComponents(selectMenu)
     return actionRow
 }
-
 module.exports = {
     mkdsf: function (path) {
         if (!fs.existsSync(path)) fs.mkdirSync(path)
+    },
+    /* taken from StackOverflow: https://stackoverflow.com/a/12646864/21098495 */
+    shuffleArray: (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
     },
     SelectMenu: selectmenu,
     ComponentCallback: function (id, interaction, callback, /** @type {Client} */client, timeoutOptions) {
@@ -50,7 +57,7 @@ module.exports = {
     },
     ButtonCallback: function(callback, client, label, style) {
         const id = randomstring.generate()
-        const button = new builders.Button()
+        const button = new ButtonBuilder()
         button.setStyle(style)
         button.setLabel(label)
         button.setCustomId(id)
@@ -83,70 +90,68 @@ module.exports = {
         if (shouldUseSeperateComponents) currentComponents = currentpage.components
         const allcomps = new Array;
         const menu = selectmenu(optnames, id);
-        const npb = new builders.Button();
-        const bpb = new builders.Button();
-        npb.setStyle(oceanic.ButtonStyles.PRIMARY);
-        bpb.setStyle(oceanic.ButtonStyles.PRIMARY);
+        const npb = new ButtonBuilder();
+        const bpb = new ButtonBuilder();
+        npb.setStyle(ButtonStyle.Primary);
+        bpb.setStyle(ButtonStyle.Primary);
         npb.setLabel('Next page');
         bpb.setLabel('Previous page');
         npb.setCustomId(npid);
         bpb.setCustomId(bpid);
-        const PagesRow = new builders.ActionRow();
+        const PagesRow = new ActionRowBuilder();
         PagesRow.addComponents(npb, bpb);
         allcomps.push(PagesRow);
         allcomps.push(menu);
         if (othercomponents) allcomps.concat(othercomponents)
-        client.on('interactionCreate',  async (/** @type {oceanic.AnyComponentSelectMenuInteraction} */i) => {
+        client.on('interactionCreate', async i => {
             if (i.customId != id) return
-            if (!i.isSelectMenuComponentInteraction() && !i.isButtonComponentInteraction()) return;
-            if (i.isSelectMenuComponentInteraction()) {
+            if (!i.isStringSelectMenu() && !i.isButton()) return;
+            if (i.isStringSelectMenu()) {
                 currentembed = currentpage.embeds[i.values[0]];
                 currentopt = i.values[0];
-                i.editOriginal({components: allcomps, embeds: [currentembed]})
+                await i.update({components: allcomps, embeds: [currentembed]})
             }
-            else if (i.isButtonComponentInteraction()) {
+            else if (i.isButton()) {
                 if (i.customId == npid) {
                     currentPage += 1;
                     currentembed = pages[currentPage].embeds[0];
                     currentopt = optnames[currentPage][0]
                     if (!shouldUseSeperateComponents) await i.update({components: allcomps, embeds: [currentembed]})
-                    else await i.editOriginal({components: allcomps.concat(pages[currentPage].components), embeds: [currentembed]})
+                    else await i.update({components: allcomps.concat(pages[currentPage].components), embeds: [currentembed]})
                 }
                 else if (i.customId == bpid) {
                     currentPage -= 1;
                     currentembed = pages[currentPage].embeds[0];
                     currentopt = optnames[currentPage][0]
                     if (!shouldUseSeperateComponents) await i.update({components: allcomps, embeds: [currentembed]})
-                    else await i.editOriginal({components: allcomps.concat(pages[currentPage].components), embeds: [currentembed]})
+                    else await i.update({components: allcomps.concat(pages[currentPage].components), embeds: [currentembed]})
                 }
             }
         })
-        return {menuid: id, backid: bpid, nextid: npid, action: async (/** @type {oceanic.AnyComponentSelectMenuInteraction} */i) => {
+        return {menuid: id, backid: bpid, nextid: npid, action: async i => {
             if (i.customId != id) return
-            if (!i.isSelectMenuComponentInteraction() && !i.isButtonComponentInteraction()) return;
-            if (i.isSelectMenuComponentInteraction()) {
+            if (!i.isStringSelectMenu() && !i.isButton()) return;
+            if (i.isStringSelectMenu()) {
                 currentembed = currentpage.embeds[i.values[0]];
                 currentopt = i.values[0];
-                i.editOriginal({components: allcomps, embeds: [currentembed]})
+                await i.update({components: allcomps, embeds: [currentembed]})
             }
-            else if (i.isButtonComponentInteraction()) {
+            else if (i.isButton()) {
                 if (i.customId == npid) {
                     currentPage += 1;
                     currentembed = pages[currentPage].embeds[0];
                     currentopt = optnames[currentPage][0]
                     if (!shouldUseSeperateComponents) await i.update({components: allcomps, embeds: [currentembed]})
-                    else await i.editOriginal({components: allcomps.concat(pages[currentPage].components), embeds: [currentembed]})
+                    else await i.update({components: allcomps.concat(pages[currentPage].components), embeds: [currentembed]})
                 }
                 else if (i.customId == bpid) {
                     currentPage -= 1;
                     currentembed = pages[currentPage].embeds[0];
                     currentopt = optnames[currentPage][0]
                     if (!shouldUseSeperateComponents) await i.update({components: allcomps, embeds: [currentembed]})
-                    else await i.editOriginal({components: allcomps.concat(pages[currentPage].components), embeds: [currentembed]})
+                    else await i.update({components: allcomps.concat(pages[currentPage].components), embeds: [currentembed]})
                 }
             }
         }}
     }
 }
-
-// nothing changed i just added this so the commit can be accurate
