@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 const parent = path.join(__dirname + "/..");
+if (!fs.existsSync(parent + "/data")) fs.mkdirSync(parent + "/data");
 const { token } = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
 import * as oceanic from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
@@ -31,7 +32,7 @@ Array.prototype.clear = function() {
 async function playNextSong(guild) {
     if (guilds[guild].queuedTracks[0]) {
         try {
-            if (!guilds[guild].playing) guilds[guild].playing = true;
+            console.log(guilds[guild].queuedTracks);
             const currentTrack = guilds[guild].currentTrack;
             guilds[guild].currentlyPlayingTrackObject = guilds[guild].queuedTracks[currentTrack];
             const get = await dlsr.download(guilds[guild].queuedTracks[currentTrack].url);
@@ -45,7 +46,6 @@ async function playNextSong(guild) {
             if (guilds[guild].connection) guilds[guild].connection.subscribe(guilds[guild].audioPlayer);
             function oncething() {
                 guilds[guild].audioPlayer.once('stateChange', (oldState, newState) => {
-                    console.log(oldState.status, newState.status);
                     if (newState.status == 'idle') {
                         if (guilds[guild].playing) {
                             if ((!guilds[guild].looping && !guilds[guild].loopqueue)) {
@@ -168,7 +168,6 @@ const cmdArray = [
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {
             await interaction.defer();
             guilds[interaction.guildID].audioPlayer.unpause();
-            guilds[interaction.guildID].playing = true
             const embed = new builders.EmbedBuilder()
             embed.setDescription("Resumed playing " + guilds[interaction.guildID].currentlyPlayingTrack + ".");
             await interaction.editOriginal({embeds: [embed.json]})
@@ -484,10 +483,7 @@ const cmdArray = [
         .setDescription('Clear the queue.').setDMPermission(false),
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {
             await interaction.defer()
-            guilds[interaction.guildID].queuedTracks.splice(0, 5000);
-            guilds[interaction.guildID].audioPlayer.removeAllListeners();
-            guilds[interaction.guildID].audioPlayer.stop(true);
-            guilds[interaction.guildID].playing = false;
+            guilds[interaction.guildID].queuedTracks.splice(0, 5000)
             guilds[interaction.guildID].currentTrack = 0;
             const embed = new builders.EmbedBuilder()
             embed.setDescription("Cleared queue.")
@@ -552,7 +548,6 @@ const cmdArray = [
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {
             await interaction.defer()
             guilds[interaction.guildID].audioPlayer.pause();
-            guilds[interaction.guildID].playing = false;
             const embed = new builders.EmbedBuilder()
             embed.setDescription("Paused track " + guilds[interaction.guildID].queuedTracks[guilds[interaction.guildID].currentTrack].songName + '.')
             await interaction.editOriginal({embeds: [embed.json]})
@@ -658,7 +653,6 @@ const cmdArray = [
                 guilds[interaction.guildID].connection.disconnect();
                 guilds[interaction.guildID].connection = null
                 const embed = new builders.EmbedBuilder()
-                guilds[interaction.guildID].playing = false;
                 embed.setDescription("Disconnected.")
                 await interaction.editOriginal({embeds: [embed.json]})
             }
@@ -680,16 +674,12 @@ const cmdArray = [
                 required: true,
                 type: 3
             }
-        )
-        .setDMPermission(false),
+        ),
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {await interaction.defer()
             const playlist = interaction.data.options.getString('playlist');
             const videos = await ytpl(playlist)
             const videonames = [];
             async function addvid(/** @type {ytpl.Result}*/vid) {
-                if (!ytdl.validateURL(vid.url)) {
-                    return await interaction.editOriginal({content: "Invalid link."})
-                }
                 try {
                     const title = vid.title;
                     //let newVideoName = title.removeChar('/');
@@ -792,6 +782,16 @@ client.on('guildDelete', guild => {
 })
 
 client.once("ready", async ()=>{
+    async function addCommands(cmd) {
+        for (const command of cmd) {
+            command.type = 1;
+            commands.push(command.data.toJSON());
+            client.commands.set(command.data.name, command);
+            client.application.createGlobalCommand(command.data);
+        }
+    }
+    
+    addCommands(cmdArray);
     for (const guild of client.guilds.entries()) {
         guilds[guild[1].id] = {
             skip: false,
@@ -811,13 +811,6 @@ client.once("ready", async ()=>{
                 }
             })
         }
-    }
-    for (const command of cmdArray) {
-        console.log(`creating global command ${command.data.name}`);
-        command.type = 1;
-        commands.push(command.data.toJSON());
-        client.commands.set(command.data.name, command);
-        await client.application.createGlobalCommand(command.data);
     }
     client.editStatus(null, [{type: oceanic.ActivityTypes.WATCHING, name: (client.guilds.size).toString() + ' servers'}]);
 })
