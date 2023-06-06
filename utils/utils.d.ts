@@ -6,20 +6,7 @@ declare namespace Utils {
     export function ComponentCallback(id: string, interaction: any, callback: Function, client: any, timeoutOptions: object): void
     export function ButtonCallback(callback: Function, client: any, label: string, style: any): object
     export function PageSelect(options: object, client: any, othercomponents: Array<any>): object
-    export class Command {
-        type: ApplicationCommandTypes;
-        name: string;
-        description: string;
-        options: [];
-        dmPermission: boolean;
-        defaultMemberPermissions: string;
-        setType(type: ApplicationCommandTypes): Command;
-        setName(name: string): Command;
-        setDescription(desc: string): Command;
-        addOptions(...options): Command;
-        setDMPermission(bool: boolean): Command;
-        get build()
-    }
+    export function shuffleArray(array: Array<any>): void;
 }
 
 export = Utils
