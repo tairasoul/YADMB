@@ -32,7 +32,6 @@ Array.prototype.clear = function() {
 async function playNextSong(guild) {
     if (guilds[guild].queuedTracks[0]) {
         try {
-            console.log(guilds[guild].queuedTracks);
             const currentTrack = guilds[guild].currentTrack;
             guilds[guild].currentlyPlayingTrackObject = guilds[guild].queuedTracks[currentTrack];
             const get = await dlsr.download(guilds[guild].queuedTracks[currentTrack].url);
@@ -738,7 +737,7 @@ const cmdArray = [
                 }
                 catch (err) {
                     console.error(err)
-                    return await interaction.editOriginal({content: "Encountered an error while adding the video to the queue: " + err})
+                    return await interaction.editOriginal({content: "Encountered an error while adding a video to the queue: " + err})
                 }
             }
             for (const video of videos.items) {
