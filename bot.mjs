@@ -31,6 +31,7 @@ Array.prototype.clear = function() {
 async function playNextSong(guild) {
     if (guilds[guild].queuedTracks[0]) {
         try {
+            if (!guilds[guild].playing) guilds[guild].playing = true;
             const currentTrack = guilds[guild].currentTrack;
             guilds[guild].currentlyPlayingTrackObject = guilds[guild].queuedTracks[currentTrack];
             const get = await dlsr.download(guilds[guild].queuedTracks[currentTrack].url);
@@ -44,6 +45,7 @@ async function playNextSong(guild) {
             if (guilds[guild].connection) guilds[guild].connection.subscribe(guilds[guild].audioPlayer);
             function oncething() {
                 guilds[guild].audioPlayer.once('stateChange', (oldState, newState) => {
+                    console.log(oldState.status, newState.status);
                     if (newState.status == 'idle') {
                         if (guilds[guild].playing) {
                             if ((!guilds[guild].looping && !guilds[guild].loopqueue)) {
@@ -790,13 +792,6 @@ client.on('guildDelete', guild => {
 })
 
 client.once("ready", async ()=>{
-    for (const command of cmdArray) {
-        console.log(`creating global command ${command.data.name}`);
-        command.type = 1;
-        commands.push(command.data.toJSON());
-        client.commands.set(command.data.name, command);
-        await client.application.createGlobalCommand(command.data);
-    }
     for (const guild of client.guilds.entries()) {
         guilds[guild[1].id] = {
             skip: false,
@@ -816,6 +811,13 @@ client.once("ready", async ()=>{
                 }
             })
         }
+    }
+    for (const command of cmdArray) {
+        console.log(`creating global command ${command.data.name}`);
+        command.type = 1;
+        commands.push(command.data.toJSON());
+        client.commands.set(command.data.name, command);
+        await client.application.createGlobalCommand(command.data);
     }
     client.editStatus(null, [{type: oceanic.ActivityTypes.WATCHING, name: (client.guilds.size).toString() + ' servers'}]);
 })
