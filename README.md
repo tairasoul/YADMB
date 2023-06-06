@@ -29,7 +29,10 @@ if you want it to store locally, easiest way is to go to an earlier commit
 
 # changelog
 
-- better __dirname getting, now works on (probably) all operating systems
+- add a shuffle command
+
+- start working on figuring out why it sometimes just decides to skip song and go to the next one
+  - may be the stream stopping for no reason, not sure
 
 # commands
 
