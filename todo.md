@@ -19,6 +19,9 @@
 - auto-leave after 5 minutes of being alone in a vc or when alone in vc
   - this was originally implemented as "leave when alone in vc" but oceanic.js doesn't make the old vc status contain the channel the user was in
 
+- fix the issue where it sometimes just stops the current song and plays the next one
+  - not sure why this happens, will try to find out
+
 # in progress
 
 
