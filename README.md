@@ -52,6 +52,10 @@ adds every video in a playlist to the queue
 
 clears the current track queue
 
+## shuffle
+
+shuffles the queue
+
 ## join
 
 joins the VC you are in
