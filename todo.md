@@ -10,9 +10,6 @@
   - shows the thumbnail (if possible, i'm having issues with showing thumbnail in add-search)
   - shows song name, author, likes, views
 
-- shuffle command
-  - randomly shuffles each song in the list
-
 - make it so you can skip a whole playlist or just a single song
   - may require a full rework of the music system
 
@@ -23,6 +20,9 @@
   - this was originally implemented as "leave when alone in vc" but oceanic.js doesn't make the old vc status contain the channel the user was in
 
 # in progress
+
+- shuffle command
+  - randomly shuffles each song in the list
 
 # finished + comments
 
