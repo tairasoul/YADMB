@@ -168,6 +168,7 @@ const cmdArray = [
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {
             await interaction.defer();
             guilds[interaction.guildID].audioPlayer.unpause();
+            guilds[interaction.guildID].playing = true
             const embed = new builders.EmbedBuilder()
             embed.setDescription("Resumed playing " + guilds[interaction.guildID].currentlyPlayingTrack + ".");
             await interaction.editOriginal({embeds: [embed.json]})
@@ -211,7 +212,7 @@ const cmdArray = [
                     videoNames.push(title)
                     const embed = new builders.EmbedBuilder()
                     embed.setDescription("Added **"+ videoNames.join(', ') + "** to queue.")
-                    await interaction.createFollowup({content: '', embeds: [embed.json]})
+                    await interaction.createFollowup({embeds: [embed.json]})
                     if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                     /*if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
                     if (!fs.existsSync(`${parent}/data/${author}/${newVideoName}.mp3`) || !(fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000)) {
@@ -227,7 +228,7 @@ const cmdArray = [
                             videoNames.push(title)
                             const embed = new builders.EmbedBuilder()
                             embed.setDescription("Added **"+ videoNames.join(', ') + "** to queue.")
-                            await interaction.createFollowup({content: '', embeds: [embed.json]})
+                            await interaction.createFollowup({embeds: [embed.json]})
                             if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                         })
                     }
@@ -240,7 +241,7 @@ const cmdArray = [
                         videoNames.push(title)
                         const embed = new builders.EmbedBuilder()
                         embed.setDescription("Added **"+ videoNames.join(', ') + "** to queue.")
-                        await interaction.createFollowup({content: '', embeds: [embed.json]})
+                        await interaction.createFollowup({embeds: [embed.json]})
                         if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                     }*/
                 }
@@ -360,7 +361,7 @@ const cmdArray = [
                     guilds[interaction.guildID].queuedTracks.push(obj)
                     const embed = new builders.EmbedBuilder()
                     embed.setDescription("Added **"+ title + "** to queue.")
-                    await i.editOriginal({content: '', embeds: [embed.json]})
+                    await i.editOriginal({embeds: [embed.json]})
                     if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                     /*let newVideoName = title.removeChar('/')
                     if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
@@ -376,7 +377,7 @@ const cmdArray = [
                             guilds[interaction.guildID].queuedTracks.push(obj)
                             const embed = new builders.EmbedBuilder()
                             embed.setDescription("Added **"+ title + "** to queue.")
-                            await i.editOriginal({content: '', embeds: [embed.json]})
+                            await i.editOriginal({embeds: [embed.json]})
                             if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                         })
                     }
@@ -388,7 +389,7 @@ const cmdArray = [
                         guilds[interaction.guildID].queuedTracks.push(obj)
                         const embed = new builders.EmbedBuilder()
                         embed.setDescription("Added **"+ title + "** to queue.")
-                        await i.editOriginal({content: '', embeds: [embed.json]})
+                        await i.editOriginal({embeds: [embed.json]})
                         if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                     }*/
                 }
@@ -425,7 +426,7 @@ const cmdArray = [
                         guilds[interaction.guildID].queuedTracks.push(obj)
                         const embed = new builders.EmbedBuilder()
                         embed.setDescription("Added **"+ title + "** to queue.")
-                        await i.editOriginal({content: '', embeds: [embed.json]})
+                        await i.editOriginal({embeds: [embed.json]})
                         if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                         /*let newVideoName = title.removeChar('/')
                         if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
@@ -441,7 +442,7 @@ const cmdArray = [
                                 guilds[interaction.guildID].queuedTracks.push(obj)
                                 const embed = new builders.EmbedBuilder()
                                 embed.setDescription("Added **"+ title + "** to queue.")
-                                await i.editOriginal({content: '', embeds: [embed.json]})
+                                await i.editOriginal({embeds: [embed.json]})
                                 if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                             })
                         }
@@ -453,7 +454,7 @@ const cmdArray = [
                             guilds[interaction.guildID].queuedTracks.push(obj)
                             const embed = new builders.EmbedBuilder()
                             embed.setDescription("Added **"+ title + "** to queue.")
-                            await i.editOriginal({content: '', embeds: [embed.json]})
+                            await i.editOriginal({embeds: [embed.json]})
                             if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                         }*/
                     }
@@ -483,11 +484,14 @@ const cmdArray = [
         .setDescription('Clear the queue.').setDMPermission(false),
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {
             await interaction.defer()
-            guilds[interaction.guildID].queuedTracks.splice(0, 5000)
+            guilds[interaction.guildID].queuedTracks.splice(0, 5000);
+            guilds[interaction.guildID].audioPlayer.removeAllListeners();
+            guilds[interaction.guildID].audioPlayer.stop(true);
+            guilds[interaction.guildID].playing = false;
             guilds[interaction.guildID].currentTrack = 0;
             const embed = new builders.EmbedBuilder()
             embed.setDescription("Cleared queue.")
-            await interaction.editOriginal({content: '', embeds: [embed.json]})
+            await interaction.editOriginal({embeds: [embed.json]})
         }
     },
     {
@@ -524,20 +528,20 @@ const cmdArray = [
                     guilds[interaction.guildID].playing = true
                     const embed = new builders.EmbedBuilder()
                     embed.setDescription("Joined VC <#" + interaction.member.voiceState.channelID + "> starting track **" + guilds[interaction.guildID].queuedTracks[guilds[interaction.guildID].currentTrack].songName + "**")
-                    await interaction.editOriginal({content: '', embeds: [embed.json]})
+                    await interaction.editOriginal({embeds: [embed.json]})
                     playNextSong(interaction.guildID)
                 }
                 else {
                     const embed = new builders.EmbedBuilder()
                     embed.setDescription("Joined VC <#" + interaction.member.voiceState.channelID + ">")
-                    await interaction.editOriginal({content: '', embeds: [embed.json]})
+                    await interaction.editOriginal({embeds: [embed.json]})
                 }
             }
             catch (err) {
                 console.error(err)
                 const embed = new builders.EmbedBuilder()
                 embed.setDescription("You are not in a VC.")
-                await interaction.editOriginal({content: '', embeds: [embed.json]})
+                await interaction.editOriginal({embeds: [embed.json]})
             }
         }
     },
@@ -548,9 +552,22 @@ const cmdArray = [
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {
             await interaction.defer()
             guilds[interaction.guildID].audioPlayer.pause();
+            guilds[interaction.guildID].playing = false;
             const embed = new builders.EmbedBuilder()
             embed.setDescription("Paused track " + guilds[interaction.guildID].queuedTracks[guilds[interaction.guildID].currentTrack].songName + '.')
-            await interaction.editOriginal({content: '', embeds: [embed.json]})
+            await interaction.editOriginal({embeds: [embed.json]})
+        }
+    },
+    {
+        data: new builders.ApplicationCommandBuilder()
+        .setName("shuffle")
+        .setDescription("Shuffle the music queue.").setDMPermission(false),
+        async execute(/** @type {oceanic.CommandInteraction} */interaction) {
+            await interaction.defer()
+            utils.shuffleArray(guilds[interaction.guildID].queuedTracks);
+            const embed = new builders.EmbedBuilder()
+            embed.setDescription("Shuffled queue.")
+            await interaction.editOriginal({embeds: [embed.json]})
         }
     },
     {
@@ -562,7 +579,7 @@ const cmdArray = [
             await interaction.defer()
             const embed = new builders.EmbedBuilder()
             embed.setDescription("Skipped song " + guilds[interaction.guildID].queuedTracks[guilds[interaction.guildID].currentTrack].songName + '.')
-            await interaction.editOriginal({content: '', embeds: [embed.json]})
+            await interaction.editOriginal({embeds: [embed.json]})
             guilds[interaction.guildID].audioPlayer.removeAllListeners();
             guilds[interaction.guildID].audioPlayer.stop(true);
             guilds[interaction.guildID].queuedTracks.splice(guilds[interaction.guildID].currentTrack, 1);
@@ -596,12 +613,12 @@ const cmdArray = [
                 if (guilds[interaction.guildID].looping) {
                     const embed = new builders.EmbedBuilder()
                     embed.setDescription("Looping current song.")
-                    await interaction.editOriginal({content: '', embeds: [embed.json]})
+                    await interaction.editOriginal({embeds: [embed.json]})
                 }
                 else {
                     const embed = new builders.EmbedBuilder()
                     embed.setDescription("No longer looping current song.")
-                    await interaction.editOriginal({content: '', embeds: [embed.json]})
+                    await interaction.editOriginal({embeds: [embed.json]})
                 }
             }
             else if (choice == "queue" && !guilds[interaction.guildID].looping) {
@@ -609,23 +626,23 @@ const cmdArray = [
                 if (guilds[interaction.guildID].loopqueue) {
                     const embed = new builders.EmbedBuilder()
                     embed.setDescription("Looping queue.")
-                    await interaction.editOriginal({content: '', embeds: [embed.json]})
+                    await interaction.editOriginal({embeds: [embed.json]})
                 }
                 else {
                     const embed = new builders.EmbedBuilder()
                     embed.setDescription("No longer looping the queue.")
-                    await interaction.editOriginal({content: '', embeds: [embed.json]})
+                    await interaction.editOriginal({embeds: [embed.json]})
                 }
             }
             else if (choice == "song" && guilds[interaction.guildID].loopqueue) {
                 const embed = new builders.EmbedBuilder()
                 embed.setDescription("Cannot loop song while looping queue.")
-                await interaction.editOriginal({content: '', embeds: [embed.json]})
+                await interaction.editOriginal({embeds: [embed.json]})
             }
             else if (choice == "queue" && guilds[interaction.guildID].looping) {
                 const embed = new builders.EmbedBuilder()
                 embed.setDescription("Cannot loop queue while looping song.")
-                await interaction.editOriginal({content: '', embeds: [embed.json]})
+                await interaction.editOriginal({embeds: [embed.json]})
             }
         }
     },
@@ -641,13 +658,14 @@ const cmdArray = [
                 guilds[interaction.guildID].connection.disconnect();
                 guilds[interaction.guildID].connection = null
                 const embed = new builders.EmbedBuilder()
+                guilds[interaction.guildID].playing = false;
                 embed.setDescription("Disconnected.")
-                await interaction.editOriginal({content: '', embeds: [embed.json]})
+                await interaction.editOriginal({embeds: [embed.json]})
             }
             else {
                 const embed = new builders.EmbedBuilder()
                 embed.setDescription("Not in a VC.")
-                await interaction.editOriginal({content: '', embeds: [embed.json]})
+                await interaction.editOriginal({embeds: [embed.json]})
             }
         }
     },
@@ -662,7 +680,8 @@ const cmdArray = [
                 required: true,
                 type: 3
             }
-        ),
+        )
+        .setDMPermission(false),
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {await interaction.defer()
             const playlist = interaction.data.options.getString('playlist');
             const videos = await ytpl(playlist)
@@ -686,7 +705,7 @@ const cmdArray = [
                     guilds[interaction.guildID].queuedTracks.push(obj)
                     const embed = new builders.EmbedBuilder()
                     embed.setDescription("Added **"+ videonames.join(', ') + "** to queue.")
-                    await interaction.editOriginal({content: '', embeds: [embed.json]})
+                    await interaction.editOriginal({embeds: [embed.json]})
                     if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                     /*let newVideoName = title.removeChar('/')
                     if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
@@ -703,7 +722,7 @@ const cmdArray = [
                             guilds[interaction.guildID].queuedTracks.push(obj)
                             const embed = new builders.EmbedBuilder()
                             embed.setDescription("Added " + videoLength + " tracks to queue.")
-                            await interaction.editOriginal({content: '', embeds: [embed.json]})
+                            await interaction.editOriginal({embeds: [embed.json]})
                             if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                         })
                     }
@@ -773,16 +792,13 @@ client.on('guildDelete', guild => {
 })
 
 client.once("ready", async ()=>{
-    async function addCommands(cmd) {
-        for (const command of cmd) {
-            command.type = 1;
-            commands.push(command.data.toJSON());
-            client.commands.set(command.data.name, command);
-            client.application.createGlobalCommand(command.data);
-        }
+    for (const command of cmdArray) {
+        console.log(`creating global command ${command.data.name}`);
+        command.type = 1;
+        commands.push(command.data.toJSON());
+        client.commands.set(command.data.name, command);
+        await client.application.createGlobalCommand(command.data);
     }
-    
-    addCommands(cmdArray);
     for (const guild of client.guilds.entries()) {
         guilds[guild[1].id] = {
             skip: false,
