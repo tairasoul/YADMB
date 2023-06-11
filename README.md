@@ -29,14 +29,16 @@ if you want it to store locally, easiest way is to go to an earlier commit
 
 # changelog
 
-- add a shuffle command
+- add-playlist:
+  - you can now shuffle the playlist before adding it to queue
+  - adds playlists faster now
 
-- start working on figuring out why it sometimes just decides to skip song and go to the next one
-  - may be the stream stopping for no reason, not sure
+- add-queue:
+  - you can now tell it to add the song to be played next instead of adding it to the end of the queue
 
 # commands
 
-## addqueue
+## add-queue
 
 adds a link to the queue
 
