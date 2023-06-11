@@ -3,7 +3,6 @@ import fs from "node:fs"
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-const parent = path.join(__dirname + "/..");
 const { token } = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
 import * as oceanic from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
@@ -43,6 +42,7 @@ async function playNextSong(guild) {
             guilds[guild].currentlyPlayingTrack = guilds[guild].queuedTracks[currentTrack].songName;
             guilds[guild].audioPlayer.play(a);
             if (guilds[guild].connection) guilds[guild].connection.subscribe(guilds[guild].audioPlayer);
+            // probably not the best method, but fuck it.
             function oncething() {
                 guilds[guild].audioPlayer.once('stateChange', (oldState, newState) => {
                     if (newState.status == 'idle') {
@@ -97,7 +97,9 @@ const client = new Client({
     }
 });
 
-client.on('voiceStateUpdate', (oldState, newState) => {
+// temporarily not needed while i think of how to remake this with Oceanic.js
+
+/*client.on('voiceStateUpdate', (oldState, newState) => {
     if (!oldState.voiceState || !newState) return;
     if (oldState.voiceState.channel && guilds[oldState.guild.id].connection && oldState.voiceState.channel?.voiceMembers.size == 1) {
         guilds[oldState.guild.id].connection.removeAllListeners(); guilds[oldState.guild.id].connection.disconnect();guilds[oldState.guild.id].connection = null;
@@ -108,50 +110,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         guilds[oldState.guild.id].connection = null
     }
     if (oldState && !newState.channelID && oldState.user.bot) guilds[oldState.guild.id].playing = false;
-})
-
-String.prototype.removeChar = function(char) {
-    // Replace all occurrences of the character with an empty string
-    const modifiedString = this.replace(char, '');
-    // If the modified string is the same as the original string, return the modified string
-    if (modifiedString == this) {
-      return modifiedString;
-    }
-    // Otherwise, call the function recursively on the modified string
-    return modifiedString.removeChar(char);
-};
-
-String.prototype.replaceSpaces = function(replacement) {
-    // Initialize the modified string to an empty string
-    let modifiedString = '';
-    // Initialize the position to 0
-    let pos = 2000;
-    // Iterate over the string by 2000 characters at a time
-    while (pos < this.length) {
-      // Get the substring of the string up to the current position
-      const substring = this.substring(0, pos);
-      // Find the last occurrence of the space character in the substring
-      const index = substring.lastIndexOf(' ');
-      // If a space character is found
-      if (index !== -1) {
-        // Get the part of the string before the space character
-        const before = this.slice(0, index);
-        // Get the part of the string after the space character
-        const after = this.slice(index + 1);
-        // Concatenate the modified string with the part before the space character, the replacement character, and the part after the space character
-        modifiedString = modifiedString.concat(before, replacement, after);
-      } else {
-        // If no space character is found, concatenate the modified string with the rest of the original string
-        modifiedString = modifiedString.concat(this.slice(pos));
-      }
-      // Increment the position by 2000 characters
-      pos += 2000;
-    }
-    // Return the modified string
-    return modifiedString;
-};
-
-client.setMaxListeners(0);
+})*/
 
 client.on("ready", () => {
     console.log("logged in");
@@ -204,15 +163,8 @@ const cmdArray = [
                     return await interaction.editOriginal("Invalid link.")
                 }
                 try {
-                    let info;
-                    let title;
-                    info = await ytdl.getInfo(vid);
-                    title = info.videoDetails.title
-                    //let newVideoName = title.removeChar('/');
-                    /*const obj = {
-                        path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                        songName: title
-                    }*/
+                    const info = await ytdl.getInfo(vid);
+                    const title = info.videoDetails.title
                     const obj = {
                         url: vid,
                         songName: title
@@ -228,36 +180,6 @@ const cmdArray = [
                     embed.setDescription("Added **"+ videoNames.join(", ") + "** to queue.")
                     await interaction.createFollowup({embeds: [embed.json]})
                     if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
-                    /*if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
-                    if (!fs.existsSync(`${parent}/data/${author}/${newVideoName}.mp3`) || !(fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000)) {
-                        const viddl = ytdl(res, {quality: 'highestaudio', IPV6Block: 'fe80::/16'})
-                        viddl.pipe(fs.createWriteStream(`${parent}/data/${author}/${newVideoName}.mp3`))
-                        viddl.on('end', async () => {
-                            console.log('a')
-                            const obj = {
-                                path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                                songName: title
-                            }
-                            guilds[interaction.guildID].queuedTracks.push(obj)
-                            videoNames.push(title)
-                            const embed = new builders.EmbedBuilder()
-                            embed.setDescription("Added **"+ videoNames.join(', ') + "** to queue.")
-                            await interaction.createFollowup({embeds: [embed.json]})
-                            if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
-                        })
-                    }
-                    else if (fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000) {
-                        const obj = {
-                            path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                            songName: title
-                        }
-                        guilds[interaction.guildID].queuedTracks.push(obj)
-                        videoNames.push(title)
-                        const embed = new builders.EmbedBuilder()
-                        embed.setDescription("Added **"+ videoNames.join(', ') + "** to queue.")
-                        await interaction.createFollowup({embeds: [embed.json]})
-                        if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
-                    }*/
                 }
                 catch (err) {
                     console.error(err)
@@ -363,11 +285,6 @@ const cmdArray = [
                 }
                 try {
                     const title = vid.title;
-                    //let newVideoName = title.removeChar('/');
-                    /*const obj = {
-                        path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                        songName: title
-                    }*/
                     const obj = {
                         url: vid.url,
                         songName: title
@@ -377,35 +294,6 @@ const cmdArray = [
                     embed.setDescription("Added **"+ title + "** to queue.")
                     await i.editOriginal({embeds: [embed.json]})
                     if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
-                    /*let newVideoName = title.removeChar('/')
-                    if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
-                    if (!fs.existsSync(`${parent}/data/${author}/${newVideoName}.mp3`) || !(fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000)) {
-                        const viddl = ytdl(res, {quality: 'highestaudio', IPV6Block: 'fe80::/16'})
-                        viddl.pipe(fs.createWriteStream(`${parent}/data/${author}/${newVideoName}.mp3`))
-                        viddl.on('end', async () => {
-                            console.log('a')
-                            const obj = {
-                                path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                                songName: title
-                            }
-                            guilds[interaction.guildID].queuedTracks.push(obj)
-                            const embed = new builders.EmbedBuilder()
-                            embed.setDescription("Added **"+ title + "** to queue.")
-                            await i.editOriginal({embeds: [embed.json]})
-                            if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
-                        })
-                    }
-                    else if (fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000) {
-                        const obj = {
-                            path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                            songName: title
-                        }
-                        guilds[interaction.guildID].queuedTracks.push(obj)
-                        const embed = new builders.EmbedBuilder()
-                        embed.setDescription("Added **"+ title + "** to queue.")
-                        await i.editOriginal({embeds: [embed.json]})
-                        if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
-                    }*/
                 }
                 catch (err) {
                     console.error(err)
@@ -423,54 +311,15 @@ const cmdArray = [
                     }
                     try {
                         const title = currentVideo.title;
-                        //let newVideoName = title.removeChar('/');
-                        /*const obj = {
-                            path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                            songName: title
-                        }*/
                         const obj = {
                             url: currentVideo.url,
                             songName: title
                         }
-                        //let newVideoName = title.removeChar('/');
-                        /*const obj = {
-                            path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                            songName: title
-                        }*/
                         guilds[interaction.guildID].queuedTracks.push(obj)
                         const embed = new builders.EmbedBuilder()
                         embed.setDescription("Added **"+ title + "** to queue.")
                         await i.editOriginal({embeds: [embed.json]})
                         if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
-                        /*let newVideoName = title.removeChar('/')
-                        if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
-                        if (!fs.existsSync(`${parent}/data/${author}/${newVideoName}.mp3`) || !(fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000)) {
-                            const viddl = ytdl(res, {quality: 'highestaudio', IPV6Block: 'fe80::/16'})
-                            viddl.pipe(fs.createWriteStream(`${parent}/data/${author}/${newVideoName}.mp3`))
-                            viddl.on('end', async () => {
-                                console.log('a')
-                                const obj = {
-                                    path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                                    songName: title
-                                }
-                                guilds[interaction.guildID].queuedTracks.push(obj)
-                                const embed = new builders.EmbedBuilder()
-                                embed.setDescription("Added **"+ title + "** to queue.")
-                                await i.editOriginal({embeds: [embed.json]})
-                                if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
-                            })
-                        }
-                        else if (fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000) {
-                            const obj = {
-                                path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                                songName: title
-                            }
-                            guilds[interaction.guildID].queuedTracks.push(obj)
-                            const embed = new builders.EmbedBuilder()
-                            embed.setDescription("Added **"+ title + "** to queue.")
-                            await i.editOriginal({embeds: [embed.json]})
-                            if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
-                        }*/
                     }
                     catch (err) {
                         console.error(err)
@@ -495,7 +344,7 @@ const cmdArray = [
                     val.disable()
                 })
                 await interaction.editOriginal({content: 'Results for **' + term + '**:', components: [actionRow, actionRow2], embeds: [currentVideo.embed.json]})
-            }, 240000)
+            }, 120000)
         }
     },
     {
@@ -700,7 +549,7 @@ const cmdArray = [
         .addOption(
             {
                 name: 'playlist',
-                description: "The playlist to add.",
+                description: "The playlist to add. Can also be a channel URL.",
                 required: true,
                 type: 3
             }
@@ -722,44 +571,11 @@ const cmdArray = [
             async function addvid(/** @type {ytpl.Result}*/vid) {
                 try {
                     const title = vid.title;
-                    //let newVideoName = title.removeChar('/');
-                    /*const obj = {
-                        path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                        songName: title
-                    }*/
                     const obj = {
                         url: vid.url,
                         songName: title
                     }
                     videosToConcat.push(obj);
-                    /*let newVideoName = title.removeChar('/')
-                    if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
-                    if (!fs.existsSync(`${parent}/data/${author}/${newVideoName}.mp3`) || !(fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000)) {
-                        const viddl = ytdl(res, {quality: 'highestaudio', IPV6Block: 'fe80::/16'})
-                        viddl.pipe(fs.createWriteStream(`${parent}/data/${author}/${newVideoName}.mp3`))
-                        viddl.on('end', async () => {
-                            console.log('a')
-                            const obj = {
-                                path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                                songName: title,
-                                trackType: 'single'
-                            }
-                            guilds[interaction.guildID].queuedTracks.push(obj)
-                            const embed = new builders.EmbedBuilder()
-                            embed.setDescription("Added " + videoLength + " tracks to queue.")
-                            await interaction.editOriginal({embeds: [embed.json]})
-                            if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
-                        })
-                    }
-                    else if (fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000) {
-                        const obj = {
-                            path: `${parent}/data/${author}/${newVideoName}.mp3`,
-                            songName: title,
-                            trackType: 'single'
-                        }
-                        guilds[interaction.guildID].queuedTracks.push(obj)
-                        if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
-                    }*/
                 }
                 catch (err) {
                     console.error(err)
@@ -781,7 +597,6 @@ const cmdArray = [
 
 client.on('guildCreate', guild => {
     guilds[guild.id] = {
-        skip: false,
         currentlyPlayingTrack: null,
         currentlyPlayingTrackObject: null,
         currentAudioResource: null,
@@ -825,7 +640,6 @@ client.on('guildDelete', guild => {
 client.once("ready", async ()=>{
     for (const guild of client.guilds.entries()) {
         guilds[guild[1].id] = {
-            skip: false,
             currentlyPlayingTrack: null,
             currentlyPlayingTrackObject: null,
             currentAudioResource: null,
