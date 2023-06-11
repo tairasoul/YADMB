@@ -1,3 +1,5 @@
+// will work on remaking this later, for now it'll be mostly outdated except for the selectmenu function and shuffleArray
+
 const fs = require('fs');
 const oceanic = require('oceanic.js');
 const { ActionRowBuilder, SelectMenuBuilder, SelectMenuOptionBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
