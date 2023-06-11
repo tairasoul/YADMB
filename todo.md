@@ -22,6 +22,8 @@
 - fix the issue where it sometimes just stops the current song and plays the next one
   - not sure why this happens, will try to find out
 
+- hopefully increase the speed of add-playlist
+
 # in progress
 
 
