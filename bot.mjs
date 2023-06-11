@@ -23,7 +23,7 @@ import ytpl from 'ytpl';
 
 // change to your liking
 
-const currentVolume = 0.05
+const currentVolume = 0.075
 
 Array.prototype.clear = function() {
     return this.splice(0, 500000)
@@ -60,9 +60,6 @@ async function playNextSong(guild) {
                                     guilds[guild].currentTrack = 0;
                                 }
                             }
-                            guilds[guild].audioPlayer.off('error', (error) => {
-                                console.log(`an audio player error occured in ${guild}, error: ${error}`)
-                            })
                             guilds[guild].audioPlayer.removeAllListeners();
                             playNextSong(guild);
                         }
@@ -180,7 +177,7 @@ const cmdArray = [
     },
     {
         data: new builders.ApplicationCommandBuilder()
-        .setName("addqueue")
+        .setName("add-queue")
         .setDescription("Add a link to the queue.")
         .addOption(
             {
@@ -189,10 +186,19 @@ const cmdArray = [
                 description: 'Link to add to queue',
                 required: true
             }
+        )
+        .addOption(
+            {
+                type: oceanic.ApplicationCommandOptionTypes.BOOLEAN,
+                name: 'playnext',
+                description: 'Should this song play next?',
+                required: false
+            }
         ).setDMPermission(false),
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {
             await interaction.defer();
             const video = interaction.data.options.getString("link");
+            const playNext = interaction.data.options.getBoolean("playnext");
             const videoNames = []
             async function addvid(vid) {
                 if (!ytdl.validateURL(vid)) {
@@ -212,10 +218,15 @@ const cmdArray = [
                         url: vid,
                         songName: title
                     }
-                    guilds[interaction.guildID].queuedTracks.push(obj)
+                    if (playNext) {
+                        guilds[interaction.guildID].queuedTracks.splice(guilds[interaction.guildID].currentTrack + 1, 0, obj)
+                    }
+                    else {
+                        guilds[interaction.guildID].queuedTracks.push(obj)
+                    }
                     videoNames.push(title)
                     const embed = new builders.EmbedBuilder()
-                    embed.setDescription("Added **"+ videoNames.join(', ') + "** to queue.")
+                    embed.setDescription("Added **"+ videoNames.join(", ") + "** to queue.")
                     await interaction.createFollowup({embeds: [embed.json]})
                     if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
                     /*if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
@@ -257,11 +268,11 @@ const cmdArray = [
             if (video.includes(' ')) {
                 const a = video.split(' ')
                 for (const vid of a) {
-                    addvid(vid)
+                    await addvid(vid)
                 }
             }
             else {
-                addvid(video)
+                await addvid(video)
             }
         }
     },
@@ -484,6 +495,7 @@ const cmdArray = [
                 actionRow2.getComponents().forEach((val) => {
                     val.disable()
                 })
+                await interaction.editOriginal({content: 'Results for **' + term + '**:', components: [actionRow, actionRow2], embeds: [currentVideo.embed.json]})
             }, 240000)
         }
     },
@@ -698,7 +710,7 @@ const cmdArray = [
         async execute(/** @type {oceanic.CommandInteraction} */interaction) {await interaction.defer()
             const playlist = interaction.data.options.getString('playlist');
             const videos = await ytpl(playlist)
-            const videonames = [];
+            const videosToConcat = [];
             async function addvid(/** @type {ytpl.Result}*/vid) {
                 try {
                     const title = vid.title;
@@ -711,12 +723,7 @@ const cmdArray = [
                         url: vid.url,
                         songName: title
                     }
-                    videonames.push(title);
-                    guilds[interaction.guildID].queuedTracks.push(obj)
-                    const embed = new builders.EmbedBuilder()
-                    embed.setDescription("Added **"+ videonames.join(', ') + "** to queue.")
-                    await interaction.editOriginal({embeds: [embed.json]})
-                    if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
+                    videosToConcat.push(obj);
                     /*let newVideoName = title.removeChar('/')
                     if (!fs.existsSync(`${parent}/data/${author}`)) fs.mkdirSync(`${parent}/data/${author}`, {recursive: true})
                     if (!fs.existsSync(`${parent}/data/${author}/${newVideoName}.mp3`) || !(fs.statSync(`${parent}/data/${author}/${newVideoName}.mp3`).size > 2000)) {
@@ -754,6 +761,11 @@ const cmdArray = [
             for (const video of videos.items) {
                 await addvid(video)
             }
+            const embed = new builders.EmbedBuilder()
+            embed.setDescription("Added **" + (videos.items.length - 1) + " tracks** to queue.")
+            await interaction.editOriginal({embeds: [embed.json]})
+            videosToConcat.forEach((val) => guilds[interaction.guildID].queuedTracks.push(val));
+            if (guilds[interaction.guildID].audioPlayer.state.status == voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playNextSong(interaction.guildID);
         }
     }
 ]
@@ -829,6 +841,10 @@ client.once("ready", async ()=>{
         client.commands.set(command.data.name, command);
         await client.application.createGlobalCommand(command.data);
     }
+    const cmds = await client.application.getGlobalCommands();
+    cmds.forEach((val) => {
+        if (val.name == "addqueue") val.delete();
+    })
     client.editStatus(null, [{type: oceanic.ActivityTypes.WATCHING, name: (client.guilds.size).toString() + ' servers'}]);
 })
 
