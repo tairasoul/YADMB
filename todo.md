@@ -22,8 +22,6 @@
 - fix the issue where it sometimes just stops the current song and plays the next one
   - not sure why this happens, will try to find out
 
-- hopefully increase the speed of add-playlist
-
 # in progress
 
 
@@ -39,6 +37,9 @@
 
 - shuffle command
   - randomly shuffles each song in the list
+
+- hopefully increase the speed of add-playlist
+  - no longer tells you every song added, was very unnecessary
 
 # cancelled + reason
 
