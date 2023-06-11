@@ -49,5 +49,5 @@
 
 # known issues + potential fixes
 
-- cannot skip after clearing queue with no songs left
-  - may make clear-queue stop the audio player
+- sometimes skips songs for no reason?
+  - check if song was at the end, if not restart the stream at the point where it stopped
