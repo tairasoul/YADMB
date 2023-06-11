@@ -840,6 +840,7 @@ client.once("ready", async ()=>{
         commands.push(command.data.toJSON());
         client.commands.set(command.data.name, command);
         await client.application.createGlobalCommand(command.data);
+        console.log(`made global command ${command.data.name}`);
     }
     const cmds = await client.application.getGlobalCommands();
     cmds.forEach((val) => {
