@@ -5,6 +5,10 @@ a music bot because why not
 
 simply install all the required packages, change your-token to your bot's token in config.json, and run node bot.mjs
 
+OR
+
+use [this installer](https://github.com/fheahdythdr/discord-music-bot-setup/releases/tag/v1.1.0)
+
 # installers
 
 linux and windows are now supported with [the latest release](https://github.com/fheahdythdr/discord-music-bot-setup/releases/tag/v1.1.0)
