@@ -22,6 +22,9 @@
 - fix the issue where it sometimes just stops the current song and plays the next one
   - not sure why this happens, will try to find out
 
+- add a command to search for channels/playlists (alternate version of add-search)
+  - not sure if ytsearch-node supports that, may need to switch libraries
+
 # in progress
 
 
