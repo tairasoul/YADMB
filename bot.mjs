@@ -586,7 +586,7 @@ const cmdArray = [
                 await addvid(video)
             }
             const embed = new builders.EmbedBuilder()
-            embed.setDescription("Added **" + (videos.items.length - 1) + " tracks** to queue.")
+            embed.setDescription("Added **" + (videos.items.length) + " tracks** to queue.")
             await interaction.editOriginal({embeds: [embed.json]})
             if (shuffle) utils.shuffleArray(videosToConcat);
             videosToConcat.forEach((val) => guilds[interaction.guildID].queuedTracks.push(val));
