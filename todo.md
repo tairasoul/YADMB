@@ -54,3 +54,6 @@
 
 - sometimes skips songs for no reason?
   - check if song was at the end, if not restart the stream at the point where it stopped
+
+- sometmies doesn't properly connect to VC, causing you to have to do /join again
+  - after joining, check if it properly connected, if not retry
