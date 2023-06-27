@@ -16,19 +16,19 @@
 - add capability to filter with regex to add-playlist and add-search
   - won't be too hard as then i just have to add an optional argument
 
-- auto-leave after 5 minutes of being alone in a vc or when alone in vc
-  - this was originally implemented as "leave when alone in vc" but oceanic.js doesn't make the old vc status contain the channel the user was in
-
-- fix the issue where it sometimes just stops the current song and plays the next one
-  - ~~not sure why this happens, will try to find out~~
-  - happens due to stream abort issues
-  - [play-dl](https://www.npmjs.com/package/play-dl) should fix this, will work on switching to it then adding support for spotify and soundcloud
-
 - add a command to search for channels/playlists (alternate version of add-search)
   - not sure if ytsearch-node supports that, may need to switch libraries
 
 # in progress
 
+- fix the issue where it sometimes just stops the current song and plays the next one
+  - ~~not sure why this happens, will try to find out~~
+  - happens due to stream abort issues
+  - [play-dl](https://www.npmjs.com/package/play-dl) should fix this, will work on switching to it then adding support for spotify and soundcloud
+ 
+  - auto-leave after 5 minutes of being alone in a vc or when alone in vc
+    - this was originally implemented as "leave when alone in vc" but oceanic.js doesn't make the old vc status contain the channel the user was in
+    - currently insta-leaves, need to implement a timer
 
 # finished + comments
 
