@@ -10,9 +10,10 @@ const Client = oceanic.Client;
 import ytsr from './utils/node_modified_modules/ytsearch-node/src/parsedata.js';
 import utils from './utils/utils.js';
 import * as voice from "@discordjs/voice";
-import {default as dlsr} from 'youtube-dlsr';
+import { default as playdl } from 'play-dl';
 import ytdl from 'ytdl-core';
 import { createAudioPlayer, NoSubscriberBehavior, createAudioResource } from "@discordjs/voice";
+import thumb from 'youtube-thumbnail-grabber';
 const guilds = {
 
 }
@@ -33,9 +34,10 @@ async function playNextSong(guild) {
             if (!guilds[guild].playing) guilds[guild].playing = true;
             const currentTrack = guilds[guild].currentTrack;
             guilds[guild].currentlyPlayingTrackObject = guilds[guild].queuedTracks[currentTrack];
-            const get = await dlsr.download(guilds[guild].queuedTracks[currentTrack].url);
-            const a = createAudioResource(get, {
-                inlineVolume: true
+            const get = await playdl.stream(guilds[guild].queuedTracks[currentTrack].url);
+            const a = createAudioResource(get.stream, {
+                inlineVolume: true,
+                inputType: get.type
             })
             guilds[guild].currentAudioResource = a;
             a.volume.setVolume(currentVolume);
@@ -97,20 +99,19 @@ const client = new Client({
     }
 });
 
-// temporarily not needed while i think of how to remake this with Oceanic.js
-
-/*client.on('voiceStateUpdate', (oldState, newState) => {
-    if (!oldState.voiceState || !newState) return;
-    if (oldState.voiceState.channel && guilds[oldState.guild.id].connection && oldState.voiceState.channel?.voiceMembers.size == 1) {
-        guilds[oldState.guild.id].connection.removeAllListeners(); guilds[oldState.guild.id].connection.disconnect();guilds[oldState.guild.id].connection = null;
+client.on('voiceStateUpdate', (oldState, newState) => {
+    if (guilds[oldState.guildID].voiceChannel != null && guilds[oldState.guildID].connection) {
+        /** @type {oceanic.VoiceChannel} */
+        const channel = guilds[oldState.guildID].voiceChannel;
+        /** @type {voice.VoiceConnection} */
+        const connection = guilds[oldState.guildID].connection;
+        if (channel.voiceMembers.size == 1) {
+            connection.disconnect();
+            guilds[oldState.guildID].connection = null;
+            guilds[oldState.guildID].voiceChannel = null;
+        }
     }
-    if (oldState && !newState.channelID && guilds[oldState.guild.id].connection && oldState.user.bot) {
-        guilds[oldState.guild.id].connection.removeAllListeners();
-        guilds[oldState.guild.id].connection.disconnect();
-        guilds[oldState.guild.id].connection = null
-    }
-    if (oldState && !newState.channelID && oldState.user.bot) guilds[oldState.guild.id].playing = false;
-})*/
+})
 
 client.on("ready", () => {
     console.log("logged in");
@@ -160,7 +161,9 @@ const cmdArray = [
             const videoNames = []
             async function addvid(vid) {
                 if (!ytdl.validateURL(vid)) {
-                    return await interaction.editOriginal("Invalid link.")
+                    const embed = new builders.EmbedBuilder()
+                    embed.setDescription("Invalid link.")
+                    return await interaction.editOriginal({embeds: [embed.json]})
                 }
                 try {
                     const info = await ytdl.getInfo(vid);
@@ -221,9 +224,8 @@ const cmdArray = [
                 for (const item of searchResults) {
                     if (item.type != 'video') return
                     try {
-                        const url = item.thumbnail.url
                         const embed = new builders.EmbedBuilder()
-                        embed.setThumbnail(url);
+                        embed.setThumbnail(thumb(item.watchUrl, 'max'));
                         embed.setTitle(item.title);
                         embed.addFields(
                             {name: 'Uploaded', value: item.publishedAt},
@@ -393,6 +395,7 @@ const cmdArray = [
                     })
                 }
                 connthing()
+                guilds[interaction.guildID].voiceChannel = interaction.member.voiceState.channel
                 if (guilds[interaction.guildID].queuedTracks[0]) {
                     guilds[interaction.guildID].playing = true
                     const embed = new builders.EmbedBuilder()
@@ -534,6 +537,7 @@ const cmdArray = [
                 guilds[interaction.guildID].playing = false;
                 embed.setDescription("Disconnected.")
                 await interaction.editOriginal({embeds: [embed.json]})
+                guilds[interaction.guildID].voiceChannel = null
             }
             else {
                 const embed = new builders.EmbedBuilder()
@@ -606,6 +610,7 @@ client.on('guildCreate', guild => {
         loopqueue: false,
         currentTrack: 0,
         queuedTracks: [],
+        voiceChannel: null,
         audioPlayer: createAudioPlayer({
             behaviors: {
                 noSubscriber: NoSubscriberBehavior.Pause
@@ -649,6 +654,7 @@ client.once("ready", async ()=>{
             loopqueue: false,
             currentTrack: 0,
             queuedTracks: [],
+            voiceChannel: null,
             audioPlayer: createAudioPlayer({
                 behaviors: {
                     noSubscriber: NoSubscriberBehavior.Pause,
