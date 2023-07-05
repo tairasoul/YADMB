@@ -28,14 +28,12 @@
 # finished + comments
 
 - fix the issue where it sometimes just stops the current song and plays the next one
-  - ~~not sure why this happens, will try to find out~~
-  - happens due to stream abort issues
-  - [play-dl](https://www.npmjs.com/package/play-dl) should fix this, will work on switching to it then adding support for spotify and soundcloud
+  - need to add support for soundcloud and spotify next
 
 - migrate from local filesystem to directly streaming from youtube 
   - i am not sure if it still gets rate-limited, we'll have to fuck around and find out to see
 
-- no longer uses ytdl, instead uses youtube-dlsr
+- ~~no longer uses ytdl, instead uses youtube-dlsr~~ wasn't good either, now play-dl
 
 - (maybe) make a c++ program that'll guide you through each step of getting this to run
   - available at [this repo](https://github.com/fheahdythdr/discord-music-bot-setup)
@@ -47,7 +45,6 @@
   - no longer tells you every song added, was very unnecessary
 
 # cancelled + reason
-
 
 - change libraries from ytdl to use [youtube-stream-url](https://www.npmjs.com/package/youtube-stream-url)
   - the resulting url doesn't work
