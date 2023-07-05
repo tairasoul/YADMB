@@ -20,17 +20,17 @@
   - not sure if ytsearch-node supports that, may need to switch libraries
 
 # in progress
-
-- fix the issue where it sometimes just stops the current song and plays the next one
-  - ~~not sure why this happens, will try to find out~~
-  - happens due to stream abort issues
-  - [play-dl](https://www.npmjs.com/package/play-dl) should fix this, will work on switching to it then adding support for spotify and soundcloud
  
 - auto-leave after 5 minutes of being alone in a vc or when alone in vc
   - this was originally implemented as "leave when alone in vc" but oceanic.js doesn't make the old vc status contain the channel the user was in
   - currently insta-leaves, need to implement a timer
 
 # finished + comments
+
+- fix the issue where it sometimes just stops the current song and plays the next one
+  - ~~not sure why this happens, will try to find out~~
+  - happens due to stream abort issues
+  - [play-dl](https://www.npmjs.com/package/play-dl) should fix this, will work on switching to it then adding support for spotify and soundcloud
 
 - migrate from local filesystem to directly streaming from youtube 
   - i am not sure if it still gets rate-limited, we'll have to fuck around and find out to see
