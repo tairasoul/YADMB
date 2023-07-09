@@ -1,14 +1,25 @@
 {
   "dependencies": {
-    "@discordjs/voice": "^0.14.0",
+    "@discordjs/voice": "^0.16.0",
     "@oceanicjs/builders": "^1.1.7",
+    "axios": "^1.4.0",
     "discord.js": "^14.11.0",
+    "hhmmss": "^1.0.0",
+    "humanize-duration": "^3.28.0",
     "libsodium-wrappers": "^0.7.11",
     "oceanic-collectors": "^1.0.7",
     "oceanic.js": "^1.7.0",
     "opusscript": "^0.0.8",
-    "youtube-dlsr": "^2.8.2",
+    "play-dl": "^1.9.6",
+    "youtube-thumbnail-grabber": "^1.0.2",
+    "yt-stream": "^1.4.7",
     "ytdl-core": "^4.11.4",
-    "ytpl": "^2.3.0"
+    "ytpl": "^2.3.0",
+    "ytsearch-node": "^2.0.6",
+    "ytsr": "^3.8.2"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/humanize-duration": "^3.27.1"
   }
 }
