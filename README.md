@@ -15,10 +15,6 @@ linux and windows are now supported with [the latest release](https://github.com
 
 download discord-music-bot-installer-linux if on linux, otherwise discord-music-bot-installer-windows.rar
 
-# notes
-
-seems to sometimes skip a song for no reason or replay it, got no idea why
-
 # extra information
 
 ~~this bot stores all music played in a local folder, so it doesn't have to keep streaming to youtube.~~
@@ -33,20 +29,13 @@ if you want it to store locally, easiest way is to go to an earlier commit
 
 # changelog
 
-- add-playlist:
-  - you can now shuffle the playlist before adding it to queue
-  - adds playlists faster now
-
-- add-queue:
-  - you can now tell it to add the song to be played next instead of adding it to the end of the queue
-
 # commands
 
-## add-queue
+## add-url
 
 adds a link to the queue
 
-## add-search
+## search
 
 searches for the specific term provided, and creates an embed with different pages in a select menu, containing each video returned. it gets the same videos as you would when searching for it manually.
 
@@ -72,7 +61,7 @@ leaves the vc it's in
 
 ## loop
 
-loops the song or the queue, depending on which was provided
+loops the song, the playlist, the queue or nothing, depending on which was provided
 
 ## pause
 
@@ -82,9 +71,13 @@ pauses the currently playing track
 
 resumes the currently playing track
 
-## skip
+## skip-song
 
 skips the currently playing track
+
+## skip-playlist
+
+skips the currently playing playlist
 
 # other features
 
