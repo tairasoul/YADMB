@@ -1,5 +1,3 @@
-// will work on remaking this later, for now it'll be mostly outdated except for the selectmenu function and shuffleArray
-
 const fs = require('fs');
 const oceanic = require('oceanic.js');
 const { ActionRowBuilder, SelectMenuBuilder, SelectMenuOptionBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
@@ -155,5 +153,14 @@ module.exports = {
                 }
             }
         }}
+    },
+    // listen  for interactions from a specific guild, user and custom id
+    LFGIC: function(client, guildid, userid, customid, callback) {
+        return client.on("interactionCreate", async i => {
+            if (i.guildID != guildid) return;
+            if (i.user.id != userid) return;
+            if (i.data.customID != customid) return;
+            await callback(i);
+        });
     }
 }
