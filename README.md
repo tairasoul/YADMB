@@ -29,6 +29,8 @@ if you want it to store locally, easiest way is to go to an earlier commit
 
 # changelog
 
+rewritten fully, new queue system
+
 # commands
 
 ## add-url
