@@ -43,6 +43,10 @@
 
 - hopefully increase the speed of add-playlist
   - no longer tells you every song added, was very unnecessary
+ 
+- rewrite
+  - done rewriting
+  - old code had parts from 7 months ago and i wanted to change up the queue system a lil bit
 
 # cancelled + reason
 
