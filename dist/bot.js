@@ -42,50 +42,53 @@ function setupGuild(guild) {
     });
     cg.audioPlayer.on("stateChange", () => {
         if (cg.audioPlayer.state.status == voice.AudioPlayerStatus.Idle) {
-            const currentTrack = cg.currentTrack;
             console.log(util.inspect(cg.queuedTracks, true, 20));
             switch (cg.loopType) {
                 case "none":
-                    if (cg.queuedTracks[currentTrack].type === "playlist") {
-                        cg.queuedTracks[currentTrack].tracks.splice(0, 1);
-                        if (cg.queuedTracks[currentTrack].tracks.length === 0) {
+                    if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
+                        cg.queuedTracks[cg.currentTrack].tracks.splice(0, 1);
+                        if (cg.queuedTracks[cg.currentTrack].tracks.length === 0) {
                             cg.queuedTracks.splice(0, 1);
-                            playSong(cg.queuedTracks[currentTrack].tracks[cg.queuedTracks[currentTrack].trackNumber], guild.id);
+                            playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                         }
                         else {
-                            playSong(cg.queuedTracks[currentTrack].tracks[cg.queuedTracks[currentTrack].trackNumber], guild.id);
+                            playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                         }
                     }
                     else {
-                        cg.queuedTracks[currentTrack].tracks.splice(0, 1);
-                        playSong(cg.queuedTracks[currentTrack].tracks[cg.queuedTracks[currentTrack].trackNumber], guild.id);
+                        cg.queuedTracks[cg.currentTrack].tracks.splice(0, 1);
+                        playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                     }
                     break;
                 case "song":
-                    playSong(cg.queuedTracks[currentTrack].tracks[cg.queuedTracks[currentTrack].trackNumber], guild.id);
+                    playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                     break;
                 case "queue":
-                    if (cg.queuedTracks[currentTrack].type === "playlist") {
-                        cg.queuedTracks[currentTrack].trackNumber += 1;
+                    console.log(cg.currentTrack);
+                    if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
+                        cg.queuedTracks[cg.currentTrack].trackNumber += 1;
                     }
                     else {
                         cg.currentTrack += 1;
                     }
-                    if (cg.queuedTracks[currentTrack].trackNumber == cg.queuedTracks[currentTrack].tracks.length)
+                    console.log(cg.queuedTracks[cg.currentTrack].trackNumber);
+                    if (cg.queuedTracks[cg.currentTrack].trackNumber == cg.queuedTracks[cg.currentTrack].tracks.length)
                         cg.currentTrack += 1;
-                    if (cg.currentTrack === cg.queuedTracks.length)
+                    console.log(cg.currentTrack);
+                    if (cg.currentTrack == cg.queuedTracks.length)
                         cg.currentTrack = 0;
-                    playSong(cg.queuedTracks[currentTrack].tracks[cg.queuedTracks[currentTrack].trackNumber], guild.id);
+                    console.log(cg.currentTrack);
+                    playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                     break;
                 case "playlist":
-                    if (cg.queuedTracks[currentTrack].tracks.length === cg.queuedTracks[currentTrack].trackNumber) {
-                        cg.queuedTracks[currentTrack].trackNumber = 0;
+                    if (cg.queuedTracks[cg.currentTrack].tracks.length === cg.queuedTracks[cg.currentTrack].trackNumber) {
+                        cg.queuedTracks[cg.currentTrack].trackNumber = 0;
                         cg.currentTrack += 1;
-                        playSong(cg.queuedTracks[currentTrack].tracks[cg.queuedTracks[currentTrack].trackNumber], guild.id);
+                        playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                     }
                     else {
-                        cg.queuedTracks[currentTrack].trackNumber += 1;
-                        playSong(cg.queuedTracks[currentTrack].tracks[cg.queuedTracks[currentTrack].trackNumber], guild.id);
+                        cg.queuedTracks[cg.currentTrack].trackNumber += 1;
+                        playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                     }
                     break;
             }
@@ -672,10 +675,9 @@ const commands = [
             await interaction.defer();
             const embed = new builders.EmbedBuilder();
             const g = guilds[interaction.guildID];
-            const ct = g.queuedTracks[g.currentTrack];
             g.queuedTracks.splice(g.currentTrack, 1);
             if (g.currentTrack >= g.queuedTracks.length)
-                ct.trackNumber = 0;
+                g.currentTrack = 0;
             embed.setDescription(`Skipped current playlist.`);
             await interaction.editOriginal({ embeds: [embed.toJSON()] });
         }
