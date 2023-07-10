@@ -9,6 +9,6 @@
     "strict": true,                                      /* Enable all strict type-checking options. */
     "skipLibCheck": true,                               /* Skip type checking all .d.ts files. */
     "module": "ES2022",
-    "downlevelIteration": true
+    "target": "ES2022"
   }
 }
