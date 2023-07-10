@@ -119,6 +119,7 @@ interface Guild {
     currentlyPlaying: string | null;
     audioPlayer: voice.AudioPlayer;
     volume: number;
+    leaveTimer: NodeJS.Timeout | null;
 }
 
 interface Command {
@@ -165,10 +166,15 @@ client.on('voiceStateUpdate', (oldState: oceanic.Member, newState: oceanic.JSONV
         const channel = guilds[oldState.guildID].voiceChannel as oceanic.VoiceChannel;
         const connection = guilds[oldState.guildID].connection as voice.VoiceConnection;
         if (channel.voiceMembers.size == 1) {
-            connection.disconnect();
-            connection.destroy();
-            guilds[oldState.guildID].connection = null;
-            guilds[oldState.guildID].voiceChannel = null;
+            guilds[oldState.guildID].leaveTimer = setTimeout(() => {
+                connection.disconnect();
+                connection.destroy();
+                guilds[oldState.guildID].connection = null;
+                guilds[oldState.guildID].voiceChannel = null;
+            }, 60 * 1000 * 5)
+        }
+        else {
+            if (guilds[oldState.guildID].leaveTimer != null) clearTimeout(guilds[oldState.guildID].leaveTimer as NodeJS.Timeout);
         }
     }
 })
@@ -212,7 +218,8 @@ client.on('guildCreate', (guild: oceanic.Guild) => {
                 noSubscriber: NoSubscriberBehavior.Pause
             }
         }),
-        volume: 0.05
+        volume: 0.05,
+        leaveTimer: null
     }
 
     setupGuild(guild)
@@ -873,7 +880,8 @@ client.on('ready', async () => {
                     noSubscriber: NoSubscriberBehavior.Pause
                 }
             }),
-            volume: 0.05
+            volume: 0.05,
+            leaveTimer: null
         }
 
         setupGuild(guild[1]);
