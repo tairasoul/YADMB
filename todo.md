@@ -21,6 +21,9 @@
 
 # in progress
 
+- find and fix some final bugs with the current queue system
+    - the new queue system has a few bugs left due to the fact it's now more of just adding mini-queues and not singular links
+
 # finished + comments
 
 - fix the issue where it sometimes just stops the current song and plays the next one
