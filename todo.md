@@ -20,10 +20,6 @@
   - not sure if ytsearch-node supports that, may need to switch libraries
 
 # in progress
- 
-- auto-leave after 5 minutes of being alone in a vc or when alone in vc
-  - this was originally implemented as "leave when alone in vc" but oceanic.js doesn't make the old vc status contain the channel the user was in
-  - currently insta-leaves, need to implement a timer
 
 # finished + comments
 
@@ -38,6 +34,10 @@
 - (maybe) make a c++ program that'll guide you through each step of getting this to run
   - available at [this repo](https://github.com/fheahdythdr/discord-music-bot-setup)
 
+- auto-leave after 5 minutes of being alone in a vc or when alone in vc
+  - this was originally implemented as "leave when alone in vc" but oceanic.js doesn't make the old vc status contain the channel the user was in
+  - solved by storing the old channel upon joining within the guild data
+  
 - shuffle command
   - randomly shuffles each song in the list
 
