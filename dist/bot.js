@@ -71,17 +71,17 @@ function setupGuild(guild) {
                     else {
                         cg.currentTrack += 1;
                     }
-                    console.log(cg.queuedTracks[cg.currentTrack].trackNumber);
-                    if (cg.queuedTracks[cg.currentTrack].trackNumber == cg.queuedTracks[cg.currentTrack].tracks.length)
+                    if (cg.currentTrack >= cg.queuedTracks.length)
+                        cg.currentTrack = 0;
+                    if (cg.queuedTracks[cg.currentTrack].trackNumber >= cg.queuedTracks[cg.currentTrack].tracks.length)
                         cg.currentTrack += 1;
-                    console.log(cg.currentTrack);
                     if (cg.currentTrack >= cg.queuedTracks.length)
                         cg.currentTrack = 0;
                     console.log(cg.currentTrack);
                     playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                     break;
                 case "playlist":
-                    if (cg.queuedTracks[cg.currentTrack].tracks.length <= cg.queuedTracks[cg.currentTrack].trackNumber) {
+                    if (cg.queuedTracks[cg.currentTrack].tracks.length <= cg.queuedTracks[cg.currentTrack].trackNumber || cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber + 1] === undefined) {
                         cg.queuedTracks[cg.currentTrack].trackNumber = 0;
                     }
                     else {
@@ -127,6 +127,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     if (guilds[oldState.guildID].voiceChannel !== null && guilds[oldState.guildID].connection) {
         const channel = guilds[oldState.guildID].voiceChannel;
         const connection = guilds[oldState.guildID].connection;
+        console.log(channel.voiceMembers.size);
         if (channel.voiceMembers.size == 1) {
             guilds[oldState.guildID].leaveTimer = setTimeout(() => {
                 connection.disconnect();
@@ -382,32 +383,44 @@ const commands = [
             type: 3
         })
             .addOption({
-            name: "exclude",
-            description: "What types of results to exclude.",
+            name: "exclude-playlist",
+            description: "Exclude playlists?",
             required: false,
-            type: oceanic.ApplicationCommandOptionTypes.STRING,
-            choices: [
-                {
-                    name: "playlists",
-                    value: "playlist"
-                },
-                {
-                    name: "videos",
-                    value: "video"
-                }
-            ]
+            type: oceanic.ApplicationCommandOptionTypes.BOOLEAN
+        })
+            .addOption({
+            name: "exclude-channel",
+            description: "Exclude channels?",
+            required: false,
+            type: oceanic.ApplicationCommandOptionTypes.BOOLEAN
+        })
+            .addOption({
+            name: "exclude-video",
+            description: "Exclude videos?",
+            required: false,
+            type: oceanic.ApplicationCommandOptionTypes.BOOLEAN
         })
             .setDMPermission(false),
         async execute(interaction) {
             await interaction.defer();
             const term = interaction.data.options.getString('term', true);
-            const exclude = interaction.data.options.getString('exclude');
+            const excludes = [];
+            const enames = [
+                "exclude-playlist",
+                "exclude-channel",
+                "exclude-video"
+            ];
+            for (const name of enames) {
+                if (interaction.data.options.getBoolean(name) === true) {
+                    excludes.push(name);
+                }
+            }
             const results = await playdl.search(term);
             const searches = [];
             const names = {};
             let currentVideo;
             for (const item of results) {
-                if (item.type != "channel" && item.type != exclude) {
+                if (!excludes.includes(item.type)) {
                     const embed = new builders.EmbedBuilder();
                     embed.setImage(item.thumbnails[0].url);
                     embed.setTitle(item.title);
@@ -523,6 +536,10 @@ const commands = [
                 client.off("interactionCreate", pl);
                 client.off("interactionCreate", vl);
                 client.off("interactionCreate", vla);
+                actionRow.getComponents().forEach((component) => component.disable());
+                actionRow2.getComponents().forEach((component) => component.disable());
+                // @ts-ignore
+                await interaction.editOriginal({ components: [actionRow, actionRow2], embeds: [currentVideo.embed.toJSON()] });
             }, 120000);
         }
     },
@@ -634,6 +651,7 @@ const commands = [
         })
             .setDMPermission(false),
         async execute(interaction) {
+            await interaction.defer();
             const shuffleType = interaction.data.options.getString("type", true);
             const g = guilds[interaction.guildID];
             const ct = g.queuedTracks[g.currentTrack];
@@ -682,7 +700,7 @@ const commands = [
             }
             g.audioPlayer.stop();
             embed.setDescription(`Skipped song ${songName}.`);
-            await interaction.createMessage({ embeds: [embed.toJSON()] });
+            await interaction.createFollowup({ embeds: [embed.toJSON()] });
         }
     },
     {
@@ -699,7 +717,7 @@ const commands = [
             if (g.currentTrack >= g.queuedTracks.length)
                 g.currentTrack = 0;
             embed.setDescription(`Skipped current playlist.`);
-            await interaction.editOriginal({ embeds: [embed.toJSON()] });
+            await interaction.createFollowup({ embeds: [embed.toJSON()] });
         }
     },
     {
