@@ -1,23 +1,13 @@
 # todo 
 
-- add optional DJ role (if specified, only that role can use commands)
-  - if DJ role is not specified, everyone can use commands
-  - if DJ role is specified, give admins capability to specify which commands only DJ's can use and which commands everyone can use
-
 - add a progress command
   - updates live, stops updating when someone uses it again (or just deletes and sends it again if a music commands channel is specified)
   - shows how long is remaining
   - shows the thumbnail (if possible, i'm having issues with showing thumbnail in add-search)
   - shows song name, author, likes, views
 
-- make it so you can skip a whole playlist or just a single song
-  - may require a full rework of the music system
-
 - add capability to filter with regex to add-playlist and add-search
   - won't be too hard as then i just have to add an optional argument
-
-- add a command to search for channels/playlists (alternate version of add-search)
-  - not sure if ytsearch-node supports that, may need to switch libraries
 
 # in progress
 
@@ -28,9 +18,15 @@
 
 - fix the issue where it sometimes just stops the current song and plays the next one
   - need to add support for soundcloud and spotify next
+ 
+- make it so you can skip a whole playlist or just a single song
+  - reworked music system but it introduced a few bugs, those will be fixed
 
 - migrate from local filesystem to directly streaming from youtube 
   - i am not sure if it still gets rate-limited, we'll have to fuck around and find out to see
+  - 
+- add a command to search for channels/playlists (alternate version of add-search)
+  - play-dl does this
 
 - ~~no longer uses ytdl, instead uses youtube-dlsr~~ wasn't good either, now play-dl
 
@@ -55,6 +51,9 @@
 
 - change libraries from ytdl to use [youtube-stream-url](https://www.npmjs.com/package/youtube-stream-url)
   - the resulting url doesn't work
+ 
+- add optional DJ role (if specified, only that role can use commands)
+  - this is already done by discord within the Integrations part of server settings
 
 # known issues + potential fixes
 
