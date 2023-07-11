@@ -75,21 +75,19 @@ function setupGuild(guild) {
                     if (cg.queuedTracks[cg.currentTrack].trackNumber == cg.queuedTracks[cg.currentTrack].tracks.length)
                         cg.currentTrack += 1;
                     console.log(cg.currentTrack);
-                    if (cg.currentTrack == cg.queuedTracks.length)
+                    if (cg.currentTrack >= cg.queuedTracks.length)
                         cg.currentTrack = 0;
                     console.log(cg.currentTrack);
                     playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                     break;
                 case "playlist":
-                    if (cg.queuedTracks[cg.currentTrack].tracks.length === cg.queuedTracks[cg.currentTrack].trackNumber) {
+                    if (cg.queuedTracks[cg.currentTrack].tracks.length <= cg.queuedTracks[cg.currentTrack].trackNumber) {
                         cg.queuedTracks[cg.currentTrack].trackNumber = 0;
-                        cg.currentTrack += 1;
-                        playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                     }
                     else {
                         cg.queuedTracks[cg.currentTrack].trackNumber += 1;
-                        playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                     }
+                    playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                     break;
             }
         }
@@ -411,7 +409,7 @@ const commands = [
             for (const item of results) {
                 if (item.type != "channel" && item.type != exclude) {
                     const embed = new builders.EmbedBuilder();
-                    embed.setThumbnail(item.thumbnails[0].url);
+                    embed.setImage(item.thumbnails[0].url);
                     embed.setTitle(item.title);
                     if (item.uploadedAt)
                         embed.addField('Uploaded', item.uploadedAt);
