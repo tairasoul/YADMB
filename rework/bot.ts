@@ -24,7 +24,7 @@ function startsWith(str: string, strings: string[]) {
 
 function getProvider(url: string) {
     // no clue if these are all, please open an issue if they are not
-    const youtube = ["https://www.youtube.com", "https://youtu.be"];
+    const youtube = ["https://www.youtube.com", "https://youtu.be", "https://music.youtube.com"];
     const sc = ["https://soundcloud.com", "https://on.soundcloud.com"];
     const deezer = ["https://www.deezer.com"];
     const spotify = ["https://open.spotify.com"];
@@ -49,7 +49,7 @@ function setupGuild(guild: oceanic.Guild) {
                     if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
                         cg.queuedTracks[cg.currentTrack].tracks.splice(0, 1);
                         if (cg.queuedTracks[cg.currentTrack].tracks.length === 0) {
-                            cg.queuedTracks.splice(0, 1)
+                            cg.queuedTracks.splice(0, 1);
                             playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id)
                         }
                         else {
@@ -57,7 +57,7 @@ function setupGuild(guild: oceanic.Guild) {
                         }
                     }
                     else {
-                        cg.queuedTracks[cg.currentTrack].tracks.splice(0, 1)
+                        cg.queuedTracks[cg.currentTrack].tracks.splice(0, 1);
                         playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id)
                     }
                     break;
@@ -171,7 +171,7 @@ client.on('voiceStateUpdate', (oldState: oceanic.Member, newState: oceanic.JSONV
                 connection.destroy();
                 guilds[oldState.guildID].connection = null;
                 guilds[oldState.guildID].voiceChannel = null;
-            }, 60 * 1000 * 5)
+            }, 60 * 1000)
         }
         else {
             if (guilds[oldState.guildID].leaveTimer != null) clearTimeout(guilds[oldState.guildID].leaveTimer as NodeJS.Timeout);
@@ -264,6 +264,7 @@ const commands: Command[] = [
                 Does it start with any of the following URLs?
                 https://www.youtube.com
                 https://youtu.be
+                https://music.youtube.com
                 https://soundcloud.com
                 https://on.soundcloud.com
                 https://www.deezer.com
@@ -316,6 +317,11 @@ const commands: Command[] = [
                     // both deezer and spotify need to be searched up on youtube
                     case "deezer":
                         const dvid = await playdl.deezer(video);
+                        if (dvid.type !== "track") {
+                            const dembed = new builders.EmbedBuilder();
+                            dembed.setDescription(`${dvid.title} is not a Deezer track! add-url only supports singular tracks.`);
+                            return await interaction.editOriginal({embeds: [dembed.toJSON()]})
+                        }
                         const yvid = (await playdl.search(dvid.title, {
                             limit: 1
                         }))[0]
@@ -354,6 +360,12 @@ const commands: Command[] = [
                             await playdl.refreshToken() // This will check if access token has expired or not. If yes, then refresh the token.
                         }
                         const sp_data = await playdl.spotify(video);
+
+                        if (sp_data.type !== "track") {
+                            const dembed = new builders.EmbedBuilder();
+                            dembed.setDescription(`${sp_data.name} is not a Spotify track! add-url only supports singular tracks.`);
+                            return await interaction.editOriginal({embeds: [dembed.toJSON()]})
+                        }
 
                         const search = (await playdl.search(sp_data.name, { limit: 1}))[0];
                         const spotifyadd: queuedTrack = {
@@ -561,7 +573,7 @@ const commands: Command[] = [
                     )
                 }
                 const embed = new builders.EmbedBuilder();
-                embed.setDescription(`Playing **${currentVideo.title}** after current track..`);
+                embed.setDescription(`Playing **${currentVideo.title}** after current track.`);
                 await i.editOriginal(
                     {
                         embeds: [embed.toJSON()]
@@ -718,7 +730,6 @@ const commands: Command[] = [
         .setDescription("Skip the current song.")
         .setDMPermission(false),
         async execute(interaction: oceanic.CommandInteraction) {
-            await interaction.defer();
             const embed = new builders.EmbedBuilder();
             const g = guilds[interaction.guildID as string];
             const ct = g.queuedTracks[g.currentTrack];
@@ -726,15 +737,18 @@ const commands: Command[] = [
             if (ct.type == "song") {
                 songName = ct.tracks[0].name;
                 g.queuedTracks.splice(g.currentTrack, 1);
+                g.currentTrack -= 1;
                 if (g.currentTrack >= g.queuedTracks.length) ct.trackNumber = 0;
             }
             else {
                 songName = ct.tracks[ct.trackNumber].name;
                 ct.tracks.splice(ct.trackNumber, 1);
+                ct.trackNumber -= 1;
                 if (ct.trackNumber >= ct.tracks.length) ct.trackNumber = 0;
             }
+            g.audioPlayer.stop();
             embed.setDescription(`Skipped song ${songName}.`);
-            await interaction.editOriginal({embeds: [embed.toJSON()]})
+            await interaction.createMessage({embeds: [embed.toJSON()]})
         }
     },
     {
@@ -745,6 +759,8 @@ const commands: Command[] = [
             await interaction.defer();
             const embed = new builders.EmbedBuilder();
             const g = guilds[interaction.guildID as string];
+            g.currentTrack -= 1;
+            g.audioPlayer.stop()
             g.queuedTracks.splice(g.currentTrack, 1);
             if (g.currentTrack >= g.queuedTracks.length) g.currentTrack = 0;
             embed.setDescription(`Skipped current playlist.`);
