@@ -12,6 +12,11 @@ import ytdl from 'ytdl-core';
 import { createAudioPlayer, NoSubscriberBehavior, createAudioResource } from "@discordjs/voice";
 import ytpl from 'ytpl';
 import * as util from "node:util"
+// @ts-ignore
+import * as hdc from "hiddencoder";
+// @ts-ignore
+import * as lzw from "lzwcompress";
+import base64 from "base-64";
 
 // util functions
 
@@ -608,6 +613,99 @@ const commands: Command[] = [
                 // @ts-ignore
                 await interaction.editOriginal({components: [actionRow, actionRow2], embeds: [currentVideo.embed.toJSON()]})
             }, 120000)
+        }
+    },
+    {
+        data: new builders.ApplicationCommandBuilder(1, "export")
+        .setDescription("Export the current queue/playlist as a single string.")
+        .addOption(
+            {
+                type: oceanic.ApplicationCommandOptionTypes.STRING,
+                required: true,
+                name: "type",
+                description: "What to export.",
+                choices: [
+                    {
+                        name: "playlist",
+                        value: "playlist"
+                    },
+                    {
+                        name: "queue",
+                        value: "queue"
+                    }
+                ]
+            }
+        ),
+        async execute(interaction: oceanic.CommandInteraction) {
+            await interaction.defer()
+            const type: "playlist" | "queue" = interaction.data.options.getString("type", true);
+            const g = guilds[interaction.guildID as string];
+            switch(type) {
+                case "playlist":
+                    const q = g.queuedTracks[g.currentTrack];
+                    if (q.type === "song") {
+                        const embed = new builders.EmbedBuilder();
+                        embed.setDescription("The current track is not a playlist.")
+                        return await interaction.editOriginal({embeds: [embed.toJSON()]});
+                    }
+                    const clone: queuedTrack = {
+                        trackNumber: 0,
+                        tracks: q.tracks,
+                        type: "playlist"
+                    };
+                    const c = lzw.pack(clone);
+                    const encoded = base64.encode(c.toString());
+                    const embed = new builders.EmbedBuilder();
+                    embed.setDescription(encoded);
+                    embed.setTitle("This is your exported playlist.");
+                    return await interaction.editOriginal({embeds: [embed.toJSON()]});
+                case "queue":
+                    const qClone: queuedTrack[] = [];
+                    for (const track of g.queuedTracks) {
+                        qClone.push(track)
+                    }
+                    for (const clone of qClone) {
+                        clone.trackNumber = 0;
+                    }
+                    const lzp = lzw.pack(qClone);
+                    const q_enc = base64.encode(lzp.toString());
+                    const qembed = new builders.EmbedBuilder();
+                    qembed.setTitle("This is the exported queue.");
+                    qembed.setDescription(q_enc);
+                    return await interaction.editOriginal({embeds: [qembed.toJSON()]});
+            }
+        }
+    },
+    {
+        data: new builders.ApplicationCommandBuilder(1, "import")
+        .setDescription("Import a exported queue/playlist.")
+        .addOption(
+            {
+                name: "encoded",
+                type: oceanic.ApplicationCommandOptionTypes.STRING,
+                description: "The encoded queue/playlist.",
+                required: true
+            }
+        ),
+        async execute(interaction: oceanic.CommandInteraction) {
+            await interaction.defer()
+            const g = guilds[interaction.guildID as string];
+            const encoded = interaction.data.options.getString("encoded", true);
+            const decode = base64.decode(encoded);
+            const arr = decode.split(",");
+            const numbers = [];
+            for (const string of arr) {
+                numbers.push(parseInt(string));
+            }
+            const lzd = lzw.unpack(numbers);
+            if (lzd.trackNumber) {
+                g.queuedTracks.push(lzd);
+            }
+            else {
+                for (const track of lzd) {
+                    g.queuedTracks.push(track);
+                }
+            }
         }
     },
     {
