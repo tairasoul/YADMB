@@ -13,7 +13,7 @@ import { createAudioPlayer, NoSubscriberBehavior, createAudioResource } from "@d
 import ytpl from 'ytpl';
 import * as util from "node:util";
 // @ts-ignore
-import * as lzw from "lzwcompress";
+import { default as lzw } from "lzwcompress";
 import base64 from "base-64";
 // util functions
 function startsWith(str, strings) {
@@ -598,10 +598,12 @@ const commands = [
                     }
                     const lzp = lzw.pack(qClone);
                     const q_enc = base64.encode(lzp.toString());
-                    const qembed = new builders.EmbedBuilder();
-                    qembed.setTitle("This is the exported queue.");
-                    qembed.setDescription(q_enc);
-                    return await interaction.editOriginal({ embeds: [qembed.toJSON()] });
+                    await interaction.editOriginal({ content: "Exported queue:", files: [
+                            {
+                                name: `${interaction.member.id}.export.txt`,
+                                contents: new Buffer(q_enc)
+                            }
+                        ] });
             }
         }
     },
