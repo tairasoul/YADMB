@@ -667,9 +667,7 @@ const commands: Command[] = [
                     }
                     const lzp = lzw.pack(qClone);
                     const q_enc = base64.encode(lzp.toString());
-                    const qembed = new builders.EmbedBuilder();
-                    qembed.setTitle("This is the exported queue.");
-                    await interaction.editOriginal({embeds: [qembed.toJSON()], files: [
+                    await interaction.editOriginal({content: "Exported queue:", files: [
                         {
                             name: `${(interaction.member as oceanic.Member).id}.export.txt`,
                             contents: new Buffer(q_enc)
