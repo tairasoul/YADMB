@@ -8,6 +8,11 @@
 
 - add capability to filter with regex to add-playlist and add-search
   - won't be too hard as then i just have to add an optional argument
+ 
+- command to view current queue
+  - will rewrite PageSelect in utils.js for this, as it'll end up being easier (maybe).
+  - it'll give you the option to remove the song, play that song next, and other functions either suggested or thought of later
+  - if it's a playlist you'll be able to export it through it
 
 # in progress
 
