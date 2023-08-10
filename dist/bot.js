@@ -127,21 +127,29 @@ const client = new oceanic.Client({
     }
 });
 client.on('voiceStateUpdate', (oldState, newState) => {
-    if (guilds[oldState.guildID].voiceChannel !== null && guilds[oldState.guildID].connection) {
-        const channel = guilds[oldState.guildID].voiceChannel;
+    if (client.getVoiceConnection(oldState.guildID) === undefined && guilds[oldState.guildID].connection) {
         const connection = guilds[oldState.guildID].connection;
-        console.log(channel.voiceMembers.size);
-        if (channel.voiceMembers.size == 1) {
-            guilds[oldState.guildID].leaveTimer = setTimeout(() => {
-                connection.disconnect();
-                connection.destroy();
-                guilds[oldState.guildID].connection = null;
-                guilds[oldState.guildID].voiceChannel = null;
-            }, 60 * 1000);
-        }
-        else {
-            if (guilds[oldState.guildID].leaveTimer != null)
-                clearTimeout(guilds[oldState.guildID].leaveTimer);
+        connection.disconnect();
+        guilds[oldState.guildID].connection = null;
+        guilds[oldState.guildID].voiceChannel = null;
+    }
+    else {
+        if (guilds[oldState.guildID].voiceChannel !== null && guilds[oldState.guildID].connection) {
+            const channel = guilds[oldState.guildID].voiceChannel;
+            const connection = guilds[oldState.guildID].connection;
+            console.log(channel.voiceMembers.size);
+            if (channel.voiceMembers.size == 1) {
+                guilds[oldState.guildID].leaveTimer = setTimeout(() => {
+                    connection.disconnect();
+                    connection.destroy();
+                    guilds[oldState.guildID].connection = null;
+                    guilds[oldState.guildID].voiceChannel = null;
+                }, 60 * 1000);
+            }
+            else {
+                if (guilds[oldState.guildID].leaveTimer != null)
+                    clearTimeout(guilds[oldState.guildID].leaveTimer);
+            }
         }
     }
 });
@@ -373,6 +381,12 @@ const commands = [
                         await interaction.editOriginal({ embeds: [scembed.toJSON()] });
                         break;
                 }
+                const ctn = guilds[interaction.guildID].currentTrack;
+                const t = guilds[interaction.guildID].queuedTracks[ctn];
+                const cst = t.trackNumber;
+                const st = t.tracks[cst];
+                if (guilds[interaction.guildID].audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection)
+                    playSong(st, interaction.guildID);
             }
         }
     },
@@ -415,7 +429,7 @@ const commands = [
             ];
             for (const name of enames) {
                 if (interaction.data.options.getBoolean(name) === true) {
-                    excludes.push(name);
+                    excludes.push(name.split("-")[1]);
                 }
             }
             const results = await playdl.search(term);
@@ -460,6 +474,7 @@ const commands = [
             const actionRow2 = new builders.ActionRow();
             actionRow2.type = oceanic.ComponentTypes.ACTION_ROW;
             actionRow2.addComponents(accept, acceptnext);
+            // change page
             // @ts-ignore
             const pl = async (i) => {
                 // @ts-ignore
@@ -472,6 +487,7 @@ const commands = [
                 }
                 catch { }
             };
+            // add video to queue
             // @ts-ignore
             const vl = async (i) => {
                 await i.defer();
@@ -499,6 +515,7 @@ const commands = [
                 if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection)
                     playSong(st, interaction.guildID);
             };
+            // play video next
             //@ts-ignore
             const vla = async (i) => {
                 await i.defer();
@@ -635,6 +652,15 @@ const commands = [
                     g.queuedTracks.push(track);
                 }
             }
+            const embed = new builders.EmbedBuilder();
+            embed.setTitle(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"}.`);
+            await interaction.editOriginal({ embeds: [embed.toJSON()] });
+            const ct = g.currentTrack;
+            const t = g.queuedTracks[ct];
+            const cst = t.trackNumber;
+            const st = t.tracks[cst];
+            if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection)
+                playSong(st, interaction.guildID);
         }
     },
     {
