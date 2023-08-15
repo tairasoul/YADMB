@@ -18,6 +18,7 @@ download discord-music-bot-installer-linux if on linux, otherwise discord-music-
 # changelog
 
 change how import works and how export sends things
+
 add view-queue
 
 # commands
@@ -73,6 +74,7 @@ skips the currently playing playlist
 ## export
 
 exports the entire queue or the entire current playlist, sends you a file
+
 save this file for when you want to import it later
 
 ## import
@@ -82,6 +84,7 @@ import a queue/playlist from a file
 ## view-queue
 
 view the queue
+
 probably still buggy as hell
 
 # other features
