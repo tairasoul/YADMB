@@ -15,22 +15,10 @@ linux and windows are now supported with [the latest release](https://github.com
 
 download discord-music-bot-installer-linux if on linux, otherwise discord-music-bot-installer-windows.rar
 
-# extra information
-
-~~this bot stores all music played in a local folder, so it doesn't have to keep streaming to youtube.~~
-
-~~if you have a workaround that works universally, feel free to implement it and create a pull request~~
-
-~~if you have a workaround that only works on your end, feel free to try to implement it on your local files~~
-
-this bot no longer stores it locally.
-
-if you want it to store locally, easiest way is to go to an earlier commit
-
 # changelog
 
-added import/export, fixed up a few commands.
-working on new command
+change how import works and how export sends things
+add view-queue
 
 # commands
 
@@ -81,6 +69,20 @@ skips the currently playing track
 ## skip-playlist
 
 skips the currently playing playlist
+
+## export
+
+exports the entire queue or the entire current playlist, sends you a file
+save this file for when you want to import it later
+
+## import
+
+import a queue/playlist from a file
+
+## view-queue
+
+view the queue
+probably still buggy as hell
 
 # other features
 
