@@ -8,11 +8,6 @@
 
 - add capability to filter with regex to add-playlist and add-search
   - won't be too hard as then i just have to add an optional argument
- 
-- command to view current queue
-  - will rewrite PageSelect in utils.js for this, as it'll end up being easier (maybe).
-  - it'll give you the option to remove the song, play that song next, and other functions either suggested or thought of later
-  - if it's a playlist you'll be able to export it through it
 
 # in progress
 
@@ -20,6 +15,10 @@
     - the new queue system has a few bugs left due to the fact it's now more of just adding mini-queues and not singular links
 
 # finished + comments
+
+- command to view current queue
+  - made different pager functions
+  - page handling is done in bot.ts
 
 - fix the issue where it sometimes just stops the current song and plays the next one
   - need to add support for soundcloud and spotify next
