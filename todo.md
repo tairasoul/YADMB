@@ -16,6 +16,10 @@
 
 # finished + comments
 
+- command to view current queue
+  - made different pager functions
+  - page handling is done in bot.ts
+
 - fix the issue where it sometimes just stops the current song and plays the next one
   - need to add support for soundcloud and spotify next
  
