@@ -8,13 +8,20 @@
 
 - add capability to filter with regex to add-playlist and add-search
   - won't be too hard as then i just have to add an optional argument
+ 
+- add more view-queue options
+  - for example, making it so you can import a playlist and concat it with a viewed playlist
+  - moving a song around the queue
+  - exporting playlist
+  - others (suggest in issues)
 
 # in progress
 
+# finished + comments
+
 - find and fix some final bugs with the current queue system
     - the new queue system has a few bugs left due to the fact it's now more of just adding mini-queues and not singular links
-
-# finished + comments
+    - it should be completely functional now
 
 - command to view current queue
   - made different pager functions
