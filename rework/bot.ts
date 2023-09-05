@@ -16,6 +16,19 @@ import {default as lzw} from "lzwcompress";
 import base64 from "base-64";
 import rstring from "randomstring";
 import util from "node:util"
+const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
+let debug = false;
+if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
+
+function debugLog(text: any) {
+    if (debug) console.log(text)
+}
+
+function embedMessage(text: string) {
+    const embed = new builders.EmbedBuilder();
+    embed.setDescription(text);
+    return embed.toJSON()
+}
 
 // util functions
 
@@ -68,7 +81,7 @@ function setupGuild(guild: oceanic.Guild) {
                     if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])  playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                     break;
                 case "queue":
-                    console.log(cg.currentTrack)
+                    debugLog(cg.currentTrack)
                     if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
                         cg.queuedTracks[cg.currentTrack].trackNumber += 1;
                     }
@@ -78,7 +91,7 @@ function setupGuild(guild: oceanic.Guild) {
                     if (cg.currentTrack >= cg.queuedTracks.length) cg.currentTrack = 0;
                     if (cg.queuedTracks[cg.currentTrack].trackNumber >= cg.queuedTracks[cg.currentTrack].tracks.length) cg.currentTrack += 1
                     if (cg.currentTrack >= cg.queuedTracks.length) cg.currentTrack = 0;
-                    console.log(cg.currentTrack)
+                    debugLog(cg.currentTrack)
                     if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])  playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id)
                     break;
                 case "playlist":
@@ -130,7 +143,6 @@ interface Command {
 
 // starter variables
 
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 const { token } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 const guilds: { [id: string]: Guild} = {}
 const loopTypeStrs = {
@@ -173,7 +185,7 @@ client.on('voiceStateUpdate', (oldState: oceanic.Member, newState: oceanic.JSONV
         if (guilds[oldState.guildID].voiceChannel !== null && guilds[oldState.guildID].connection) {
             const channel = guilds[oldState.guildID].voiceChannel as oceanic.VoiceChannel;
             const connection = guilds[oldState.guildID].connection as voice.VoiceConnection;
-            console.log(channel.voiceMembers.size);
+            debugLog(channel.voiceMembers.size);
             if (channel.voiceMembers.size == 1) {
                 guilds[oldState.guildID].leaveTimer = setTimeout(() => {
                     connection.disconnect();
@@ -234,7 +246,7 @@ client.on('guildCreate', (guild: oceanic.Guild) => {
 
     setupGuild(guild)
 
-    client.editStatus("online", [{type: oceanic.ActivityTypes.WATCHING, name: (client.guilds.size).toString() + ' servers'}]);
+    client.editStatus("online", [{name: (client.guilds.size).toString() + ' servers', state: "Watching"}]);
 })
 
 client.setMaxListeners(200);
@@ -242,7 +254,7 @@ client.setMaxListeners(200);
 client.on('guildDelete', (guild: oceanic.Uncached | oceanic.Guild) => {
     guilds[guild.id].audioPlayer.removeAllListeners();
     delete guilds[guild.id]
-    client.editStatus("online", [{type: oceanic.ActivityTypes.WATCHING, name: (client.guilds.size).toString() + ' servers'}]);
+    client.editStatus("online", [{name: (client.guilds.size).toString() + ' servers', state: "Watching"}]);
 })
 
 const commands: Command[] = [
@@ -724,15 +736,15 @@ const commands: Command[] = [
             });
             const encodedData = await data.text();
             const decode = base64.decode(encodedData);
-            console.log(decode);
+            debugLog(decode);
             const arr = decode.split(",");
-            console.log(arr);
+            debugLog(arr);
             const numbers = [];
             for (const string of arr) {
                 numbers.push(parseInt(string));
             }
             const lzd = lzw.unpack(numbers);
-            console.log(lzd);
+            debugLog(util.inspect(lzd, true, 5));
             if (lzd.trackNumber) {
                 g.queuedTracks.push(lzd);
             }
@@ -742,7 +754,7 @@ const commands: Command[] = [
                 }
             }
             const embed = new builders.EmbedBuilder();
-            embed.setTitle(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"}.`);
+            embed.setDescription(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"} from ${encoded.filename}`);
             await interaction.editOriginal({embeds: [embed.toJSON()]});
             const ct = g.currentTrack;
             const t = g.queuedTracks[ct];
@@ -1045,14 +1057,16 @@ const commands: Command[] = [
         .setDescription("View the queue.")
         .setDMPermission(false),
         async execute(interaction: oceanic.CommandInteraction) {
-            await interaction.defer();
+            await interaction.defer(1 << 6)
+            await interaction.editOriginal({embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")], flags: 1 << 6})
             const data: {queued: PageHolder, tracks: PageHolder | null} = {
-                queued: await utils.queuedTrackPager(guilds[interaction.guildID as string].queuedTracks),
+                queued: await utils.queuedTrackPager(guilds[interaction.guildID as string].queuedTracks, async (title) => {
+                    await interaction.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6})
+                }),
                 tracks: null
             }
             let isInspecting = false;
             let currentPage = 0;
-            let inspectingMessageId = "";
             let currentInspectPage = 0;
             // make ids
             const nextEmbedId = rstring.generate();
@@ -1088,11 +1102,11 @@ const commands: Command[] = [
             const actionRows = {
                 song: [
                     new builders.ActionRow().addComponents(playNext).toJSON(),
-                    new builders.ActionRow().addComponents(nextEmbed, prevEmbed).toJSON()
+                    new builders.ActionRow().addComponents(prevEmbed, nextEmbed).toJSON()
                 ],
                 playlist: [
                     new builders.ActionRow().addComponents(inspect, shuffle, playNext).toJSON(),
-                    new builders.ActionRow().addComponents(nextEmbed, prevEmbed).toJSON()
+                    new builders.ActionRow().addComponents(prevEmbed, nextEmbed).toJSON()
                 ],
                 inspected: [
                     new builders.ActionRow().addComponents(removeInspected, exitInspect).toJSON(),
@@ -1101,11 +1115,11 @@ const commands: Command[] = [
                 disabled: {
                     song: [
                         new builders.ActionRow().addComponents(playNext.disable()).toJSON(),
-                        new builders.ActionRow().addComponents(nextEmbed.disable(), prevEmbed.disable()).toJSON()
+                        new builders.ActionRow().addComponents(prevEmbed.disable(), nextEmbed.disable()).toJSON()
                     ],
                     playlist: [
                         new builders.ActionRow().addComponents(inspect.disable(), shuffle.disable(), playNext.disable()).toJSON(),
-                        new builders.ActionRow().addComponents(nextEmbed.disable(), prevEmbed.disable()).toJSON()
+                        new builders.ActionRow().addComponents(prevEmbed.disable(), nextEmbed.disable()).toJSON()
                     ],
                     inspected: [
                         new builders.ActionRow().addComponents(removeInspected.disable(), exitInspect.disable()).toJSON(),
@@ -1117,14 +1131,14 @@ const commands: Command[] = [
             const onInspect = async (i: oceanic.ComponentInteraction) => {
                 if (i.data.customID !== inspectId) return;
                 if (i.user.id !== interaction.user.id) return;
-                await i.defer();
                 currentInspectPage = 0;
-                await i.editOriginal({content: "Paging tracks for playlist."});
-                data.tracks = await utils.trackPager(guilds[interaction.guildID as string].queuedTracks[currentPage].tracks);
+                await i.createMessage({embeds: [embedMessage("Paging tracks for playlist.")], flags: 1 << 6});
+                data.tracks = await utils.trackPager(guilds[interaction.guildID as string].queuedTracks[currentPage].tracks, async (title) => {
+                    await i.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6})
+                });
                 isInspecting = true;
                 /** @ts-ignore */
-                const msg = await i.editOriginal({content: "", embeds: data.tracks.pages[0].embed.toJSON(true), components: actionRows.inspected});
-                inspectingMessageId = msg.id;
+                await interaction.editOriginal({content: "", embeds: data.tracks.pages[0].embed.toJSON(true), components: actionRows.inspected, flags: 1 << 6});
             }
             
             const onNext = async (i: oceanic.ComponentInteraction) => {
@@ -1132,16 +1146,17 @@ const commands: Command[] = [
                 if (i.user.id !== interaction.user.id) return;
                 if (isInspecting && data.tracks) {
                     currentInspectPage += 1;
+                    if (currentInspectPage === data.tracks.pages.length) currentInspectPage = 0;
                     const embed = data.tracks.pages[currentInspectPage].embed;
                     /** @ts-ignore */
-                    await i.editParent({embeds: [embed.toJSON()], components: actionRows.inspected})
+                    await i.editParent({embeds: [embed.toJSON()], components: actionRows.inspected, flags: 1 << 6})
                 }
                 else {
                     currentPage += 1;
                     if (currentPage === data.queued.pages.length) currentPage = 0;
                     const current = data.queued.pages[currentPage];
                     /** @ts-ignore */
-                    await i.editParent({content: "", embeds: current.embed.toJSON(true), components: current.type === "playlist" ? actionRows.playlist : actionRows.song});
+                    await i.editParent({content: "", embeds: current.embed.toJSON(true), components: current.type === "playlist" ? actionRows.playlist : actionRows.song, flags: 1 << 6});
                 }
             }
 
@@ -1152,14 +1167,14 @@ const commands: Command[] = [
                     currentInspectPage -= 1;
                     const embed = data.tracks.pages[currentInspectPage].embed;
                     /** @ts-ignore */
-                    await i.editParent({embeds: [embed.toJSON()], components: actionRows.inspected})
+                    await i.editParent({embeds: [embed.toJSON()], components: actionRows.inspected, flags: 1 << 6})
                 }
                 else {
                     currentPage -= 1;
-                    if (currentPage === 0) currentPage = data.queued.pages.length - 1;
+                    if (currentPage === -1) currentPage = data.queued.pages.length - 1;
                     const current = data.queued.pages[currentPage];
                     /** @ts-ignore */
-                    await i.editParent({content: "", embeds: current.embed.toJSON(true), components: current.type === "playlist" ? actionRows.playlist : actionRows.song});
+                    await i.editParent({content: "", embeds: current.embed.toJSON(true), components: current.type === "playlist" ? actionRows.playlist : actionRows.song, flags: 1 << 6});
                 }
             }
 
@@ -1169,8 +1184,7 @@ const commands: Command[] = [
                 const queueIndex = data.queued.pages[currentPage].index;
                 const queued = guilds[i.guildID as string].queuedTracks[queueIndex];
                 utils.shuffleArray(queued.tracks);
-                /** @ts-ignore */
-                await i.editParent({content: "Shuffled playlist.", embeds: data.queued.pages[currentPage].embed.toJSON(true), components: actionRows.playlist})
+                await i.createMessage({embeds: [embedMessage("Shuffled playlist.")], flags: 1 << 6})
             }
 
             const onPlayNext = async (i: oceanic.ComponentInteraction) => {
@@ -1182,15 +1196,17 @@ const commands: Command[] = [
                 const queued = g.queuedTracks;
                 const removed = queued.splice(queueIndex, 1);
                 queued.splice(g.currentTrack, 0, removed[0]);
-                await i.editOriginal({content: "Playing " + removed[0].name + " next."});
+                await i.createMessage({embeds: [embedMessage("Playing " + removed[0].name + " next.")], flags: 1 << 6});
             }
 
             const onExitInspect = async (i: oceanic.ComponentInteraction) => {
                 if (i.data.customID !== exitInspectId) return;
                 if (i.user.id !== interaction.user.id) return;
                 isInspecting = false;
-                await interaction.deleteFollowup(inspectingMessageId);
-                inspectingMessageId = "";
+                await i.createMessage({embeds: [embedMessage("Exited inspect mode.")], flags: 1 << 6});
+                const current = data.queued.pages[currentPage];
+                /** @ts-ignore */
+                await interaction.editOriginal({content: "", embeds: current.embed.toJSON(true), components: current.type === "playlist" ? actionRows.playlist : actionRows.song, flags: 1 << 6});
             }
 
             const onRemoveInspected = async (i: oceanic.ComponentInteraction) => {
@@ -1208,7 +1224,7 @@ const commands: Command[] = [
                 /** @ts-ignore */
                 const embed = data.tracks.pages[currentInspectPage].embed;
                 /** @ts-ignore */
-                await i.editParent({content: "",embeds: [embed.toJSON()], components: actionRows.inspected})
+                await i.editParent({content: "",embeds: [embed.toJSON()], components: actionRows.inspected, flags: 1 << 6})
             }
             /** @ts-ignore */
             client.on("interactionCreate", onNext);
@@ -1227,7 +1243,7 @@ const commands: Command[] = [
 
             const currentpage = data.queued.pages[0];
             /** @ts-ignore */
-            await interaction.editOriginal({embeds: currentpage.embed.toJSON(true), components: currentpage.type === "playlist" ? actionRows.playlist : actionRows.song});
+            await interaction.editOriginal({content: "", embeds: currentpage.embed.toJSON(true), components: currentpage.type === "playlist" ? actionRows.playlist : actionRows.song, flags: 1 << 6});
 
             setTimeout(async () => {
                 /** @ts-ignore */
@@ -1248,13 +1264,13 @@ const commands: Command[] = [
                     /** @ts-ignore */
                     const embed = data.tracks?.pages[currentInspectPage].embed;
                     /** @ts-ignore */
-                    await interaction.editOriginal({embeds: embed?.toJSON(true), components: actionRows.disabled.inspected});
+                    await interaction.editOriginal({embeds: embed?.toJSON(true), components: actionRows.disabled.inspected, flags: 1 << 6});
                 }
                 else {
                     const current = data.queued.pages[currentPage]
                     const embed = current.embed;
                     /** @ts-ignore */
-                    await interaction.editOriginal({embeds: embed?.toJSON(true), components: current.type === "playlist" ? actionRows.disabled.playlist : actionRows.disabled.song});
+                    await interaction.editOriginal({embeds: embed?.toJSON(true), components: current.type === "playlist" ? actionRows.disabled.playlist : actionRows.disabled.song, flags: 1 << 6});
                 }
             }, 720000)
         }
@@ -1290,7 +1306,7 @@ client.on('ready', async () => {
         await client.application.createGlobalCommand(command.data);
         console.log(`created global command ${command.data.name}`);
     }
-    client.editStatus("online", [{type: oceanic.ActivityTypes.WATCHING, name: (client.guilds.size).toString() + ' servers'}]);
+    client.editStatus("online", [{state: "Watching", name: (client.guilds.size).toString() + ' servers'}]);
 })
 
 // @ts-ignore
