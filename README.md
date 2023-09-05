@@ -17,9 +17,13 @@ download discord-music-bot-installer-linux if on linux, otherwise discord-music-
 
 # changelog
 
-change how import works and how export sends things
+view-queue now uses ephemeral messages, no longer creates a 2nd message when inspecting a playlist
 
-add view-queue
+most debug information logs will now only appear if you have a file in dist/ called enableDebugging
+
+import now mentions the filename
+
+fix issues with view-queue that caused it to error sometimes when it tries to loop around
 
 # commands
 
