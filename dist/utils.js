@@ -1,10 +1,20 @@
 import fs from 'fs';
 import * as oceanic from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
+import path from 'path';
+import { fileURLToPath } from 'url';
 /** @ts-ignore */
 import lzw from "lzwcompress";
 import base64 from "base-64";
 import playdl from "play-dl";
+const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
+let debug = false;
+if (fs.existsSync(`${__dirname}/enableDebugging`))
+    debug = true;
+function debugLog(text) {
+    if (debug)
+        console.log(text);
+}
 export function SelectMenu(options, customId) {
     const actionRow = new builders.ActionRow();
     actionRow.type = oceanic.ComponentTypes.ACTION_ROW;
@@ -130,12 +140,19 @@ export function Pager(pages) {
     }
     return new PageHolder(PageClasses);
 }
-export async function queuedTrackPager(array) {
+export async function queuedTrackPager(array, callback = () => { return new Promise((resolve) => resolve()); }) {
     const pages = [];
     for (let i = 0; i < array.length; i++) {
         const queued = array[i];
+        await callback(queued.name);
+        debugLog(`paging ${queued.name}`);
+        debugLog(queued);
         const embed = new builders.EmbedBuilder();
         embed.setTitle(queued.name);
+        embed.addField("index", i.toString(), true);
+        embed.addField("type", queued.type, true);
+        embed.addField("songs", queued.tracks.length.toString(), true);
+        debugLog(queued.tracks[0].url);
         /** @ts-ignore */
         embed.setImage((await playdl.video_basic_info(queued.tracks[0].url)).video_details.thumbnails.find((val) => val.url.includes("maxresdefault")).url);
         pages.push({
@@ -147,12 +164,16 @@ export async function queuedTrackPager(array) {
     }
     return Pager({ pages: pages });
 }
-export async function trackPager(array) {
+export async function trackPager(array, callback = () => { return new Promise((resolve) => resolve()); }) {
     const pages = [];
     for (let i = 0; i < array.length; i++) {
         const queued = array[i];
+        await callback(queued.name);
+        debugLog(`paging ${queued.name}`);
+        debugLog(queued);
         const embed = new builders.EmbedBuilder();
         embed.setTitle(queued.name);
+        embed.addField("index", i.toString(), true);
         /** @ts-ignore */
         embed.setImage((await playdl.video_basic_info(queued.url)).video_details.thumbnails.find((val) => val.url.includes("maxresdefault")).url);
         pages.push({
