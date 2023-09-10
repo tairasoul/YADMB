@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import * as oceanic from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
-import utils, { PageHolder } from './utils.js';
+import utils, { PageData, PageHolder } from './utils.js';
 import * as voice from "@discordjs/voice";
 import { default as playdl } from 'play-dl';
 import humanize from 'humanize-duration'
@@ -735,20 +735,14 @@ const commands: Command[] = [
                 method: "GET"
             });
             const encodedData = await data.text();
-            const decode = base64.decode(encodedData);
-            debugLog(decode);
-            const arr = decode.split(",");
-            debugLog(arr);
-            const numbers = [];
-            for (const string of arr) {
-                numbers.push(parseInt(string));
-            }
-            const lzd = lzw.unpack(numbers);
-            debugLog(util.inspect(lzd, true, 5));
-            if (lzd.trackNumber) {
+            const lzd = utils.decodeStr(encodedData);
+            debugLog(lzd);
+            if (lzd?.trackNumber !== undefined) {
+                debugLog("found track number")
                 g.queuedTracks.push(lzd);
             }
             else {
+                debugLog("no track number, iterating.")
                 for (const track of lzd) {
                     g.queuedTracks.push(track);
                 }
@@ -1069,6 +1063,7 @@ const commands: Command[] = [
             let currentPage = 0;
             let currentInspectPage = 0;
             // make ids
+            debugLog("making component ids")
             const nextEmbedId = rstring.generate();
             const prevEmbedId = rstring.generate();
             const inspectId = rstring.generate();
@@ -1078,7 +1073,10 @@ const commands: Command[] = [
             const prevInspectedId = rstring.generate();
             const exitInspectId = rstring.generate();
             const removeInspectedId = rstring.generate();
+            const exportId = rstring.generate();
+            const exitId = rstring.generate();
             // setup buttons
+            debugLog("creating components")
             const nextEmbed = new builders.Button(oceanic.ButtonStyles.PRIMARY, nextEmbedId);
             const prevEmbed = new builders.Button(oceanic.ButtonStyles.PRIMARY, prevEmbedId);
             const inspect = new builders.Button(oceanic.ButtonStyles.PRIMARY, inspectId);
@@ -1087,8 +1085,11 @@ const commands: Command[] = [
             const nextInspected = new builders.Button(oceanic.ButtonStyles.PRIMARY, nextInspectedId);
             const prevInspected = new builders.Button(oceanic.ButtonStyles.PRIMARY, prevInspectedId);
             const exitInspect = new builders.Button(oceanic.ButtonStyles.PRIMARY, exitInspectId);
-            const removeInspected = new builders.Button(oceanic.ButtonStyles.PRIMARY, removeInspectedId)
+            const removeInspected = new builders.Button(oceanic.ButtonStyles.PRIMARY, removeInspectedId);
+            const exportB = new builders.Button(oceanic.ButtonStyles.PRIMARY, exportId);
+            const exit = new builders.Button(oceanic.ButtonStyles.PRIMARY, exitId);
             // setup labels
+            debugLog("setting labels")
             nextEmbed.setLabel("Next");
             prevEmbed.setLabel("Previous");
             inspect.setLabel("Inspect");
@@ -1098,15 +1099,17 @@ const commands: Command[] = [
             prevInspected.setLabel("Previous song");
             exitInspect.setLabel("Exit inspect mode");
             removeInspected.setLabel("Remove inspected song");
+            exportB.setLabel("Export viewed playlist");
+            exit.setLabel("Stop viewing queue")
             // setup action rows
             const actionRows = {
                 song: [
                     new builders.ActionRow().addComponents(playNext).toJSON(),
-                    new builders.ActionRow().addComponents(prevEmbed, nextEmbed).toJSON()
+                    new builders.ActionRow().addComponents(prevEmbed, exit, nextEmbed).toJSON()
                 ],
                 playlist: [
-                    new builders.ActionRow().addComponents(inspect, shuffle, playNext).toJSON(),
-                    new builders.ActionRow().addComponents(prevEmbed, nextEmbed).toJSON()
+                    new builders.ActionRow().addComponents(inspect, shuffle, playNext, exportB).toJSON(),
+                    new builders.ActionRow().addComponents(prevEmbed, exit, nextEmbed).toJSON(),
                 ],
                 inspected: [
                     new builders.ActionRow().addComponents(removeInspected, exitInspect).toJSON(),
@@ -1115,11 +1118,11 @@ const commands: Command[] = [
                 disabled: {
                     song: [
                         new builders.ActionRow().addComponents(playNext.disable()).toJSON(),
-                        new builders.ActionRow().addComponents(prevEmbed.disable(), nextEmbed.disable()).toJSON()
+                        new builders.ActionRow().addComponents(prevEmbed.disable(), exit.disable(), nextEmbed.disable()).toJSON()
                     ],
                     playlist: [
-                        new builders.ActionRow().addComponents(inspect.disable(), shuffle.disable(), playNext.disable()).toJSON(),
-                        new builders.ActionRow().addComponents(prevEmbed.disable(), nextEmbed.disable()).toJSON()
+                        new builders.ActionRow().addComponents(inspect.disable(), shuffle.disable(), playNext.disable(), exportB.disable()).toJSON(),
+                        new builders.ActionRow().addComponents(prevEmbed.disable(), exit.disable(), nextEmbed.disable()).toJSON()
                     ],
                     inspected: [
                         new builders.ActionRow().addComponents(removeInspected.disable(), exitInspect.disable()).toJSON(),
@@ -1128,9 +1131,53 @@ const commands: Command[] = [
                 }
             }
 
+            const onExit = async (i: oceanic.ComponentInteraction) => {
+                if (i.data.customID !== exitId) return;
+                /** @ts-ignore */
+                client.off("interactionCreate", onNext);
+                /** @ts-ignore */
+                client.off("interactionCreate", onPrev);
+                /** @ts-ignore */
+                client.off("interactionCreate", onInspect);
+                /** @ts-ignore */
+                client.off("interactionCreate", onShuffle);
+                /** @ts-ignore */
+                client.off("interactionCreate", onPlayNext);
+                /** @ts-ignore */
+                client.off("interactionCreate", onExitInspect);
+                /** @ts-ignore */
+                client.off("interactionCreate", onRemoveInspected);
+                /** @ts-ignore */
+                client.off("interactionCreate", onExport);
+                /** @ts-ignore */
+                client.off("interactionCreate", onExit);
+                /** @ts-ignore */
+                await interaction.editOriginal({components: isInspecting ? actionRows.disabled.inspected : data.queued.pages[currentPage].type == "song" ? actionRows.disabled.song : actionRows.disabled.playlist})
+                await i.createMessage({content: "Exited view.", flags: 1 << 6})
+            }
+
+            const onExport = async (i: oceanic.ComponentInteraction) => {
+                if (i.data.customID !== exportId) return;
+                await i.defer(1 << 6)
+                const q = guilds[interaction.guildID as string].queuedTracks[currentPage]
+                const clone: queuedTrack = {
+                    trackNumber: 0,
+                    tracks: q.tracks,
+                    type: "playlist",
+                    name: q.name
+                };
+                const c = lzw.pack(clone);
+                const encoded = base64.encode(c.toString());
+                await i.editOriginal({content: "Exported playlist. Save this as a file:", files: [
+                    {
+                        name: `${(interaction.member as oceanic.Member).id}.${interaction.guildID as string}.${interaction.createdAt.getTime()}.export.txt`,
+                        contents: new Buffer(encoded)
+                    }
+                ], flags: 1 << 6});
+            }
+
             const onInspect = async (i: oceanic.ComponentInteraction) => {
                 if (i.data.customID !== inspectId) return;
-                if (i.user.id !== interaction.user.id) return;
                 currentInspectPage = 0;
                 await i.createMessage({embeds: [embedMessage("Paging tracks for playlist.")], flags: 1 << 6});
                 data.tracks = await utils.trackPager(guilds[interaction.guildID as string].queuedTracks[currentPage].tracks, async (title) => {
@@ -1143,7 +1190,6 @@ const commands: Command[] = [
             
             const onNext = async (i: oceanic.ComponentInteraction) => {
                 if (i.data.customID !== nextEmbedId && i.data.customID !==  nextInspectedId) return;
-                if (i.user.id !== interaction.user.id) return;
                 if (isInspecting && data.tracks) {
                     currentInspectPage += 1;
                     if (currentInspectPage === data.tracks.pages.length) currentInspectPage = 0;
@@ -1162,7 +1208,6 @@ const commands: Command[] = [
 
             const onPrev = async (i: oceanic.ComponentInteraction) => {
                 if (i.data.customID !== prevEmbedId && i.data.customID !== prevInspectedId) return;
-                if (i.user.id !== interaction.user.id) return;
                 if (isInspecting && data.tracks) {
                     currentInspectPage -= 1;
                     const embed = data.tracks.pages[currentInspectPage].embed;
@@ -1180,16 +1225,16 @@ const commands: Command[] = [
 
             const onShuffle = async (i: oceanic.ComponentInteraction) => {
                 if (i.data.customID !== shuffleId) return;
-                if (i.user.id !== interaction.user.id) return;
                 const queueIndex = data.queued.pages[currentPage].index;
-                const queued = guilds[i.guildID as string].queuedTracks[queueIndex];
-                utils.shuffleArray(queued.tracks);
+                debugLog(queueIndex);
+                debugLog(guilds[i.guildID as string].queuedTracks[queueIndex].tracks)
+                utils.shuffleArray(guilds[i.guildID as string].queuedTracks[queueIndex].tracks);
+                debugLog(guilds[i.guildID as string].queuedTracks[queueIndex].tracks)
                 await i.createMessage({embeds: [embedMessage("Shuffled playlist.")], flags: 1 << 6})
             }
 
             const onPlayNext = async (i: oceanic.ComponentInteraction) => {
                 if (i.data.customID !== playNextId) return;
-                if (i.user.id !== interaction.user.id) return;
                 await i.defer()
                 const queueIndex = data.queued.pages[currentPage].index;
                 const g = guilds[i.guildID as string];
@@ -1201,7 +1246,6 @@ const commands: Command[] = [
 
             const onExitInspect = async (i: oceanic.ComponentInteraction) => {
                 if (i.data.customID !== exitInspectId) return;
-                if (i.user.id !== interaction.user.id) return;
                 isInspecting = false;
                 await i.createMessage({embeds: [embedMessage("Exited inspect mode.")], flags: 1 << 6});
                 const current = data.queued.pages[currentPage];
@@ -1211,7 +1255,6 @@ const commands: Command[] = [
 
             const onRemoveInspected = async (i: oceanic.ComponentInteraction) => {
                 if (i.data.customID !== removeInspectedId) return;
-                if (i.user.id !== interaction.user.id) return;
                 await i.defer();
                 const queueIndexes = {
                     queue: data.queued.pages[currentPage].index,
@@ -1240,6 +1283,10 @@ const commands: Command[] = [
             client.on("interactionCreate", onExitInspect);
             /** @ts-ignore */
             client.on("interactionCreate", onRemoveInspected);
+            /** @ts-ignore */
+            client.on("interactionCreate", onExport);
+            /** @ts-ignore */
+            client.on("interactionCreate", onExit)
 
             const currentpage = data.queued.pages[0];
             /** @ts-ignore */
@@ -1260,6 +1307,10 @@ const commands: Command[] = [
                 client.off("interactionCreate", onExitInspect);
                 /** @ts-ignore */
                 client.off("interactionCreate", onRemoveInspected);
+                /** @ts-ignore */
+                client.off("interactionCreate", onExport);
+                /** @ts-ignore */
+                client.off("interactionCreate", onExit);
                 if (isInspecting) {
                     /** @ts-ignore */
                     const embed = data.tracks?.pages[currentInspectPage].embed;
@@ -1273,6 +1324,361 @@ const commands: Command[] = [
                     await interaction.editOriginal({embeds: embed?.toJSON(true), components: current.type === "playlist" ? actionRows.disabled.playlist : actionRows.disabled.song, flags: 1 << 6});
                 }
             }, 720000)
+        }
+    },
+    {
+        data: new builders.ApplicationCommandBuilder(1, "create-playlist")
+        .setDescription("Create a custom playlist.")
+        .addOption({
+            type: oceanic.ApplicationCommandOptionTypes.STRING,
+            required: true,
+            name: "playlist-name",
+            description: "Name of the playlist."
+        })
+        .setDMPermission(false),
+        async execute(interaction: oceanic.CommandInteraction) {
+            await interaction.defer(1 << 6);
+            const name = interaction.data.options.getString("playlist-name", true);
+            const data: queuedTrack = {
+                type: "playlist",
+                name: name,
+                trackNumber: 0,
+                tracks: []
+            }
+            const paged: PageData[] = []
+            let currentTrack = 0;
+            await interaction.editOriginal({embeds: [embedMessage("Creating component ids.")], flags: 1 << 6});
+            // create component ids
+            debugLog("creatiing component ids")
+            const backId = rstring.generate();
+            const nextId = rstring.generate();
+            const addId = rstring.generate();
+            const removeId = rstring.generate();
+            const moveUpId = rstring.generate();
+            const moveBackId = rstring.generate();
+            const exportId = rstring.generate();
+            const modalId = rstring.generate();
+            // create components
+            await interaction.editOriginal({embeds: [embedMessage("Creating components.")], flags: 1 << 6});
+            const back = new builders.Button(oceanic.ButtonStyles.PRIMARY, backId);
+            const next = new builders.Button(oceanic.ButtonStyles.PRIMARY, nextId);
+            const add = new builders.Button(oceanic.ButtonStyles.PRIMARY, addId);
+            const remove = new builders.Button(oceanic.ButtonStyles.PRIMARY, removeId);
+            const moveUp = new builders.Button(oceanic.ButtonStyles.PRIMARY, moveUpId);
+            const moveBack = new builders.Button(oceanic.ButtonStyles.PRIMARY, moveBackId);
+            const exportB = new builders.Button(oceanic.ButtonStyles.PRIMARY, exportId)
+            // set labels
+            back.setLabel("Previous song");
+            next.setLabel("Next song");
+            add.setLabel("Add song");
+            remove.setLabel("Remove song");
+            moveUp.setLabel("Move song forwards");
+            moveBack.setLabel("Move song backwards");
+            exportB.setLabel("Export playlist (disables buttons)")
+            // create component thingy
+            const rows = {
+                enabled: [
+                    new builders.ActionRow().addComponents(moveBack, add, remove, moveUp).toJSON(),
+                    new builders.ActionRow().addComponents(back, exportB, next).toJSON()
+                ],
+                moveBackDisabled: [
+                    new builders.ActionRow().addComponents(moveBack.disable(), add, remove, moveUp).toJSON(),
+                    new builders.ActionRow().addComponents(back, exportB, next).toJSON()
+                ],
+                moveUpDisabled: [
+                    new builders.ActionRow().addComponents(moveBack.enable(), add, remove, moveUp.disable()).toJSON(),
+                    new builders.ActionRow().addComponents(back, exportB, next).toJSON()
+                ],
+                movesDisabled: [
+                    new builders.ActionRow().addComponents(moveBack.disable(), add, remove, moveUp.disable()).toJSON(),
+                    new builders.ActionRow().addComponents(back, exportB, next).toJSON()
+                ],
+                disabled: [
+                    new builders.ActionRow().addComponents(moveBack.disable(), add.disable(), remove.disable(), moveUp.disable()).toJSON(),
+                    new builders.ActionRow().addComponents(back.disable(), exportB.disable(), next.disable()).toJSON()
+                ],
+            }
+            // create callbacks
+
+            const onExport = async (i: oceanic.ComponentInteraction) => {
+                if (i.data.customID !== exportId) return;
+                await i.defer(1 << 6);
+                const encoded = base64.encode(lzw.pack(data));
+                await i.editOriginal({content: `Exported playlist **${name}**. Save this as a file:`, files: [
+                    {
+                        name: `${(interaction.member as oceanic.Member).id}.${interaction.guildID as string}.${interaction.createdAt.getTime()}.export.txt`,
+                        contents: new Buffer(encoded)
+                    }
+                ]})
+                /** @ts-ignore */
+                client.off("interactionCreate", onBack);
+                /** @ts-ignore */
+                client.off("interactionCreate", onNext);
+                /** @ts-ignore */
+                client.off("interactionCreate", onRemove);
+                /** @ts-ignore */
+                client.off("interactionCreate", onAdd);
+                /** @ts-ignore */
+                client.off("interactionCreate", onMoveBack);
+                /** @ts-ignore */
+                client.off("interactionCreate", onMoveUp);
+                /** @ts-ignore */
+                client.off("interactionCreate", onExport);
+                /** @ts-ignore */
+                await interaction.editOriginal({embeds: [paged[currentTrack].embed.toJSON()], components: rows.disabled, flags: 1 << 6})
+            }
+
+            const onBack = async (i: oceanic.ComponentInteraction) => {
+                if (i.data.customID !== backId) return;
+                currentTrack -= 1;
+                if (currentTrack == -1) currentTrack = paged.length - 1;
+                const embed = paged[currentTrack].embed;
+                const components = (currentTrack == 0 ? rows.moveBackDisabled : currentTrack == paged.length - 1 ? rows.moveUpDisabled : rows.enabled)
+                /** @ts-ignore */
+                await i.editParent({embeds: [embed.toJSON()], components: components, flags: 1 << 6})
+            }
+
+            const onNext = async (i: oceanic.ComponentInteraction) => {
+                if (i.data.customID !== nextId) return;
+                currentTrack += 1;
+                if (currentTrack == paged.length) currentTrack = 0;
+                debugLog(paged);
+                const embed = paged[currentTrack].embed;
+                const components = (currentTrack == 0 ? rows.moveBackDisabled : currentTrack == paged.length - 1 ? rows.moveUpDisabled : rows.enabled)
+                /** @ts-ignore */
+                await i.editParent({embeds: [embed.toJSON()], components: components, flags: 1 << 6})
+            }
+            
+            const onMoveBack = async (i: oceanic.ComponentInteraction) => {
+                if (i.data.customID !== moveBackId) return;
+                const currentData = {
+                    paged: paged.splice(currentTrack, 1)[0],
+                    track: data.tracks.splice(currentTrack, 1)[0]
+                }
+                debugLog(paged);
+                currentData.paged.index -= 1
+                for (const field of currentData.paged.embed.getFields()) {
+                    if (field.name === "index") {
+                        field.value = (currentData.paged.index).toString();
+                    }
+                }
+                paged[currentTrack - 1].index += 1;
+                for (const field of paged[currentTrack - 1].embed.getFields()) {
+                    if (field.name === "index") {
+                        field.value = (paged[currentTrack- 1].index).toString();
+                    }
+                }
+                paged.splice(currentTrack - 1, 0, currentData.paged);
+                debugLog(paged);
+                data.tracks.splice(currentTrack - 1, 0, currentData.track);
+                const embed = paged[currentTrack].embed;
+                /** @ts-ignore */
+                await i.editParent({embeds: [embed.toJSON()], components: rows.enabled, flags: 1 << 6});
+                await i.createFollowup({embeds: [embedMessage(`Moved track **${currentData.track.name}** backwards.`)], flags: 1 << 6});
+            }
+
+            const onMoveUp = async (i: oceanic.ComponentInteraction) => {
+                if (i.data.customID !== moveUpId) return;
+                const currentData = {
+                    paged: paged.splice(currentTrack, 1)[0],
+                    track: data.tracks.splice(currentTrack, 1)[0]
+                }
+                debugLog(paged);
+                currentData.paged.index += 1
+                for (const field of currentData.paged.embed.getFields()) {
+                    if (field.name === "index") {
+                        field.value = (currentData.paged.index).toString();
+                    }
+                }
+                paged[currentTrack].index -= 1;
+                for (const field of paged[currentTrack].embed.getFields()) {
+                    if (field.name === "index") {
+                        field.value = (paged[currentTrack].index).toString();
+                    }
+                }
+                paged.splice(currentTrack + 1, 0, currentData.paged);
+                debugLog(paged)
+                data.tracks.splice(currentTrack + 1, 0, currentData.track);
+                const embed = paged[currentTrack].embed;
+                /** @ts-ignore */
+                await i.editParent({embeds: [embed.toJSON()], components: rows.enabled, flags: 1 << 6});
+                await i.createFollowup({embeds: [embedMessage(`Moved track **${currentData.track.name}** forwards.`)], flags: 1 << 6});
+            }
+            
+            const onRemove = async (i: oceanic.ComponentInteraction) => {
+                if (i.data.customID !== removeId) return;
+                const splicedData = {
+                    paged: paged.splice(currentTrack, 1),
+                    track: data.tracks.splice(currentTrack, 1)
+                }
+                if (currentTrack == paged.length) currentTrack = paged.length - 1;
+                if (data.tracks.length > 0) {
+                    const components = (currentTrack == 0 ? rows.moveBackDisabled : currentTrack == paged.length - 1 ? rows.moveUpDisabled : rows.enabled)
+                    /** @ts-ignore */
+                    await i.editParent({embeds: [paged[currentTrack].embed.toJSON()], components: components, flags: 1 << 6})
+                }
+                else {
+                    /** @ts-ignore */
+                    await interaction.editOriginal({embeds: [embedMessage("No songs yet. Use the components to add some!")], components: rows.movesDisabled, flags: 1 << 6})
+                }
+                await i.createFollowup({embeds: [embedMessage(`Removed track **${splicedData.track[0].name}**`)], flags: 1 << 6});
+            }
+
+            const addCallback = async (int: oceanic.AnyModalSubmitInteraction, resolve: any) => {
+                if (int.data.customID !== modalId) return;
+                if (!int.acknowledged) await int.defer(1 << 6);
+                const video = int.data.components[0].components[0].value as string;
+                const provider = getProvider(video)
+                if (provider == undefined) {
+                    return int.editOriginal({embeds: [embedMessage("Invalid song link.")], flags: 1 << 6});
+                }
+                switch(provider) {
+                    case "youtube":
+                        if (!ytdl.validateURL(video)) {
+                            const embed = new builders.EmbedBuilder()
+                            embed.setDescription("Invalid link.")
+                            return await int.editOriginal({embeds: [embed.toJSON()], flags: 1 << 6});
+                        }
+                        const info = await ytdl.getInfo(video);
+                        const title = info.videoDetails.title;
+                        const youtubeadd: track = {
+                            name: title,
+                            url: video
+                        }
+                        data.tracks.push(youtubeadd);
+                        /** @ts-ignore */
+                        const pagedTrack: PageData = await utils.pageTrack(youtubeadd);
+                        pagedTrack.index = paged.length;
+                        pagedTrack.embed.addField("index", pagedTrack.index.toString(), true)
+                        paged.push(pagedTrack)
+                        const yembed = new builders.EmbedBuilder();
+                        yembed.setDescription(`Added **${title}** to custom playlist.`);
+                        await int.editOriginal({embeds: [yembed.toJSON()], flags: 1 << 6})
+                        resolve();
+                        break;
+                    // both deezer and spotify need to be searched up on youtube
+                    case "deezer":
+                        const dvid = await playdl.deezer(video);
+                        if (dvid.type !== "track") {
+                            const dembed = new builders.EmbedBuilder();
+                            dembed.setDescription(`**${dvid.title}** is not a Deezer track! add-url only supports singular tracks.`);
+                            return await int.editOriginal({embeds: [dembed.toJSON()], flags: 1 << 6})
+                        }
+                        const yvid = (await playdl.search(dvid.title, {
+                            limit: 1
+                        }))[0]
+                        const deezeradd: track = {
+                            name: dvid.title,
+                            url: yvid.url
+                        }
+                        data.tracks.push(deezeradd)
+                        /** @ts-ignore */
+                        const pagedDeezer: PageData = await utils.pageTrack(deezeradd);
+                        pagedDeezer.index = paged.length;
+                        pagedDeezer.embed.addField("index", pagedDeezer.index.toString(), true)
+                        paged.push(pagedDeezer)
+                        const dembed = new builders.EmbedBuilder();
+                        dembed.setDescription(`Added **${dvid.title}** to custom playlist.`);
+                        await int.editOriginal({embeds: [dembed.toJSON()], flags: 1 << 6})
+                        resolve();
+                        break;
+                    case "spotify":
+                        if (playdl.is_expired()) {
+                            await playdl.refreshToken() // This will check if access token has expired or not. If yes, then refresh the token.
+                        }
+                        const sp_data = await playdl.spotify(video);
+
+                        if (sp_data.type !== "track") {
+                            const dembed = new builders.EmbedBuilder();
+                            dembed.setDescription(`**${sp_data.name}** is not a Spotify track! add only supports singular tracks.`);
+                            return await int.editOriginal({embeds: [dembed.toJSON()], flags: 1 << 6})
+                        }
+
+                        const search = (await playdl.search(sp_data.name, { limit: 1}))[0];
+                        const spotifyadd: track = {
+                            name: sp_data.name,
+                            url: search.url
+                        }
+                        data.tracks.push(spotifyadd)
+                        /** @ts-ignore */
+                        const pagedSpotify: PageData = await utils.pageTrack(spotifyadd);
+                        pagedSpotify.index = paged.length;
+                        pagedSpotify.embed.addField("index", pagedSpotify.index.toString(), true)
+                        paged.push(pagedSpotify)
+                        const spembed = new builders.EmbedBuilder();
+                        spembed.setDescription(`Added **${sp_data.name}** to custom playlist.`);
+                        await int.editOriginal({embeds: [spembed.toJSON()], flags: 1 << 6})
+                        resolve();
+                        break;
+                    case "soundcloud":
+                        const sinfo = await playdl.soundcloud(video);
+                        const sc_add: track = {
+                            name: sinfo.name,
+                            url: video
+                        }
+                        data.tracks.push(sc_add)
+                        /** @ts-ignore */
+                        const pagedSoundcloud: PageData = await utils.pageTrack(sc_add);
+                        pagedSoundcloud.index = paged.length;
+                        pagedSoundcloud.embed.addField("index", pagedSoundcloud.index.toString(), true)
+                        paged.push(pagedSoundcloud)
+                        const scembed = new builders.EmbedBuilder();
+                        scembed.setDescription(`Added **${sinfo.name}** to custom playlist.`);
+                        await int.editOriginal({embeds: [scembed.toJSON()], flags: 1 << 6})
+                        resolve();
+                        break;
+                }
+            }
+
+            const onAdd = async (i: oceanic.ComponentInteraction) => {
+                if (i.data.customID !== addId) return;
+                const modalRow = new builders.ActionRow();
+                const inputId = rstring.generate();
+                const input = new builders.TextInput(oceanic.TextInputStyles.SHORT, "url", inputId);
+                input.setLabel("song url")
+                input.setRequired(true);
+                modalRow.addComponents(input);
+                /** @ts-ignore */
+                await i.createModal({components: [modalRow.toJSON()], customID: modalId, title: "Add song to playlist."});
+                let callback
+                await new Promise((resolve) => {
+                    callback = async (inter: oceanic.AnyModalSubmitInteraction) => {
+                        await addCallback(inter, resolve);
+                    }
+                    /** @ts-ignore */
+                    client.on("interactionCreate", callback)
+                    setTimeout(() => {
+                        /** @ts-ignore */
+                        client.off("interactionCreate", async (inter: oceanic.AnyModalSubmitInteraction) => {
+                            await addCallback(inter, resolve);
+                        })
+                    }, 180000)
+                })
+                /** @ts-ignore */
+                client.off("interactionCreate", callback)
+                if (data.tracks.length == 1) {
+                    /** @ts-ignore */
+                    await interaction.editOriginal({embeds: [paged[currentTrack].embed.toJSON()], components: rows.movesDisabled, flags: 1 << 6})
+                }
+            }
+
+            /** @ts-ignore */
+            await interaction.editOriginal({embeds: [embedMessage("No songs yet. Use the components to add some!")], components: rows.movesDisabled, flags: 1 << 6})
+
+            /** @ts-ignore */
+            client.on("interactionCreate", onBack);
+            /** @ts-ignore */
+            client.on("interactionCreate", onNext);
+            /** @ts-ignore */
+            client.on("interactionCreate", onRemove);
+            /** @ts-ignore */
+            client.on("interactionCreate", onAdd);
+            /** @ts-ignore */
+            client.on("interactionCreate", onMoveBack);
+            /** @ts-ignore */
+            client.on("interactionCreate", onMoveUp);
+            /** @ts-ignore */
+            client.on("interactionCreate", onExport);
         }
     }
 ];
