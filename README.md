@@ -7,7 +7,7 @@ simply install all the required packages, change your-token to your bot's token 
 
 OR
 
-use [this installer](https://github.com/fheahdythdr/discord-music-bot-setup/releases/tag/v1.1.0)
+use [this installer](https://github.com/fheahdythdr/discord-music-bot-setup/releases/tag/v1.2.0)
 
 # debugging
 
