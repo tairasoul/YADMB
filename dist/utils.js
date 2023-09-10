@@ -15,6 +15,20 @@ function debugLog(text) {
     if (debug)
         console.log(text);
 }
+export function getHighestResUrl(data) {
+    const thumbnails = data.video_details.thumbnails;
+    let highestX = 0;
+    let highestY = 0;
+    let currentHighestUrl = "";
+    for (const thumbnail of thumbnails) {
+        debugLog(`checking thumbnail of width ${thumbnail.width} and height ${thumbnail.height}`);
+        if (thumbnail.width > highestX && thumbnail.height > highestY) {
+            debugLog(`thumbnail of width ${thumbnail.width} and height ${thumbnail.height} is bigger than previous thumbnail`);
+            currentHighestUrl = thumbnail.url;
+        }
+    }
+    return currentHighestUrl;
+}
 export function SelectMenu(options, customId) {
     const actionRow = new builders.ActionRow();
     actionRow.type = oceanic.ComponentTypes.ACTION_ROW;
@@ -85,11 +99,14 @@ export function encodeArray(array) {
 }
 export function decodeStr(str) {
     const decoded = base64.decode(str);
+    debugLog(decoded);
     const split = decoded.split(",");
+    debugLog(split);
     const lzwArray = [];
     for (const string of split) {
         lzwArray.push(parseInt(string));
     }
+    debugLog(lzwArray);
     return lzw.unpack(lzwArray);
 }
 export class Page {
@@ -153,8 +170,8 @@ export async function queuedTrackPager(array, callback = () => { return new Prom
         embed.addField("type", queued.type, true);
         embed.addField("songs", queued.tracks.length.toString(), true);
         debugLog(queued.tracks[0].url);
-        /** @ts-ignore */
-        embed.setImage((await playdl.video_basic_info(queued.tracks[0].url)).video_details.thumbnails.find((val) => val.url.includes("maxresdefault")).url);
+        const info = await playdl.video_basic_info(queued.tracks[0].url);
+        embed.setImage(getHighestResUrl(info));
         pages.push({
             embed: embed,
             id: queued.name,
@@ -174,8 +191,9 @@ export async function trackPager(array, callback = () => { return new Promise((r
         const embed = new builders.EmbedBuilder();
         embed.setTitle(queued.name);
         embed.addField("index", i.toString(), true);
-        /** @ts-ignore */
-        embed.setImage((await playdl.video_basic_info(queued.url)).video_details.thumbnails.find((val) => val.url.includes("maxresdefault")).url);
+        const info = await playdl.video_basic_info(queued.url);
+        debugLog(info.video_details.thumbnails);
+        embed.setImage(getHighestResUrl(info));
         pages.push({
             embed: embed,
             id: queued.name,
@@ -184,6 +202,20 @@ export async function trackPager(array, callback = () => { return new Promise((r
         });
     }
     return Pager({ pages: pages });
+}
+export async function pageTrack(track) {
+    debugLog(`paging ${track.name}`);
+    debugLog(track);
+    const embed = new builders.EmbedBuilder();
+    embed.setTitle(track.name);
+    const info = await playdl.video_basic_info(track.url);
+    debugLog(info.video_details.thumbnails);
+    embed.setImage(getHighestResUrl(info));
+    return {
+        embed: embed,
+        id: track.name,
+        type: "inspectedSong"
+    };
 }
 export default {
     SelectMenu,
@@ -195,5 +227,7 @@ export default {
     decodeStr,
     Pager,
     queuedTrackPager,
-    trackPager
+    trackPager,
+    getHighestResUrl,
+    pageTrack
 };
