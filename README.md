@@ -9,6 +9,10 @@ OR
 
 use [this installer](https://github.com/fheahdythdr/discord-music-bot-setup/releases/tag/v1.1.0)
 
+# debugging
+
+to enable logging of more debug-related information, create a file called enableDebugging (no extension) in dist/
+
 # installers
 
 linux and windows are now supported with [the latest release](https://github.com/fheahdythdr/discord-music-bot-setup/releases/tag/v1.1.0)
@@ -17,13 +21,7 @@ download discord-music-bot-installer-linux if on linux, otherwise discord-music-
 
 # changelog
 
-view-queue now uses ephemeral messages, no longer creates a 2nd message when inspecting a playlist
-
-most debug information logs will now only appear if you have a file in dist/ called enableDebugging
-
-import now mentions the filename
-
-fix issues with view-queue that caused it to error sometimes when it tries to loop around
+add create-playlist
 
 # commands
 
@@ -90,6 +88,10 @@ import a queue/playlist from a file
 view the queue
 
 probably still buggy as hell
+
+## create-playlist
+
+create a custom playlist with custom name
 
 # other features
 
