@@ -15,7 +15,7 @@ to enable logging of more debug-related information, create a file called enable
 
 # installers
 
-linux and windows are now supported with [the latest release](https://github.com/fheahdythdr/discord-music-bot-setup/releases/tag/v1.1.0)
+linux and windows are now supported with [the latest release](https://github.com/tairasoul/discord-music-bot-setup/releases/tag/v1.2.0)
 
 download discord-music-bot-installer-linux if on linux, otherwise discord-music-bot-installer-windows.rar
 
