@@ -14,6 +14,11 @@
   - moving a song around the queue
   - exporting playlist
   - others (suggest in issues)
+ 
+- add optional DJ role (if specified, only that role can use commands)
+
+- add a server-info command
+  - gives info about the server as seen within the music bot, so queued tracks, volume, all that
 
 # in progress
 
@@ -62,9 +67,6 @@
 
 - change libraries from ytdl to use [youtube-stream-url](https://www.npmjs.com/package/youtube-stream-url)
   - the resulting url doesn't work
- 
-- add optional DJ role (if specified, only that role can use commands)
-  - this is already done by discord within the Integrations part of server settings
 
 # known issues + potential fixes
 
