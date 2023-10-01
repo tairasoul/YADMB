@@ -181,6 +181,20 @@ export async function queuedTrackPager(array, callback = () => { return new Prom
     }
     return Pager({ pages: pages });
 }
+export function parseVolumeString(volume) {
+    const percentRegex = /[^%]/g;
+    let mode = "whole number";
+    if (volume.match(/%/g))
+        mode = "percent";
+    const int = parseFloat(volume.match(percentRegex).join(''));
+    if (mode == "percent") {
+        var result = int / 100;
+    }
+    else {
+        var result = int;
+    }
+    return result;
+}
 export async function trackPager(array, callback = () => { return new Promise((resolve) => resolve()); }) {
     const pages = [];
     for (let i = 0; i < array.length; i++) {
@@ -229,5 +243,6 @@ export default {
     queuedTrackPager,
     trackPager,
     getHighestResUrl,
-    pageTrack
+    pageTrack,
+    parseVolumeString
 };
