@@ -1,4 +1,4 @@
-import { Collection  } from 'discord.js';
+import { Collection } from 'discord.js';
 import fs from "node:fs"
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -60,6 +60,8 @@ function setupGuild(guild: oceanic.Guild) {
 
     cg.audioPlayer.on("stateChange", () => {
         if (cg.audioPlayer.state.status == voice.AudioPlayerStatus.Idle) {
+            debugLog(util.inspect(cg.queuedTracks, false, 3))
+            debugLog(cg.currentTrack)
             switch (cg.loopType) {
                 case "none":
                     if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
@@ -73,7 +75,7 @@ function setupGuild(guild: oceanic.Guild) {
                         }
                     }
                     else {
-                        cg.queuedTracks[cg.currentTrack].tracks.splice(0, 1);
+                        cg.queuedTracks.splice(0, 1);
                         if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])  playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id)
                     }
                     break;
@@ -463,6 +465,10 @@ const commands: Command[] = [
                 const t = guilds[interaction.guildID].queuedTracks[ctn];
                 const cst = t.trackNumber;
                 const st = t.tracks[cst];
+                debugLog(ctn);
+                debugLog(t);
+                debugLog(cst);
+                debugLog(st)
                 if (guilds[interaction.guildID].audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playSong(st, interaction.guildID as string);
             }
         }
@@ -595,6 +601,11 @@ const commands: Command[] = [
                 const t = g.queuedTracks[ct];
                 const cst = t.trackNumber;
                 const st = t.tracks[cst];
+                g.queuedTracks.push(youtubeadd);
+                debugLog(ct);
+                debugLog(t);
+                debugLog(cst);
+                debugLog(st);
                 if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection) playSong(st, interaction.guildID as string);
             }
             // play video next
@@ -1507,9 +1518,17 @@ const commands: Command[] = [
             
             const onRemove = async (i: oceanic.ComponentInteraction) => {
                 if (i.data.customID !== removeId) return;
+                if (paged[currentTrack] == undefined) return;
                 const splicedData = {
                     paged: paged.splice(currentTrack, 1),
                     track: data.tracks.splice(currentTrack, 1)
+                }
+                for (const page of paged) {
+                    if (page.index > splicedData.paged[0].index) {
+                        for (const field of page.embed.getFields()) {
+                            if (field.name == "index") field.value = (parseInt(field.value) - 1).toString();
+                        }
+                    }
                 }
                 if (currentTrack == paged.length) currentTrack = paged.length - 1;
                 if (data.tracks.length > 0) {
@@ -1534,98 +1553,114 @@ const commands: Command[] = [
                 }
                 switch(provider) {
                     case "youtube":
-                        if (!ytdl.validateURL(video)) {
-                            const embed = new builders.EmbedBuilder()
-                            embed.setDescription("Invalid link.")
-                            return await int.editOriginal({embeds: [embed.toJSON()], flags: 1 << 6});
+                        try {
+                            if (!ytdl.validateURL(video)) {
+                                const embed = new builders.EmbedBuilder()
+                                embed.setDescription("Invalid link.")
+                                return await int.editOriginal({embeds: [embed.toJSON()], flags: 1 << 6});
+                            }
+                            const info = await ytdl.getInfo(video);
+                            const title = info.videoDetails.title;
+                            const youtubeadd: track = {
+                                name: title,
+                                url: video
+                            }
+                            data.tracks.push(youtubeadd);
+                            /** @ts-ignore */
+                            const pagedTrack: PageData = await utils.pageTrack(youtubeadd);
+                            pagedTrack.index = paged.length;
+                            pagedTrack.embed.addField("index", pagedTrack.index.toString(), true)
+                            paged.push(pagedTrack)
+                            const yembed = new builders.EmbedBuilder();
+                            yembed.setDescription(`Added **${title}** to custom playlist.`);
+                            await int.editOriginal({embeds: [yembed.toJSON()], flags: 1 << 6})
+                            resolve();
+                        } catch (err) {
+                            await int.editOriginal({embeds: [embedMessage(`Encountered an error: ${err}`)]})
                         }
-                        const info = await ytdl.getInfo(video);
-                        const title = info.videoDetails.title;
-                        const youtubeadd: track = {
-                            name: title,
-                            url: video
-                        }
-                        data.tracks.push(youtubeadd);
-                        /** @ts-ignore */
-                        const pagedTrack: PageData = await utils.pageTrack(youtubeadd);
-                        pagedTrack.index = paged.length;
-                        pagedTrack.embed.addField("index", pagedTrack.index.toString(), true)
-                        paged.push(pagedTrack)
-                        const yembed = new builders.EmbedBuilder();
-                        yembed.setDescription(`Added **${title}** to custom playlist.`);
-                        await int.editOriginal({embeds: [yembed.toJSON()], flags: 1 << 6})
-                        resolve();
                         break;
                     // both deezer and spotify need to be searched up on youtube
                     case "deezer":
-                        const dvid = await playdl.deezer(video);
-                        if (dvid.type !== "track") {
+                        try {
+                            const dvid = await playdl.deezer(video);
+                            if (dvid.type !== "track") {
+                                const dembed = new builders.EmbedBuilder();
+                                dembed.setDescription(`**${dvid.title}** is not a Deezer track! This only supports singular tracks.`);
+                                return await int.editOriginal({embeds: [dembed.toJSON()], flags: 1 << 6})
+                            }
+                            const yvid = (await playdl.search(dvid.title, {
+                                limit: 1
+                            }))[0]
+                            const deezeradd: track = {
+                                name: dvid.title,
+                                url: yvid.url
+                            }
+                            data.tracks.push(deezeradd)
+                            /** @ts-ignore */
+                            const pagedDeezer: PageData = await utils.pageTrack(deezeradd);
+                            pagedDeezer.index = paged.length;
+                            pagedDeezer.embed.addField("index", pagedDeezer.index.toString(), true)
+                            paged.push(pagedDeezer)
                             const dembed = new builders.EmbedBuilder();
-                            dembed.setDescription(`**${dvid.title}** is not a Deezer track! add-url only supports singular tracks.`);
-                            return await int.editOriginal({embeds: [dembed.toJSON()], flags: 1 << 6})
+                            dembed.setDescription(`Added **${dvid.title}** to custom playlist.`);
+                            await int.editOriginal({embeds: [dembed.toJSON()], flags: 1 << 6})
+                            resolve();
+                        } catch (err) {
+                            await int.editOriginal({embeds: [embedMessage(`Encountered an error: ${err}`)]})
                         }
-                        const yvid = (await playdl.search(dvid.title, {
-                            limit: 1
-                        }))[0]
-                        const deezeradd: track = {
-                            name: dvid.title,
-                            url: yvid.url
-                        }
-                        data.tracks.push(deezeradd)
-                        /** @ts-ignore */
-                        const pagedDeezer: PageData = await utils.pageTrack(deezeradd);
-                        pagedDeezer.index = paged.length;
-                        pagedDeezer.embed.addField("index", pagedDeezer.index.toString(), true)
-                        paged.push(pagedDeezer)
-                        const dembed = new builders.EmbedBuilder();
-                        dembed.setDescription(`Added **${dvid.title}** to custom playlist.`);
-                        await int.editOriginal({embeds: [dembed.toJSON()], flags: 1 << 6})
-                        resolve();
                         break;
                     case "spotify":
-                        if (playdl.is_expired()) {
-                            await playdl.refreshToken() // This will check if access token has expired or not. If yes, then refresh the token.
-                        }
-                        const sp_data = await playdl.spotify(video);
+                        try {
+                            if (playdl.is_expired()) {
+                                await playdl.refreshToken() // This will check if access token has expired or not. If yes, then refresh the token.
+                            }
+                            const sp_data = await playdl.spotify(video);
 
-                        if (sp_data.type !== "track") {
-                            const dembed = new builders.EmbedBuilder();
-                            dembed.setDescription(`**${sp_data.name}** is not a Spotify track! add only supports singular tracks.`);
-                            return await int.editOriginal({embeds: [dembed.toJSON()], flags: 1 << 6})
-                        }
+                            if (sp_data.type !== "track") {
+                                const dembed = new builders.EmbedBuilder();
+                                dembed.setDescription(`**${sp_data.name}** is not a Spotify track! This only supports singular tracks.`);
+                                return await int.editOriginal({embeds: [dembed.toJSON()], flags: 1 << 6})
+                            }
 
-                        const search = (await playdl.search(sp_data.name, { limit: 1}))[0];
-                        const spotifyadd: track = {
-                            name: sp_data.name,
-                            url: search.url
+                            const search = (await playdl.search(sp_data.name, { limit: 1}))[0];
+                            const spotifyadd: track = {
+                                name: sp_data.name,
+                                url: search.url
+                            }
+                            data.tracks.push(spotifyadd)
+                            /** @ts-ignore */
+                            const pagedSpotify: PageData = await utils.pageTrack(spotifyadd);
+                            pagedSpotify.index = paged.length;
+                            pagedSpotify.embed.addField("index", pagedSpotify.index.toString(), true)
+                            paged.push(pagedSpotify)
+                            const spembed = new builders.EmbedBuilder();
+                            spembed.setDescription(`Added **${sp_data.name}** to custom playlist.`);
+                            await int.editOriginal({embeds: [spembed.toJSON()], flags: 1 << 6})
+                            resolve();
+                        } catch (err) {
+                            await int.editOriginal({embeds: [embedMessage(`Encountered an error: ${err}`)]})
                         }
-                        data.tracks.push(spotifyadd)
-                        /** @ts-ignore */
-                        const pagedSpotify: PageData = await utils.pageTrack(spotifyadd);
-                        pagedSpotify.index = paged.length;
-                        pagedSpotify.embed.addField("index", pagedSpotify.index.toString(), true)
-                        paged.push(pagedSpotify)
-                        const spembed = new builders.EmbedBuilder();
-                        spembed.setDescription(`Added **${sp_data.name}** to custom playlist.`);
-                        await int.editOriginal({embeds: [spembed.toJSON()], flags: 1 << 6})
-                        resolve();
                         break;
                     case "soundcloud":
-                        const sinfo = await playdl.soundcloud(video);
-                        const sc_add: track = {
-                            name: sinfo.name,
-                            url: video
+                        try {
+                            const sinfo = await playdl.soundcloud(video);
+                            const sc_add: track = {
+                                name: sinfo.name,
+                                url: video
+                            }
+                            data.tracks.push(sc_add)
+                            /** @ts-ignore */
+                            const pagedSoundcloud: PageData = await utils.pageTrack(sc_add);
+                            pagedSoundcloud.index = paged.length;
+                            pagedSoundcloud.embed.addField("index", pagedSoundcloud.index.toString(), true)
+                            paged.push(pagedSoundcloud)
+                            const scembed = new builders.EmbedBuilder();
+                            scembed.setDescription(`Added **${sinfo.name}** to custom playlist.`);
+                            await int.editOriginal({embeds: [scembed.toJSON()], flags: 1 << 6})
+                            resolve();
+                        } catch (err) {
+                            await int.editOriginal({embeds: [embedMessage(`Encountered an error: ${err}`)]})
                         }
-                        data.tracks.push(sc_add)
-                        /** @ts-ignore */
-                        const pagedSoundcloud: PageData = await utils.pageTrack(sc_add);
-                        pagedSoundcloud.index = paged.length;
-                        pagedSoundcloud.embed.addField("index", pagedSoundcloud.index.toString(), true)
-                        paged.push(pagedSoundcloud)
-                        const scembed = new builders.EmbedBuilder();
-                        scembed.setDescription(`Added **${sinfo.name}** to custom playlist.`);
-                        await int.editOriginal({embeds: [scembed.toJSON()], flags: 1 << 6})
-                        resolve();
                         break;
                 }
             }
@@ -1680,6 +1715,32 @@ const commands: Command[] = [
             /** @ts-ignore */
             client.on("interactionCreate", onExport);
         }
+    },
+    {
+        data: new builders.ApplicationCommandBuilder(1, "set-volume")
+        .setDescription("Set the volume for the bot within the current guild.")
+        .addOption(
+            {
+                name: "volume",
+                type: oceanic.ApplicationCommandOptionTypes.STRING,
+                required: true,
+                description: "The volume to set to. Can contain a percent (ex. 50%) or a decimal number (ex. 1.2)."
+            }
+        )
+        .setDMPermission(false),
+        async execute(interaction: oceanic.CommandInteraction) {
+            const volume = interaction.data.options.getString("volume", true);
+            const characterRegex = /^[0-9%.]*$/g;
+            if (characterRegex.test(volume)) {
+                const parsed = utils.parseVolumeString(volume);
+                guilds[(interaction.guild as oceanic.Guild).id].volume = parsed;
+                await interaction.createMessage({embeds: [embedMessage(`Set volume for ${(interaction.guild as oceanic.Guild).id} to ${volume}, parsed: ${parsed}`)]});
+            }
+            else {
+                await interaction.createMessage({embeds: [embedMessage(`Volume ${volume} contains invalid characters! volume can only contain the characters 0-9, . and %`)]});
+            }
+            console.log(guilds[(interaction.guild as oceanic.Guild).id]);
+        }
     }
 ];
 
@@ -1698,7 +1759,7 @@ client.on('ready', async () => {
                     noSubscriber: NoSubscriberBehavior.Pause
                 }
             }),
-            volume: 0.05,
+            volume: 1,
             leaveTimer: null
         }
 
