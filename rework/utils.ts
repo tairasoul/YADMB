@@ -216,6 +216,22 @@ export async function queuedTrackPager(array: queuedTrack[], callback: (title: s
     return Pager({pages: pages})
 }
 
+export type volumeMode = "percent" | "whole number";
+
+export function parseVolumeString(volume: string) {
+    const percentRegex = /[^%]/g;
+    let mode: volumeMode = "whole number";
+    if (volume.match(/%/g)) mode = "percent";
+    const int: number = parseFloat((volume.match(percentRegex) as string[]).join(''));
+    if (mode == "percent") {
+        var result: number = int / 100;
+    }
+    else {
+        var result: number = int;
+    }
+    return result;
+}
+
 export async function trackPager(array: track[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}) {
     const pages: PageData[] = []
     for (let i = 0; i < array.length; i ++) {
@@ -269,5 +285,6 @@ export default {
     queuedTrackPager,
     trackPager,
     getHighestResUrl,
-    pageTrack
+    pageTrack,
+    parseVolumeString
 }
