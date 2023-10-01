@@ -27,7 +27,7 @@ download discord-music-bot-installer-linux if on linux, otherwise discord-music-
 
 # changelog
 
-add create-playlist
+add set-volume, about time since this has been in development for about a year and there has not been a way to change the volume at all
 
 # commands
 
@@ -98,6 +98,10 @@ probably still buggy as hell
 ## create-playlist
 
 create a custom playlist with custom name
+
+## set-volume
+
+set the volume for the current guild
 
 # other features
 
