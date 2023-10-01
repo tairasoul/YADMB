@@ -17,9 +17,7 @@
     "youtube-thumbnail-grabber": "^1.0.2",
     "yt-stream": "^1.4.7",
     "ytdl-core": "^4.11.5",
-    "ytpl": "^2.3.0",
-    "ytsearch-node": "^2.0.6",
-    "ytsr": "^3.8.2"
+    "ytpl": "^2.3.0"
   },
   "type": "module",
   "devDependencies": {
