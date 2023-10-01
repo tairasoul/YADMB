@@ -1,5 +1,5 @@
 # discord-music-bot
-a music bot because why not
+a music bot because i got bored and made one
 
 started in december 2022, this is one of the projects i've been working on the longest.
 
