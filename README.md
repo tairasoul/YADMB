@@ -1,6 +1,12 @@
 # discord-music-bot
 a music bot because why not
 
+started in december 2022, this is one of the projects i've been working on the longest.
+
+if you encounter any problems or have any suggestions, open an issue.
+
+if you want a different, probably more stable music bot, check out [jagrosh's music bot](https://github.com/jagrosh/MusicBot)
+
 # how to use
 
 simply install all the required packages, change your-token to your bot's token in config.json, and run node dist/bot
