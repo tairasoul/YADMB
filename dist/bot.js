@@ -1,4 +1,4 @@
-import { Collection } from 'discord.js';
+import { Collection } from 'oceanic.js';
 import fs from "node:fs";
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -1346,14 +1346,15 @@ const commands = [
             const onExport = async (i) => {
                 if (i.data.customID !== exportId)
                     return;
-                await i.defer(1 << 6);
+                /** @ts-ignore */
+                await i.editParent({ embeds: [paged[currentTrack].embed.toJSON()], components: rows.disabled, flags: 1 << 6 });
                 const encoded = base64.encode(lzw.pack(data));
-                await i.editOriginal({ content: `Exported playlist **${name}**. Save this as a file:`, files: [
+                await i.createFollowup({ content: `Exported playlist **${name}**. Save this as a file:`, files: [
                         {
                             name: `${interaction.member.id}.${interaction.guildID}.${interaction.createdAt.getTime()}.export.txt`,
                             contents: new Buffer(encoded)
                         }
-                    ] });
+                    ], flags: 1 << 6 });
                 /** @ts-ignore */
                 client.off("interactionCreate", onBack);
                 /** @ts-ignore */
@@ -1368,8 +1369,6 @@ const commands = [
                 client.off("interactionCreate", onMoveUp);
                 /** @ts-ignore */
                 client.off("interactionCreate", onExport);
-                /** @ts-ignore */
-                await interaction.editOriginal({ embeds: [paged[currentTrack].embed.toJSON()], components: rows.disabled, flags: 1 << 6 });
             };
             const onBack = async (i) => {
                 if (i.data.customID !== backId)
