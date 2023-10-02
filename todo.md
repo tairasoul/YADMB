@@ -40,7 +40,7 @@
 
 - migrate from local filesystem to directly streaming from youtube 
   - i am not sure if it still gets rate-limited, we'll have to fuck around and find out to see
-  - 
+
 - add a command to search for channels/playlists (alternate version of add-search)
   - play-dl does this
 
