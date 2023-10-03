@@ -27,7 +27,9 @@ download discord-music-bot-installer-linux if on linux, otherwise discord-music-
 
 # changelog
 
-add set-volume, about time since this has been in development for about a year and there has not been a way to change the volume at all
+add server-info and progress.
+
+server-info is still in progress, getting feedback about how it looks.
 
 # commands
 
