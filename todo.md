@@ -1,11 +1,5 @@
 # todo 
 
-- add a progress command
-  - updates live, stops updating when someone uses it again (or just deletes and sends it again if a music commands channel is specified)
-  - shows how long is remaining
-  - shows the thumbnail (if possible, i'm having issues with showing thumbnail in add-search)
-  - shows song name, author, likes, views
-
 - add capability to filter with regex to add-playlist and add-search
   - won't be too hard as then i just have to add an optional argument
  
@@ -28,6 +22,13 @@
 
 - add a server-info command
   - gives info about the server as seen within the music bot, so queued tracks, volume, all that
+  - getting opinions on how it looks atm, will be finished later\
+ 
+- add a progress command
+  - updates live, stops updating when someone uses it again (or just deletes and sends it again if a music commands channel is specified)
+  - shows how long is remaining
+  - shows the thumbnail (if possible, i'm having issues with showing thumbnail in add-search)
+  - shows song name, author, likes, views
 
 # finished + comments
 
