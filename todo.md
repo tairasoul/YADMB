@@ -20,9 +20,9 @@
 - rewrite the commands that use pages, so the PageHolder class is ACTUALLY used
   - currently bot.ts handles the paging instead of just.. using the functions
  
-- instead of paging at command execute time, page live and add some embeds for each song
+- instead of paging at command execute time, page when a song is added and add some embeds for each song if playlist
   - this means live-updating view-queue will be easier
-  - and it wont take as much time
+  - and it wont take as much time to do view-queue
 
 # in progress
 
