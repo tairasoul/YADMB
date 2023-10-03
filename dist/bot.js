@@ -20,6 +20,12 @@ const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)
 let debug = false;
 if (fs.existsSync(`${__dirname}/enableDebugging`))
     debug = true;
+playdl.getFreeClientID().then((val) => playdl.setToken({
+    soundcloud: {
+        client_id: val
+    }
+}));
+let setup = false;
 function debugLog(text) {
     if (debug)
         console.log(text);
@@ -58,61 +64,68 @@ function setupGuild(guild) {
         console.log(`an error occured with the audio player, ${error}`);
     });
     cg.audioPlayer.on("stateChange", () => {
-        if (cg.audioPlayer.state.status == voice.AudioPlayerStatus.Idle) {
-            debugLog(util.inspect(cg.queuedTracks, false, 3));
-            debugLog(cg.currentTrack);
-            switch (cg.loopType) {
-                case "none":
-                    if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
-                        cg.queuedTracks[cg.currentTrack].tracks.splice(0, 1);
-                        if (cg.queuedTracks[cg.currentTrack].tracks.length === 0) {
+        if (cg.audioPlayer.state.status === "idle") {
+            if (cg.queuedTracks[cg.currentTrack] != undefined) {
+                debugLog(util.inspect(cg.queuedTracks, false, 3, true));
+                debugLog(cg.currentTrack);
+                switch (cg.loopType) {
+                    case "none":
+                        if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
+                            cg.queuedTracks[cg.currentTrack].tracks.splice(0, 1);
+                            if (cg.queuedTracks[cg.currentTrack].tracks.length === 0) {
+                                cg.queuedTracks.splice(0, 1);
+                                if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
+                                    playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
+                            }
+                            else {
+                                if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
+                                    playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
+                            }
+                        }
+                        else {
                             cg.queuedTracks.splice(0, 1);
                             if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
                                 playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
                         }
-                        else {
-                            if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
-                                playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
-                        }
-                    }
-                    else {
-                        cg.queuedTracks.splice(0, 1);
+                        break;
+                    case "song":
                         if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
                             playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
-                    }
-                    break;
-                case "song":
-                    if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
-                        playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
-                    break;
-                case "queue":
-                    debugLog(cg.currentTrack);
-                    if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
-                        cg.queuedTracks[cg.currentTrack].trackNumber += 1;
-                    }
-                    else {
-                        cg.currentTrack += 1;
-                    }
-                    if (cg.currentTrack >= cg.queuedTracks.length)
-                        cg.currentTrack = 0;
-                    if (cg.queuedTracks[cg.currentTrack].trackNumber >= cg.queuedTracks[cg.currentTrack].tracks.length)
-                        cg.currentTrack += 1;
-                    if (cg.currentTrack >= cg.queuedTracks.length)
-                        cg.currentTrack = 0;
-                    debugLog(cg.currentTrack);
-                    if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
-                        playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
-                    break;
-                case "playlist":
-                    if (cg.queuedTracks[cg.currentTrack].tracks.length <= cg.queuedTracks[cg.currentTrack].trackNumber || cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber + 1] === undefined) {
-                        cg.queuedTracks[cg.currentTrack].trackNumber = 0;
-                    }
-                    else {
-                        cg.queuedTracks[cg.currentTrack].trackNumber += 1;
-                    }
-                    if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
-                        playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
-                    break;
+                        break;
+                    case "queue":
+                        debugLog(cg.currentTrack);
+                        if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
+                            cg.queuedTracks[cg.currentTrack].trackNumber += 1;
+                        }
+                        else {
+                            cg.currentTrack += 1;
+                        }
+                        if (cg.currentTrack >= cg.queuedTracks.length)
+                            cg.currentTrack = 0;
+                        if (cg.queuedTracks[cg.currentTrack].trackNumber >= cg.queuedTracks[cg.currentTrack].tracks.length)
+                            cg.currentTrack += 1;
+                        if (cg.currentTrack >= cg.queuedTracks.length)
+                            cg.currentTrack = 0;
+                        debugLog(cg.currentTrack);
+                        if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
+                            playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
+                        break;
+                    case "playlist":
+                        if (cg.queuedTracks[cg.currentTrack].tracks.length <= cg.queuedTracks[cg.currentTrack].trackNumber || cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber + 1] === undefined) {
+                            cg.queuedTracks[cg.currentTrack].trackNumber = 0;
+                        }
+                        else {
+                            cg.queuedTracks[cg.currentTrack].trackNumber += 1;
+                        }
+                        if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
+                            playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
+                        break;
+                }
+            }
+            else {
+                cg.currentResource = null;
+                cg.songStart = null;
+                cg.currentInfo = null;
             }
         }
     });
@@ -182,14 +195,20 @@ client.on('error', (error) => {
 // music playback
 async function playSong(track, guild) {
     const currentGuild = guilds[guild];
-    const stream = await playdl.stream(track.url);
+    debugLog(util.inspect(currentGuild.queuedTracks, false, 5, true));
+    const info = await playdl.video_info(track.url);
+    const stream = await playdl.stream_from_info(info);
     const resource = createAudioResource(stream.stream, {
         inlineVolume: true,
         inputType: stream.type
     });
     resource.volume?.setVolume(currentGuild.volume);
     currentGuild.currentlyPlaying = track.name;
+    currentGuild.currentResource = resource;
     currentGuild.audioPlayer.play(resource);
+    const duration = info.video_details.durationInSec;
+    currentGuild.songStart = duration * 1000;
+    currentGuild.currentInfo = info;
 }
 // start commands
 const ccommands = new Collection();
@@ -207,16 +226,19 @@ client.on('guildCreate', (guild) => {
             }
         }),
         volume: 0.05,
-        leaveTimer: null
+        leaveTimer: null,
+        currentResource: null,
+        songStart: null,
+        currentInfo: null
     };
     setupGuild(guild);
-    client.editStatus("online", [{ name: (client.guilds.size).toString() + ' servers', state: "Watching" }]);
+    client.editStatus("online", [{ name: (client.guilds.size).toString() + ' servers', type: 3 }]);
 });
-client.setMaxListeners(200);
+client.setMaxListeners(0);
 client.on('guildDelete', (guild) => {
     guilds[guild.id].audioPlayer.removeAllListeners();
     delete guilds[guild.id];
-    client.editStatus("online", [{ name: (client.guilds.size).toString() + ' servers', state: "Watching" }]);
+    client.editStatus("online", [{ name: (client.guilds.size).toString() + ' servers', type: 3 }]);
 });
 const commands = [
     {
@@ -335,9 +357,12 @@ const commands = [
                         await interaction.editOriginal({ embeds: [dembed.toJSON()] });
                         break;
                     case "spotify":
-                        if (playdl.is_expired()) {
-                            await playdl.refreshToken(); // This will check if access token has expired or not. If yes, then refresh the token.
+                        try {
+                            if (playdl.is_expired()) {
+                                await playdl.refreshToken(); // This will check if access token has expired or not. If yes, then refresh the token.
+                            }
                         }
+                        catch { }
                         const sp_data = await playdl.spotify(video);
                         if (sp_data.type !== "track") {
                             const dembed = new builders.EmbedBuilder();
@@ -756,7 +781,7 @@ const commands = [
                 const qt = g.queuedTracks;
                 const cst = qt[ct]?.trackNumber;
                 const qst = qt[ct]?.tracks;
-                const string = `Joined VC <#${interaction.member.voiceState.channelID}>${qt.length > 0 ? `starting track **${qst[cst].name}**` : ""}`;
+                const string = `Joined VC <#${interaction.member.voiceState.channelID}>${qt.length > 0 ? ` starting track **${qst[cst].name}**` : ""}`;
                 const embed = new builders.EmbedBuilder();
                 embed.setDescription(string);
                 await interaction.editOriginal({ embeds: [embed.toJSON()] });
@@ -1497,8 +1522,8 @@ const commands = [
                                 embed.setDescription("Invalid link.");
                                 return await int.editOriginal({ embeds: [embed.toJSON()], flags: 1 << 6 });
                             }
-                            const info = await ytdl.getInfo(video);
-                            const title = info.videoDetails.title;
+                            const info = await playdl.video_basic_info(video);
+                            const title = info.video_details.title;
                             const youtubeadd = {
                                 name: title,
                                 url: video
@@ -1551,9 +1576,12 @@ const commands = [
                         break;
                     case "spotify":
                         try {
-                            if (playdl.is_expired()) {
-                                await playdl.refreshToken(); // This will check if access token has expired or not. If yes, then refresh the token.
+                            try {
+                                if (playdl.is_expired()) {
+                                    await playdl.refreshToken(); // This will check if access token has expired or not. If yes, then refresh the token.
+                                }
                             }
+                            catch { }
                             const sp_data = await playdl.spotify(video);
                             if (sp_data.type !== "track") {
                                 const dembed = new builders.EmbedBuilder();
@@ -1669,17 +1697,72 @@ const commands = [
             const characterRegex = /^[0-9%.]*$/g;
             if (characterRegex.test(volume)) {
                 const parsed = utils.parseVolumeString(volume);
-                guilds[interaction.guild.id].volume = parsed;
+                const cg = guilds[interaction.guild.id];
+                cg.volume = parsed;
+                cg.currentResource?.volume?.setVolume(parsed);
+                const ap = cg.audioPlayer;
+                ap.stop();
+                if (cg.queuedTracks[cg.currentTrack])
+                    playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], interaction.guildID);
                 await interaction.createMessage({ embeds: [embedMessage(`Set volume for ${interaction.guild.id} to ${volume}, parsed: ${parsed}`)] });
             }
             else {
                 await interaction.createMessage({ embeds: [embedMessage(`Volume ${volume} contains invalid characters! volume can only contain the characters 0-9, . and %`)] });
             }
-            console.log(guilds[interaction.guild.id]);
+        }
+    },
+    {
+        data: new builders.ApplicationCommandBuilder(1, "server-info")
+            .setDescription("See info about the server as the bot has it stored.")
+            .setDMPermission(false),
+        async execute(interaction) {
+            const id = interaction.guildID;
+            const g = guilds[id];
+            const embed = new builders.EmbedBuilder();
+            embed.setTitle(`Info for ${interaction.guild.name}`);
+            embed.addField("Current song", g.currentlyPlaying || "None", true);
+            embed.addField("Loop type", g.loopType, true);
+            embed.addField("Volume", g.volume.toString()), true;
+            embed.addField("Connected channel", g.voiceChannel?.name || "Not connected", true);
+            embed.addField("Current index in queue", g.currentTrack.toString(), true);
+            embed.addField("Current index in song/playlist", g.queuedTracks[g.currentTrack]?.trackNumber.toString() || "No current playlist/song", true);
+            embed.addField("Amount of queued tracks", g.queuedTracks.length.toString(), true);
+            embed.addField("Amount of tracks in current song/playlist", g.queuedTracks[g.currentTrack]?.tracks.length.toString() || "No current playlist/song"), true;
+            embed.addField("Name of current playlist", g.queuedTracks[g.currentTrack]?.name || "No current playlist/song", true);
+            await interaction.createMessage({ embeds: [embed.toJSON()] });
+        }
+    },
+    {
+        data: new builders.ApplicationCommandBuilder(1, "progress")
+            .setDescription("Get progress of current song (if any).")
+            .setDMPermission(false),
+        async execute(interaction) {
+            const g = interaction.guild;
+            const cg = guilds[g.id];
+            const songTime = cg.currentResource?.playbackDuration;
+            const progressTime = cg.songStart;
+            const embed = new builders.EmbedBuilder();
+            if (cg.queuedTracks[cg.currentTrack] !== undefined && songTime && progressTime && cg.currentInfo) {
+                const remaining = humanize(songTime - progressTime, { round: true });
+                const ct = cg.queuedTracks[cg.currentTrack];
+                embed.setTitle(`Progress for ${ct.tracks[ct.trackNumber].name}`);
+                embed.addField("Time remaining", remaining);
+                embed.addField("Song duration", humanize(progressTime));
+                embed.addField("Author", cg.currentInfo.video_details.channel?.name || "None found.");
+                embed.addField("Likes", cg.currentInfo.video_details.likes.toString());
+                embed.addField("Views", cg.currentInfo.video_details.views.toString());
+                embed.setImage(utils.getHighestResUrl(cg.currentInfo));
+            }
+            else {
+                embed.setTitle(`No song currently playing or available.`);
+            }
+            await interaction.createMessage({ embeds: [embed.toJSON()] });
         }
     }
 ];
 client.on('ready', async () => {
+    if (setup)
+        return console.log("why did it ready more than once");
     // add all guilds
     for (const guild of client.guilds.entries()) {
         guilds[guild[1].id] = {
@@ -1695,7 +1778,10 @@ client.on('ready', async () => {
                 }
             }),
             volume: 1,
-            leaveTimer: null
+            leaveTimer: null,
+            currentResource: null,
+            songStart: null,
+            currentInfo: null
         };
         setupGuild(guild[1]);
     }
@@ -1707,7 +1793,8 @@ client.on('ready', async () => {
         await client.application.createGlobalCommand(command.data);
         console.log(`created global command ${command.data.name}`);
     }
-    client.editStatus("online", [{ state: "Watching", name: (client.guilds.size).toString() + ' servers' }]);
+    client.editStatus("online", [{ name: (client.guilds.size).toString() + ' servers', type: 3 }]);
+    setup = true;
 });
 // @ts-ignore
 client.on('interactionCreate', async (interaction) => {
