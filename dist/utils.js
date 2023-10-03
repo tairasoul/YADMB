@@ -160,24 +160,51 @@ export function Pager(pages) {
 export async function queuedTrackPager(array, callback = () => { return new Promise((resolve) => resolve()); }) {
     const pages = [];
     for (let i = 0; i < array.length; i++) {
-        const queued = array[i];
-        await callback(queued.name);
-        debugLog(`paging ${queued.name}`);
-        debugLog(queued);
-        const embed = new builders.EmbedBuilder();
-        embed.setTitle(queued.name);
-        embed.addField("index", i.toString(), true);
-        embed.addField("type", queued.type, true);
-        embed.addField("songs", queued.tracks.length.toString(), true);
-        debugLog(queued.tracks[0].url);
-        const info = await playdl.video_basic_info(queued.tracks[0].url);
-        embed.setImage(getHighestResUrl(info));
-        pages.push({
-            embed: embed,
-            id: queued.name,
-            index: i,
-            type: queued.type
-        });
+        try {
+            const queued = array[i];
+            await callback(queued.name);
+            debugLog(`paging ${queued.name}`);
+            debugLog(queued);
+            const embed = new builders.EmbedBuilder();
+            embed.setTitle(queued.name);
+            embed.addField("index", i.toString(), true);
+            embed.addField("type", queued.type, true);
+            embed.addField("songs", queued.tracks.length.toString(), true);
+            debugLog(queued.tracks[0].url);
+            const info = await playdl.video_basic_info(queued.tracks[0].url);
+            embed.setImage(getHighestResUrl(info));
+            pages.push({
+                embed: embed,
+                id: queued.name,
+                index: i,
+                type: queued.type
+            });
+        }
+        catch {
+            await new Promise((resolve) => {
+                setTimeout(async () => {
+                    const queued = array[i];
+                    await callback(queued.name);
+                    debugLog(`paging ${queued.name}`);
+                    debugLog(queued);
+                    const embed = new builders.EmbedBuilder();
+                    embed.setTitle(queued.name);
+                    embed.addField("index", i.toString(), true);
+                    embed.addField("type", queued.type, true);
+                    embed.addField("songs", queued.tracks.length.toString(), true);
+                    debugLog(queued.tracks[0].url);
+                    const info = await playdl.video_basic_info(queued.tracks[0].url);
+                    embed.setImage(getHighestResUrl(info));
+                    pages.push({
+                        embed: embed,
+                        id: queued.name,
+                        index: i,
+                        type: queued.type
+                    });
+                    resolve();
+                }, 5000);
+            });
+        }
     }
     return Pager({ pages: pages });
 }
@@ -198,38 +225,83 @@ export function parseVolumeString(volume) {
 export async function trackPager(array, callback = () => { return new Promise((resolve) => resolve()); }) {
     const pages = [];
     for (let i = 0; i < array.length; i++) {
-        const queued = array[i];
-        await callback(queued.name);
-        debugLog(`paging ${queued.name}`);
-        debugLog(queued);
-        const embed = new builders.EmbedBuilder();
-        embed.setTitle(queued.name);
-        embed.addField("index", i.toString(), true);
-        const info = await playdl.video_basic_info(queued.url);
-        debugLog(info.video_details.thumbnails);
-        embed.setImage(getHighestResUrl(info));
-        pages.push({
-            embed: embed,
-            id: queued.name,
-            index: i,
-            type: "inspectedSong"
-        });
+        try {
+            const queued = array[i];
+            await callback(queued.name);
+            debugLog(`paging ${queued.name}`);
+            debugLog(queued);
+            const embed = new builders.EmbedBuilder();
+            embed.setTitle(queued.name);
+            embed.addField("index", i.toString(), true);
+            const info = await playdl.video_basic_info(queued.url);
+            debugLog(info.video_details.thumbnails);
+            embed.setImage(getHighestResUrl(info));
+            pages.push({
+                embed: embed,
+                id: queued.name,
+                index: i,
+                type: "inspectedSong"
+            });
+        }
+        catch {
+            await new Promise((resolve) => {
+                setTimeout(async () => {
+                    const queued = array[i];
+                    await callback(queued.name);
+                    debugLog(`paging ${queued.name}`);
+                    debugLog(queued);
+                    const embed = new builders.EmbedBuilder();
+                    embed.setTitle(queued.name);
+                    embed.addField("index", i.toString(), true);
+                    const info = await playdl.video_basic_info(queued.url);
+                    debugLog(info.video_details.thumbnails);
+                    embed.setImage(getHighestResUrl(info));
+                    pages.push({
+                        embed: embed,
+                        id: queued.name,
+                        index: i,
+                        type: "inspectedSong"
+                    });
+                    resolve();
+                }, 5000);
+            });
+        }
     }
     return Pager({ pages: pages });
 }
 export async function pageTrack(track) {
-    debugLog(`paging ${track.name}`);
-    debugLog(track);
-    const embed = new builders.EmbedBuilder();
-    embed.setTitle(track.name);
-    const info = await playdl.video_basic_info(track.url);
-    debugLog(info.video_details.thumbnails);
-    embed.setImage(getHighestResUrl(info));
-    return {
-        embed: embed,
-        id: track.name,
-        type: "inspectedSong"
-    };
+    try {
+        debugLog(`paging ${track.name}`);
+        debugLog(track);
+        const embed = new builders.EmbedBuilder();
+        embed.setTitle(track.name);
+        const info = await playdl.video_basic_info(track.url);
+        debugLog(info.video_details.thumbnails);
+        embed.setImage(getHighestResUrl(info));
+        return {
+            embed: embed,
+            id: track.name,
+            type: "inspectedSong"
+        };
+    }
+    catch {
+        return new Promise((resolve) => {
+            setTimeout(async () => {
+                debugLog(`paging ${track.name}`);
+                debugLog(track);
+                const embed = new builders.EmbedBuilder();
+                embed.setTitle(track.name);
+                const info = await playdl.video_basic_info(track.url);
+                debugLog(info.video_details.thumbnails);
+                embed.setImage(getHighestResUrl(info));
+                resolve({
+                    embed: embed,
+                    id: track.name,
+                    type: "inspectedSong"
+                });
+            }, 5000);
+        });
+    }
 }
 export default {
     SelectMenu,
