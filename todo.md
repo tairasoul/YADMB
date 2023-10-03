@@ -23,14 +23,14 @@
 - add a server-info command
   - gives info about the server as seen within the music bot, so queued tracks, volume, all that
   - getting opinions on how it looks atm, will be finished later\
- 
+
+# finished + comments
+
 - add a progress command
   - updates live, stops updating when someone uses it again (or just deletes and sends it again if a music commands channel is specified)
   - shows how long is remaining
   - shows the thumbnail (if possible, i'm having issues with showing thumbnail in add-search)
   - shows song name, author, likes, views
-
-# finished + comments
 
 - find and fix some final bugs with the current queue system
     - the new queue system has a few bugs left due to the fact it's now more of just adding mini-queues and not singular links
