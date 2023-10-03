@@ -17,10 +17,17 @@
  
 - add optional DJ role (if specified, only that role can use commands)
 
-- add a server-info command
-  - gives info about the server as seen within the music bot, so queued tracks, volume, all that
+- rewrite the commands that use pages, so the PageHolder class is ACTUALLY used
+  - currently bot.ts handles the paging instead of just.. using the functions
+ 
+- instead of paging at command execute time, page live and add some embeds for each song
+  - this means live-updating view-queue will be easier
+  - and it wont take as much time
 
 # in progress
+
+- add a server-info command
+  - gives info about the server as seen within the music bot, so queued tracks, volume, all that
 
 # finished + comments
 
