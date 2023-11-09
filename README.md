@@ -27,7 +27,7 @@ download discord-music-bot-installer-linux if on linux, otherwise discord-music-
 
 # Changelog
 
-Changelog has been moved to [changelog.md](https://github.com/tairasoul/discord-music-bot/changelog.md);
+Changelog has been moved to [changelog.md](https://github.com/tairasoul/discord-music-bot/blob/main/changelog.md)
 
 # commands
 
