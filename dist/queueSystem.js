@@ -1,68 +1,42 @@
-import voice, { createAudioResource } from "@discordjs/voice";
-import fs from "node:fs"
+import { createAudioResource } from "@discordjs/voice";
+import fs from "node:fs";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import util from "node:util";
-import playdl, { InfoData } from "play-dl";
-import utils from "./utils.js"
-
+import playdl from "play-dl";
+import utils from "./utils.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
-if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
-
-function debugLog(text: any) {
-    if (debug) console.log(text)
+if (fs.existsSync(`${__dirname}/enableDebugging`))
+    debug = true;
+function debugLog(text) {
+    if (debug)
+        console.log(text);
 }
-
-type track = {
-    name: string;
-    url: string;
-}
-
-type loopType = "none" | "queue" | "song" | "playlist";
-
-type queuedTrack = {
-    type: "playlist" | "song";
-    tracks: track[];
-    trackNumber: number;
-    name: string;
-}
-
 export default class QueueHandler {
-    public tracks: queuedTrack[] = [];
-    private internalLoop: loopType = "none";
-    public internalCurrentIndex: number = 0;
-    private audioPlayer: voice.AudioPlayer;
-    private volumeString: string = "100%";
-    public currentInfo: {
-        name: string;
-        resource: voice.AudioResource<any>;
-        songStart: number;
-        info: InfoData
-    } | null = null;
-
-    constructor(guildAudioPlayer: voice.AudioPlayer) {
+    tracks = [];
+    internalLoop = "none";
+    internalCurrentIndex = 0;
+    audioPlayer;
+    volumeString = "100%";
+    currentInfo = null;
+    constructor(guildAudioPlayer) {
         this.audioPlayer = guildAudioPlayer;
     }
-
-    setLoopType(loopType: loopType) {
+    setLoopType(loopType) {
         this.internalLoop = loopType;
     }
-
-    setVolume(volumeString: string) {
+    setVolume(volumeString) {
         this.volumeString = volumeString;
     }
-
     get loopType() {
         return this.internalLoop;
     }
-
     get volume() {
-        return this.volumeString
+        return this.volumeString;
     }
-
     nextTrack() {
-        const cur = this.tracks[this.internalCurrentIndex]
+        const cur = this.tracks[this.internalCurrentIndex];
         if (this.internalLoop == "song") {
             return cur.tracks[cur.trackNumber];
         }
@@ -92,35 +66,32 @@ export default class QueueHandler {
         }
         return newCurrent.tracks[newCurrent.trackNumber];
     }
-
     async skip() {
         this.audioPlayer.stop(true);
         this.tracks.splice(--this.internalCurrentIndex, 1);
         const track = this.nextTrack();
         return track;
     }
-
     pause() {
         return this.audioPlayer.pause(true);
     }
-    
     resume() {
         return this.audioPlayer.unpause();
     }
-
     async play() {
         const currentInternal = this.tracks[this.internalCurrentIndex];
         debugLog(util.inspect(currentInternal, false, 5, true));
         debugLog(this.internalCurrentIndex);
         debugLog(util.inspect(this.tracks, false, 5, true));
         const track = currentInternal.tracks[currentInternal.trackNumber];
-        if (track == undefined) return false;
+        if (track == undefined)
+            return false;
         const info = await playdl.video_info(track.url);
         const stream = await playdl.stream_from_info(info);
         const resource = createAudioResource(stream.stream, {
             inlineVolume: true,
             inputType: stream.type
-        })
+        });
         resource.volume?.setVolume(utils.parseVolumeString(this.volumeString));
         this.audioPlayer.play(resource);
         const duration = info.video_details.durationInSec;
@@ -129,6 +100,6 @@ export default class QueueHandler {
             resource: resource,
             songStart: duration * 1000,
             info: info
-        }
+        };
     }
 }

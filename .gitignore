@@ -5,3 +5,4 @@ package-lock.json
 dist/enableDebugging
 node_modules/
 discord-music-bot.code-workspace
+.gitignore

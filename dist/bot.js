@@ -9,13 +9,14 @@ import * as voice from "@discordjs/voice";
 import { default as playdl } from 'play-dl';
 import humanize from 'humanize-duration';
 import ytdl from 'ytdl-core';
-import { createAudioPlayer, NoSubscriberBehavior, createAudioResource } from "@discordjs/voice";
+import { createAudioPlayer, NoSubscriberBehavior } from "@discordjs/voice";
 import ytpl from 'ytpl';
 // @ts-ignore
 import { default as lzw } from "lzwcompress";
 import base64 from "base-64";
 import rstring from "randomstring";
 import util from "node:util";
+import QueueHandler from './queueSystem.js';
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${__dirname}/enableDebugging`))
@@ -65,67 +66,13 @@ function setupGuild(guild) {
     });
     cg.audioPlayer.on("stateChange", () => {
         if (cg.audioPlayer.state.status === "idle") {
-            if (cg.queuedTracks[cg.currentTrack] != undefined) {
-                debugLog(util.inspect(cg.queuedTracks, false, 3, true));
-                debugLog(cg.currentTrack);
-                switch (cg.loopType) {
-                    case "none":
-                        if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
-                            cg.queuedTracks[cg.currentTrack].tracks.splice(0, 1);
-                            if (cg.queuedTracks[cg.currentTrack].tracks.length === 0) {
-                                cg.queuedTracks.splice(0, 1);
-                                if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
-                                    playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
-                            }
-                            else {
-                                if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
-                                    playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
-                            }
-                        }
-                        else {
-                            cg.queuedTracks.splice(0, 1);
-                            if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
-                                playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
-                        }
-                        break;
-                    case "song":
-                        if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
-                            playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
-                        break;
-                    case "queue":
-                        debugLog(cg.currentTrack);
-                        if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
-                            cg.queuedTracks[cg.currentTrack].trackNumber += 1;
-                        }
-                        else {
-                            cg.currentTrack += 1;
-                        }
-                        if (cg.currentTrack >= cg.queuedTracks.length)
-                            cg.currentTrack = 0;
-                        if (cg.queuedTracks[cg.currentTrack].trackNumber >= cg.queuedTracks[cg.currentTrack].tracks.length)
-                            cg.currentTrack += 1;
-                        if (cg.currentTrack >= cg.queuedTracks.length)
-                            cg.currentTrack = 0;
-                        debugLog(cg.currentTrack);
-                        if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
-                            playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
-                        break;
-                    case "playlist":
-                        if (cg.queuedTracks[cg.currentTrack].tracks.length <= cg.queuedTracks[cg.currentTrack].trackNumber || cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber + 1] === undefined) {
-                            cg.queuedTracks[cg.currentTrack].trackNumber = 0;
-                        }
-                        else {
-                            cg.queuedTracks[cg.currentTrack].trackNumber += 1;
-                        }
-                        if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])
-                            playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
-                        break;
-                }
+            if (cg.queue.nextTrack() != null) {
+                debugLog(util.inspect(cg.queue.tracks, false, 3, true));
+                debugLog(cg.queue.internalCurrentIndex);
+                cg.queue.play();
             }
             else {
-                cg.currentResource = null;
-                cg.songStart = null;
-                cg.currentInfo = null;
+                cg.queue.currentInfo = null;
             }
         }
     });
@@ -190,46 +137,22 @@ client.on("ready", () => {
     console.log("logged in");
 });
 client.on('error', (error) => {
-    console.error(`something went wrong, ${error}`);
+    console.error(`something went wrong, ${typeof error == "string" ? error : util.inspect(error, false, 5, true)}`);
 });
-// music playback
-async function playSong(track, guild) {
-    const currentGuild = guilds[guild];
-    debugLog(util.inspect(currentGuild.queuedTracks, false, 5, true));
-    const info = await playdl.video_info(track.url);
-    const stream = await playdl.stream_from_info(info);
-    const resource = createAudioResource(stream.stream, {
-        inlineVolume: true,
-        inputType: stream.type
-    });
-    resource.volume?.setVolume(currentGuild.volume);
-    currentGuild.currentlyPlaying = track.name;
-    currentGuild.currentResource = resource;
-    currentGuild.audioPlayer.play(resource);
-    const duration = info.video_details.durationInSec;
-    currentGuild.songStart = duration * 1000;
-    currentGuild.currentInfo = info;
-}
 // start commands
 const ccommands = new Collection();
 client.on('guildCreate', (guild) => {
+    const audioPlayer = createAudioPlayer({
+        behaviors: {
+            noSubscriber: NoSubscriberBehavior.Pause
+        }
+    });
     guilds[guild.id] = {
-        queuedTracks: [],
+        queue: new QueueHandler(audioPlayer),
         connection: null,
-        loopType: "none",
-        currentTrack: 0,
         voiceChannel: null,
-        currentlyPlaying: null,
-        audioPlayer: createAudioPlayer({
-            behaviors: {
-                noSubscriber: NoSubscriberBehavior.Pause
-            }
-        }),
-        volume: 0.05,
-        leaveTimer: null,
-        currentResource: null,
-        songStart: null,
-        currentInfo: null
+        audioPlayer: audioPlayer,
+        leaveTimer: null
     };
     setupGuild(guild);
     client.editStatus("online", [{ name: (client.guilds.size).toString() + ' servers', type: 3 }]);
@@ -275,9 +198,10 @@ const commands = [
                 return await interaction.editOriginal({ embeds: [embed.toJSON()] });
             }
             if (interaction.guildID) {
-                const ct = guilds[interaction.guildID].currentTrack;
-                const nowPlaying = guilds[interaction.guildID].queuedTracks[ct];
-                const qt = guilds[interaction.guildID].queuedTracks;
+                const queue = guilds[interaction.guildID].queue;
+                const ct = queue.internalCurrentIndex;
+                const nowPlaying = queue.tracks[ct];
+                const qt = queue.tracks;
                 switch (provider) {
                     case "youtube":
                         if (!ytdl.validateURL(video)) {
@@ -285,8 +209,8 @@ const commands = [
                             embed.setDescription("Invalid link.");
                             return await interaction.editOriginal({ embeds: [embed.toJSON()] });
                         }
-                        const info = await ytdl.getInfo(video);
-                        const title = info.videoDetails.title;
+                        const info = await playdl.video_basic_info(video);
+                        const title = info.video_details.title;
                         const youtubeadd = {
                             type: "song",
                             trackNumber: 0,
@@ -310,7 +234,7 @@ const commands = [
                             }
                         }
                         else {
-                            guilds[interaction.guildID].queuedTracks.push(youtubeadd);
+                            guilds[interaction.guildID].queue.tracks.push(youtubeadd);
                         }
                         const yembed = new builders.EmbedBuilder();
                         yembed.setDescription(`Added **${title}** to queue.`);
@@ -350,7 +274,7 @@ const commands = [
                             }
                         }
                         else {
-                            guilds[interaction.guildID].queuedTracks.push(deezeradd);
+                            guilds[interaction.guildID].queue.tracks.push(deezeradd);
                         }
                         const dembed = new builders.EmbedBuilder();
                         dembed.setDescription(`Added **${dvid.title}** to queue.`);
@@ -393,7 +317,7 @@ const commands = [
                             }
                         }
                         else {
-                            guilds[interaction.guildID].queuedTracks.push(spotifyadd);
+                            guilds[interaction.guildID].queue.tracks.push(spotifyadd);
                         }
                         const spembed = new builders.EmbedBuilder();
                         spembed.setDescription(`Added **${sp_data.name}** to queue.`);
@@ -424,23 +348,23 @@ const commands = [
                             }
                         }
                         else {
-                            guilds[interaction.guildID].queuedTracks.push(sc_add);
+                            guilds[interaction.guildID].queue.tracks.push(sc_add);
                         }
                         const scembed = new builders.EmbedBuilder();
                         scembed.setDescription(`Added **${sinfo.name}** to queue.`);
                         await interaction.editOriginal({ embeds: [scembed.toJSON()] });
                         break;
                 }
-                const ctn = guilds[interaction.guildID].currentTrack;
-                const t = guilds[interaction.guildID].queuedTracks[ctn];
+                const ctn = guilds[interaction.guildID].queue.internalCurrentIndex;
+                const t = guilds[interaction.guildID].queue.tracks[ctn];
                 const cst = t.trackNumber;
                 const st = t.tracks[cst];
-                debugLog(ctn);
-                debugLog(t);
-                debugLog(cst);
-                debugLog(st);
+                debugLog(`guilds["${interaction.guildID}"].queue.internalCurrentIndex: ${ctn}`);
+                debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn]: ${util.inspect(t, false, 5, true)}`);
+                debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].trackNumber: ${cst}`);
+                debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].tracks[cst]: ${util.inspect(st, false, 5, true)}`);
                 if (guilds[interaction.guildID].audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection)
-                    playSong(st, interaction.guildID);
+                    await guilds[interaction.guildID].queue.play();
             }
         }
     },
@@ -556,32 +480,33 @@ const commands = [
                     ],
                     name: currentVideo.title
                 };
-                guilds[interaction.guildID].queuedTracks.push(youtubeadd);
                 const embed = new builders.EmbedBuilder();
                 embed.setDescription(`Added **${currentVideo.title}** to queue.`);
                 await i.editOriginal({
                     embeds: [embed.toJSON()]
                 });
                 const g = guilds[interaction.guildID];
-                const ct = g.currentTrack;
-                const t = g.queuedTracks[ct];
+                const queue = g.queue;
+                const ct = queue.internalCurrentIndex;
+                const t = queue.tracks[ct];
                 const cst = t.trackNumber;
                 const st = t.tracks[cst];
-                g.queuedTracks.push(youtubeadd);
-                debugLog(ct);
-                debugLog(t);
-                debugLog(cst);
-                debugLog(st);
+                queue.tracks.push(youtubeadd);
+                debugLog(`guilds["${interaction.guildID}"].queue.internalCurrentIndex: ${ct}`);
+                debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct]: ${util.inspect(t, false, 5, true)}`);
+                debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].trackNumber: ${cst}`);
+                debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].tracks[cst]: ${util.inspect(st, false, 5, true)}`);
                 if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection)
-                    playSong(st, interaction.guildID);
+                    await queue.play();
             };
             // play video next
             //@ts-ignore
             const vla = async (i) => {
                 await i.defer();
                 const g = guilds[interaction.guildID];
-                const ct = g.currentTrack;
-                const t = g.queuedTracks[ct];
+                const queue = g.queue;
+                const ct = queue.internalCurrentIndex;
+                const t = queue.tracks[ct];
                 if (t.type === "playlist") {
                     const cst = t.trackNumber;
                     t.tracks.splice(cst + 1, 0, {
@@ -590,7 +515,7 @@ const commands = [
                     });
                 }
                 else {
-                    g.queuedTracks.push({
+                    queue.tracks.push({
                         type: "song",
                         trackNumber: 0,
                         tracks: [
@@ -647,9 +572,10 @@ const commands = [
             await interaction.defer();
             const type = interaction.data.options.getString("type", true);
             const g = guilds[interaction.guildID];
+            const queue = g.queue;
             switch (type) {
                 case "playlist":
-                    const q = g.queuedTracks[g.currentTrack];
+                    const q = queue.tracks[queue.internalCurrentIndex];
                     if (q.type === "song") {
                         const embed = new builders.EmbedBuilder();
                         embed.setDescription("The current track is not a playlist.");
@@ -671,7 +597,7 @@ const commands = [
                         ] });
                 case "queue":
                     const qClone = [];
-                    for (const track of g.queuedTracks) {
+                    for (const track of queue.tracks) {
                         qClone.push(track);
                     }
                     for (const clone of qClone) {
@@ -700,6 +626,7 @@ const commands = [
         async execute(interaction) {
             await interaction.defer();
             const g = guilds[interaction.guildID];
+            const queue = g.queue;
             const encoded = interaction.data.options.getAttachment("encoded", true);
             const data = await fetch(encoded.url, {
                 method: "GET"
@@ -709,23 +636,23 @@ const commands = [
             debugLog(lzd);
             if (lzd?.trackNumber !== undefined) {
                 debugLog("found track number");
-                g.queuedTracks.push(lzd);
+                queue.tracks.push(lzd);
             }
             else {
                 debugLog("no track number, iterating.");
                 for (const track of lzd) {
-                    g.queuedTracks.push(track);
+                    queue.tracks.push(track);
                 }
             }
             const embed = new builders.EmbedBuilder();
             embed.setDescription(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"} from ${encoded.filename}`);
             await interaction.editOriginal({ embeds: [embed.toJSON()] });
-            const ct = g.currentTrack;
-            const t = g.queuedTracks[ct];
+            const ct = queue.internalCurrentIndex;
+            const t = queue.tracks[ct];
             const cst = t.trackNumber;
             const st = t.tracks[cst];
             if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection)
-                playSong(st, interaction.guildID);
+                await queue.play();
         }
     },
     {
@@ -735,9 +662,9 @@ const commands = [
         async execute(interaction) {
             if (interaction.guildID) {
                 await interaction.defer();
-                guilds[interaction.guildID].queuedTracks.splice(0, 5000);
+                guilds[interaction.guildID].queue.tracks.splice(0, 5000);
                 guilds[interaction.guildID].audioPlayer.stop(true);
-                guilds[interaction.guildID].currentTrack = 0;
+                guilds[interaction.guildID].queue.internalCurrentIndex = 0;
                 const embed = new builders.EmbedBuilder();
                 embed.setDescription("Cleared queue.");
                 await interaction.editOriginal({ embeds: [embed.toJSON()] });
@@ -777,8 +704,9 @@ const commands = [
                         }
                     }
                 });
-                const ct = g.currentTrack;
-                const qt = g.queuedTracks;
+                const queue = g.queue;
+                const ct = queue.internalCurrentIndex;
+                const qt = queue.tracks;
                 const cst = qt[ct]?.trackNumber;
                 const qst = qt[ct]?.tracks;
                 const string = `Joined VC <#${interaction.member.voiceState.channelID}>${qt.length > 0 ? ` starting track **${qst[cst].name}**` : ""}`;
@@ -786,7 +714,7 @@ const commands = [
                 embed.setDescription(string);
                 await interaction.editOriginal({ embeds: [embed.toJSON()] });
                 if (qt.length > 0) {
-                    playSong(qst[cst], interaction.guildID);
+                    await queue.play();
                 }
             }
         }
@@ -795,24 +723,40 @@ const commands = [
         data: new builders.ApplicationCommandBuilder(1, "pause")
             .setDescription("Pause current track.").setDMPermission(false),
         async execute(interaction) {
-            await interaction.defer();
             const g = guilds[interaction.guildID];
-            g.audioPlayer.pause();
-            const embed = new builders.EmbedBuilder();
-            embed.setDescription(`Paused track ${g.currentlyPlaying}`);
-            await interaction.editOriginal({ embeds: [embed.toJSON()] });
+            const queue = g.queue;
+            if (queue.currentInfo) {
+                await interaction.defer();
+                queue.pause();
+                const embed = new builders.EmbedBuilder();
+                embed.setDescription(`Paused track ${queue.currentInfo.name}`);
+                await interaction.editOriginal({ embeds: [embed.toJSON()] });
+            }
+            else {
+                const embed = new builders.EmbedBuilder();
+                embed.setDescription(`No track to pause. Has the bot joined a voice channel yet?`);
+                await interaction.editOriginal({ embeds: [embed.toJSON()] });
+            }
         }
     },
     {
         data: new builders.ApplicationCommandBuilder(1, "resume")
             .setDescription("Resume current track.").setDMPermission(false),
         async execute(interaction) {
-            await interaction.defer();
             const g = guilds[interaction.guildID];
-            g.audioPlayer.unpause();
-            const embed = new builders.EmbedBuilder();
-            embed.setDescription(`Resumed track ${g.currentlyPlaying}`);
-            await interaction.editOriginal({ embeds: [embed.toJSON()] });
+            const queue = g.queue;
+            if (queue.currentInfo) {
+                await interaction.defer();
+                queue.resume();
+                const embed = new builders.EmbedBuilder();
+                embed.setDescription(`Resumed track ${queue.currentInfo.name}`);
+                await interaction.editOriginal({ embeds: [embed.toJSON()] });
+            }
+            else {
+                const embed = new builders.EmbedBuilder();
+                embed.setDescription(`No track to resume. Has the bot joined a voice channel yet?`);
+                await interaction.editOriginal({ embeds: [embed.toJSON()] });
+            }
         }
     },
     {
@@ -839,25 +783,26 @@ const commands = [
             await interaction.defer();
             const shuffleType = interaction.data.options.getString("type", true);
             const g = guilds[interaction.guildID];
-            const ct = g.queuedTracks[g.currentTrack];
+            const queue = g.queue;
+            const ct = queue.tracks[queue.internalCurrentIndex];
             if (ct.type === "song" && shuffleType === "playlist") {
                 const embed = new builders.EmbedBuilder();
                 embed.setDescription("The current track is a song, not a playlist.");
                 return await interaction.editOriginal({ embeds: [embed.toJSON()] });
             }
             g.audioPlayer.stop(true);
-            g.currentTrack = 0;
+            queue.internalCurrentIndex = 0;
             ct.trackNumber = 0;
             if (shuffleType === "playlist") {
                 utils.shuffleArray(ct.tracks);
             }
             else {
-                utils.shuffleArray(g.queuedTracks);
+                utils.shuffleArray(queue.tracks);
             }
             const embed = new builders.EmbedBuilder();
-            embed.setDescription(`Shuffled queue, now playing ${ct.tracks[0].name}.`);
+            embed.setDescription(`Shuffled queue, now playing ${queue.tracks[queue.internalCurrentIndex].tracks[0].name}.`);
             await interaction.editOriginal({ embeds: [embed.toJSON()] });
-            playSong(ct.tracks[0], interaction.guildID);
+            await queue.play();
         }
     },
     {
@@ -865,27 +810,18 @@ const commands = [
             .setDescription("Skip the current song.")
             .setDMPermission(false),
         async execute(interaction) {
-            const embed = new builders.EmbedBuilder();
             const g = guilds[interaction.guildID];
-            const ct = g.queuedTracks[g.currentTrack];
-            let songName;
-            if (ct.type == "song") {
-                songName = ct.tracks[0].name;
-                g.queuedTracks.splice(g.currentTrack, 1);
-                g.currentTrack -= 1;
-                if (g.currentTrack >= g.queuedTracks.length)
-                    ct.trackNumber = 0;
+            const queue = g.queue;
+            const embed = new builders.EmbedBuilder();
+            if (queue.currentInfo) {
+                embed.setDescription(`Skipped song ${queue.currentInfo.name}.`);
+                await queue.skip();
+                await queue.play();
             }
             else {
-                songName = ct.tracks[ct.trackNumber].name;
-                ct.tracks.splice(ct.trackNumber, 1);
-                ct.trackNumber -= 1;
-                if (ct.trackNumber >= ct.tracks.length)
-                    ct.trackNumber = 0;
+                embed.setDescription(`No song to skip.`);
             }
-            g.audioPlayer.stop();
-            embed.setDescription(`Skipped song ${songName}.`);
-            await interaction.createFollowup({ embeds: [embed.toJSON()] });
+            await interaction.createMessage({ embeds: [embed.toJSON()] });
         }
     },
     {
@@ -896,11 +832,12 @@ const commands = [
             await interaction.defer();
             const embed = new builders.EmbedBuilder();
             const g = guilds[interaction.guildID];
-            g.currentTrack -= 1;
+            const queue = g.queue;
+            queue.internalCurrentIndex -= 1;
             g.audioPlayer.stop();
-            g.queuedTracks.splice(g.currentTrack, 1);
-            if (g.currentTrack >= g.queuedTracks.length)
-                g.currentTrack = 0;
+            queue.tracks.splice(queue.internalCurrentIndex, 1);
+            if (queue.internalCurrentIndex >= queue.tracks.length)
+                queue.internalCurrentIndex = 0;
             embed.setDescription(`Skipped current playlist.`);
             await interaction.createFollowup({ embeds: [embed.toJSON()] });
         }
@@ -934,7 +871,7 @@ const commands = [
             const g = guilds[interaction.guildID];
             const embed = new builders.EmbedBuilder();
             embed.setDescription(loopTypeStrs[choice]);
-            g.loopType = choice;
+            g.queue.setLoopType(choice);
             await interaction.editOriginal({ embeds: [embed.toJSON()] });
         }
     },
@@ -1004,13 +941,10 @@ const commands = [
             const embed = new builders.EmbedBuilder();
             embed.setDescription(`Added **${videos.items.length} tracks** to the queue as a playlist.`);
             const g = guilds[interaction.guildID];
-            g.queuedTracks.push(added_playlist);
-            const ct = g.currentTrack;
-            const t = g.queuedTracks[ct];
-            const cst = t.trackNumber;
-            const st = t.tracks[cst];
+            const queue = g.queue;
+            queue.tracks.push(added_playlist);
             if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection)
-                playSong(st, interaction.guildID);
+                await queue.play();
             await interaction.editOriginal({ embeds: [embed.toJSON()] });
         }
     },
@@ -1022,7 +956,7 @@ const commands = [
             await interaction.defer(1 << 6);
             await interaction.editOriginal({ embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")], flags: 1 << 6 });
             const data = {
-                queued: await utils.queuedTrackPager(guilds[interaction.guildID].queuedTracks, async (title) => {
+                queued: await utils.queuedTrackPager(guilds[interaction.guildID].queue.tracks, async (title) => {
                     await interaction.editOriginal({ embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6 });
                 }),
                 tracks: null
@@ -1127,7 +1061,7 @@ const commands = [
                 if (i.data.customID !== exportId)
                     return;
                 await i.defer(1 << 6);
-                const q = guilds[interaction.guildID].queuedTracks[currentPage];
+                const q = guilds[interaction.guildID].queue.tracks[currentPage];
                 const clone = {
                     trackNumber: 0,
                     tracks: q.tracks,
@@ -1148,7 +1082,7 @@ const commands = [
                     return;
                 currentInspectPage = 0;
                 await i.createMessage({ embeds: [embedMessage("Paging tracks for playlist.")], flags: 1 << 6 });
-                data.tracks = await utils.trackPager(guilds[interaction.guildID].queuedTracks[currentPage].tracks, async (title) => {
+                data.tracks = await utils.trackPager(guilds[interaction.guildID].queue.tracks[currentPage].tracks, async (title) => {
                     await i.editOriginal({ embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6 });
                 });
                 isInspecting = true;
@@ -1198,9 +1132,9 @@ const commands = [
                     return;
                 const queueIndex = data.queued.pages[currentPage].index;
                 debugLog(queueIndex);
-                debugLog(guilds[i.guildID].queuedTracks[queueIndex].tracks);
-                utils.shuffleArray(guilds[i.guildID].queuedTracks[queueIndex].tracks);
-                debugLog(guilds[i.guildID].queuedTracks[queueIndex].tracks);
+                debugLog(guilds[i.guildID].queue.tracks[queueIndex].tracks);
+                utils.shuffleArray(guilds[i.guildID].queue.tracks[queueIndex].tracks);
+                debugLog(guilds[i.guildID].queue.tracks[queueIndex].tracks);
                 await i.createMessage({ embeds: [embedMessage("Shuffled playlist.")], flags: 1 << 6 });
             };
             const onPlayNext = async (i) => {
@@ -1209,9 +1143,9 @@ const commands = [
                 await i.defer();
                 const queueIndex = data.queued.pages[currentPage].index;
                 const g = guilds[i.guildID];
-                const queued = g.queuedTracks;
+                const queued = g.queue.tracks;
                 const removed = queued.splice(queueIndex, 1);
-                queued.splice(g.currentTrack, 0, removed[0]);
+                queued.splice(g.queue.internalCurrentIndex, 0, removed[0]);
                 await i.createMessage({ embeds: [embedMessage("Playing " + removed[0].name + " next.")], flags: 1 << 6 });
             };
             const onExitInspect = async (i) => {
@@ -1233,7 +1167,7 @@ const commands = [
                     track: data.tracks.pages[currentInspectPage].index
                 };
                 const g = guilds[i.guildID];
-                g.queuedTracks[queueIndexes.queue].tracks.splice(queueIndexes.track, 1);
+                g.queue.tracks[queueIndexes.queue].tracks.splice(queueIndexes.track, 1);
                 data.tracks?.pages.splice(currentInspectPage, 1);
                 /** @ts-ignore */
                 const embed = data.tracks.pages[currentInspectPage].embed;
@@ -1376,7 +1310,7 @@ const commands = [
                 const encoded = base64.encode(lzw.pack(data));
                 await i.createFollowup({ content: `Exported playlist **${name}**. Save this as a file:`, files: [
                         {
-                            name: `${interaction.member.id}.${interaction.guildID}.${interaction.createdAt.getTime()}.export.txt`,
+                            name: `${interaction.member.username}.playlist.${name}.export.txt`,
                             contents: new Buffer(encoded)
                         }
                     ], flags: 1 << 6 });
@@ -1683,6 +1617,397 @@ const commands = [
         }
     },
     {
+        data: new builders.ApplicationCommandBuilder(1, "edit-playlist")
+            .setDescription("Edit a custom playlist.")
+            .addOption({
+            type: oceanic.ApplicationCommandOptionTypes.ATTACHMENT,
+            required: true,
+            name: "playlist",
+            description: "Playlist file."
+        })
+            .setDMPermission(false),
+        async execute(interaction) {
+            await interaction.defer(1 << 6);
+            const attachment = interaction.data.options.getAttachment("playlist", true);
+            const text = await (await fetch(attachment.url)).text();
+            const data = utils.decodeStr(text);
+            const paged = [];
+            for (const queued of data.tracks) {
+                // @ts-ignore
+                const pagedtrack = await utils.pageTrack(queued);
+                pagedtrack.index = paged.length;
+                pagedtrack.embed.addField("index", pagedtrack.index.toString());
+                paged.push(pagedtrack);
+            }
+            let currentTrack = 0;
+            await interaction.editOriginal({ embeds: [embedMessage("Creating component ids.")], flags: 1 << 6 });
+            // create component ids
+            debugLog("creating component ids");
+            const backId = rstring.generate();
+            const nextId = rstring.generate();
+            const addId = rstring.generate();
+            const removeId = rstring.generate();
+            const moveUpId = rstring.generate();
+            const moveBackId = rstring.generate();
+            const exportId = rstring.generate();
+            const modalId = rstring.generate();
+            // create components
+            await interaction.editOriginal({ embeds: [embedMessage("Creating components.")], flags: 1 << 6 });
+            const back = new builders.Button(oceanic.ButtonStyles.PRIMARY, backId);
+            const next = new builders.Button(oceanic.ButtonStyles.PRIMARY, nextId);
+            const add = new builders.Button(oceanic.ButtonStyles.PRIMARY, addId);
+            const remove = new builders.Button(oceanic.ButtonStyles.PRIMARY, removeId);
+            const moveUp = new builders.Button(oceanic.ButtonStyles.PRIMARY, moveUpId);
+            const moveBack = new builders.Button(oceanic.ButtonStyles.PRIMARY, moveBackId);
+            const exportB = new builders.Button(oceanic.ButtonStyles.PRIMARY, exportId);
+            // set labels
+            back.setLabel("Previous song");
+            next.setLabel("Next song");
+            add.setLabel("Add song");
+            remove.setLabel("Remove song");
+            moveUp.setLabel("Move song forwards");
+            moveBack.setLabel("Move song backwards");
+            exportB.setLabel("Export playlist (disables buttons)");
+            // create component thingy
+            const rows = {
+                enabled: [
+                    new builders.ActionRow().addComponents(moveBack, add, remove, moveUp).toJSON(),
+                    new builders.ActionRow().addComponents(back, exportB, next).toJSON()
+                ],
+                moveBackDisabled: [
+                    new builders.ActionRow().addComponents(moveBack.disable(), add, remove, moveUp).toJSON(),
+                    new builders.ActionRow().addComponents(back, exportB, next).toJSON()
+                ],
+                moveUpDisabled: [
+                    new builders.ActionRow().addComponents(moveBack.enable(), add, remove, moveUp.disable()).toJSON(),
+                    new builders.ActionRow().addComponents(back, exportB, next).toJSON()
+                ],
+                movesDisabled: [
+                    new builders.ActionRow().addComponents(moveBack.disable(), add, remove, moveUp.disable()).toJSON(),
+                    new builders.ActionRow().addComponents(back, exportB, next).toJSON()
+                ],
+                disabled: [
+                    new builders.ActionRow().addComponents(moveBack.disable(), add.disable(), remove.disable(), moveUp.disable()).toJSON(),
+                    new builders.ActionRow().addComponents(back.disable(), exportB.disable(), next.disable()).toJSON()
+                ],
+            };
+            // create callbacks
+            const onExport = async (i) => {
+                if (i.data.customID !== exportId)
+                    return;
+                /** @ts-ignore */
+                await i.editParent({ embeds: [paged[currentTrack].embed.toJSON()], components: rows.disabled, flags: 1 << 6 });
+                const encoded = base64.encode(lzw.pack(data));
+                debugLog(util.inspect(data, false, 5, true));
+                await i.createFollowup({ content: `Exported playlist **${data.name}**. Save this as a file:`, files: [
+                        {
+                            name: `${interaction.member.username}.playlist.${data.name}.export.txt`,
+                            contents: new Buffer(encoded)
+                        }
+                    ], flags: 1 << 6 });
+                /** @ts-ignore */
+                client.off("interactionCreate", onBack);
+                /** @ts-ignore */
+                client.off("interactionCreate", onNext);
+                /** @ts-ignore */
+                client.off("interactionCreate", onRemove);
+                /** @ts-ignore */
+                client.off("interactionCreate", onAdd);
+                /** @ts-ignore */
+                client.off("interactionCreate", onMoveBack);
+                /** @ts-ignore */
+                client.off("interactionCreate", onMoveUp);
+                /** @ts-ignore */
+                client.off("interactionCreate", onExport);
+            };
+            const onBack = async (i) => {
+                if (i.data.customID !== backId)
+                    return;
+                currentTrack -= 1;
+                if (currentTrack == -1)
+                    currentTrack = paged.length - 1;
+                const embed = paged[currentTrack].embed;
+                const components = (currentTrack == 0 ? rows.moveBackDisabled : currentTrack == paged.length - 1 ? rows.moveUpDisabled : rows.enabled);
+                /** @ts-ignore */
+                await i.editParent({ embeds: [embed.toJSON()], components: components, flags: 1 << 6 });
+            };
+            const onNext = async (i) => {
+                if (i.data.customID !== nextId)
+                    return;
+                currentTrack += 1;
+                if (currentTrack == paged.length)
+                    currentTrack = 0;
+                debugLog(paged);
+                const embed = paged[currentTrack].embed;
+                const components = (currentTrack == 0 ? rows.moveBackDisabled : currentTrack == paged.length - 1 ? rows.moveUpDisabled : rows.enabled);
+                /** @ts-ignore */
+                await i.editParent({ embeds: [embed.toJSON()], components: components, flags: 1 << 6 });
+            };
+            const onMoveBack = async (i) => {
+                if (i.data.customID !== moveBackId)
+                    return;
+                const currentData = {
+                    paged: paged.splice(currentTrack, 1)[0],
+                    track: data.tracks.splice(currentTrack, 1)[0]
+                };
+                debugLog(paged);
+                currentData.paged.index -= 1;
+                for (const field of currentData.paged.embed.getFields()) {
+                    if (field.name === "index") {
+                        field.value = (currentData.paged.index).toString();
+                    }
+                }
+                paged[currentTrack - 1].index += 1;
+                for (const field of paged[currentTrack - 1].embed.getFields()) {
+                    if (field.name === "index") {
+                        field.value = (paged[currentTrack - 1].index).toString();
+                    }
+                }
+                paged.splice(currentTrack - 1, 0, currentData.paged);
+                debugLog(paged);
+                data.tracks.splice(currentTrack - 1, 0, currentData.track);
+                const embed = paged[currentTrack].embed;
+                /** @ts-ignore */
+                await i.editParent({ embeds: [embed.toJSON()], components: rows.enabled, flags: 1 << 6 });
+                await i.createFollowup({ embeds: [embedMessage(`Moved track **${currentData.track.name}** backwards.`)], flags: 1 << 6 });
+            };
+            const onMoveUp = async (i) => {
+                if (i.data.customID !== moveUpId)
+                    return;
+                const currentData = {
+                    paged: paged.splice(currentTrack, 1)[0],
+                    track: data.tracks.splice(currentTrack, 1)[0]
+                };
+                debugLog(paged);
+                currentData.paged.index += 1;
+                for (const field of currentData.paged.embed.getFields()) {
+                    if (field.name === "index") {
+                        field.value = (currentData.paged.index).toString();
+                    }
+                }
+                paged[currentTrack].index -= 1;
+                for (const field of paged[currentTrack].embed.getFields()) {
+                    if (field.name === "index") {
+                        field.value = (paged[currentTrack].index).toString();
+                    }
+                }
+                paged.splice(currentTrack + 1, 0, currentData.paged);
+                debugLog(paged);
+                data.tracks.splice(currentTrack + 1, 0, currentData.track);
+                const embed = paged[currentTrack].embed;
+                /** @ts-ignore */
+                await i.editParent({ embeds: [embed.toJSON()], components: rows.enabled, flags: 1 << 6 });
+                await i.createFollowup({ embeds: [embedMessage(`Moved track **${currentData.track.name}** forwards.`)], flags: 1 << 6 });
+            };
+            const onRemove = async (i) => {
+                if (i.data.customID !== removeId)
+                    return;
+                if (paged[currentTrack] == undefined)
+                    return;
+                const splicedData = {
+                    paged: paged.splice(currentTrack, 1),
+                    track: data.tracks.splice(currentTrack, 1)
+                };
+                for (const page of paged) {
+                    if (page.index > splicedData.paged[0].index) {
+                        for (const field of page.embed.getFields()) {
+                            if (field.name == "index")
+                                field.value = (parseInt(field.value) - 1).toString();
+                        }
+                    }
+                }
+                if (currentTrack == paged.length)
+                    currentTrack = paged.length - 1;
+                if (data.tracks.length > 0) {
+                    const components = (currentTrack == 0 ? rows.moveBackDisabled : currentTrack == paged.length - 1 ? rows.moveUpDisabled : rows.enabled);
+                    /** @ts-ignore */
+                    await i.editParent({ embeds: [paged[currentTrack].embed.toJSON()], components: components, flags: 1 << 6 });
+                }
+                else {
+                    /** @ts-ignore */
+                    await interaction.editOriginal({ embeds: [embedMessage("No songs yet. Use the components to add some!")], components: rows.movesDisabled, flags: 1 << 6 });
+                }
+                await i.createFollowup({ embeds: [embedMessage(`Removed track **${splicedData.track[0].name}**`)], flags: 1 << 6 });
+            };
+            const addCallback = async (int, resolve) => {
+                if (int.data.customID !== modalId)
+                    return;
+                if (!int.acknowledged)
+                    await int.defer(1 << 6);
+                const video = int.data.components[0].components[0].value;
+                const provider = getProvider(video);
+                if (provider == undefined) {
+                    return int.editOriginal({ embeds: [embedMessage("Invalid song link.")], flags: 1 << 6 });
+                }
+                switch (provider) {
+                    case "youtube":
+                        try {
+                            if (!ytdl.validateURL(video)) {
+                                const embed = new builders.EmbedBuilder();
+                                embed.setDescription("Invalid link.");
+                                return await int.editOriginal({ embeds: [embed.toJSON()], flags: 1 << 6 });
+                            }
+                            const info = await playdl.video_basic_info(video);
+                            const title = info.video_details.title;
+                            const youtubeadd = {
+                                name: title,
+                                url: video
+                            };
+                            data.tracks.push(youtubeadd);
+                            /** @ts-ignore */
+                            const pagedTrack = await utils.pageTrack(youtubeadd);
+                            pagedTrack.index = paged.length;
+                            pagedTrack.embed.addField("index", pagedTrack.index.toString(), true);
+                            paged.push(pagedTrack);
+                            const yembed = new builders.EmbedBuilder();
+                            yembed.setDescription(`Added **${title}** to custom playlist.`);
+                            await int.editOriginal({ embeds: [yembed.toJSON()], flags: 1 << 6 });
+                            resolve();
+                        }
+                        catch (err) {
+                            await int.editOriginal({ embeds: [embedMessage(`Encountered an error: ${err}`)] });
+                        }
+                        break;
+                    // both deezer and spotify need to be searched up on youtube
+                    case "deezer":
+                        try {
+                            const dvid = await playdl.deezer(video);
+                            if (dvid.type !== "track") {
+                                const dembed = new builders.EmbedBuilder();
+                                dembed.setDescription(`**${dvid.title}** is not a Deezer track! This only supports singular tracks.`);
+                                return await int.editOriginal({ embeds: [dembed.toJSON()], flags: 1 << 6 });
+                            }
+                            const yvid = (await playdl.search(dvid.title, {
+                                limit: 1
+                            }))[0];
+                            const deezeradd = {
+                                name: dvid.title,
+                                url: yvid.url
+                            };
+                            data.tracks.push(deezeradd);
+                            /** @ts-ignore */
+                            const pagedDeezer = await utils.pageTrack(deezeradd);
+                            pagedDeezer.index = paged.length;
+                            pagedDeezer.embed.addField("index", pagedDeezer.index.toString(), true);
+                            paged.push(pagedDeezer);
+                            const dembed = new builders.EmbedBuilder();
+                            dembed.setDescription(`Added **${dvid.title}** to custom playlist.`);
+                            await int.editOriginal({ embeds: [dembed.toJSON()], flags: 1 << 6 });
+                            resolve();
+                        }
+                        catch (err) {
+                            await int.editOriginal({ embeds: [embedMessage(`Encountered an error: ${err}`)] });
+                        }
+                        break;
+                    case "spotify":
+                        try {
+                            try {
+                                if (playdl.is_expired()) {
+                                    await playdl.refreshToken(); // This will check if access token has expired or not. If yes, then refresh the token.
+                                }
+                            }
+                            catch { }
+                            const sp_data = await playdl.spotify(video);
+                            if (sp_data.type !== "track") {
+                                const dembed = new builders.EmbedBuilder();
+                                dembed.setDescription(`**${sp_data.name}** is not a Spotify track! This only supports singular tracks.`);
+                                return await int.editOriginal({ embeds: [dembed.toJSON()], flags: 1 << 6 });
+                            }
+                            const search = (await playdl.search(sp_data.name, { limit: 1 }))[0];
+                            const spotifyadd = {
+                                name: sp_data.name,
+                                url: search.url
+                            };
+                            data.tracks.push(spotifyadd);
+                            /** @ts-ignore */
+                            const pagedSpotify = await utils.pageTrack(spotifyadd);
+                            pagedSpotify.index = paged.length;
+                            pagedSpotify.embed.addField("index", pagedSpotify.index.toString(), true);
+                            paged.push(pagedSpotify);
+                            const spembed = new builders.EmbedBuilder();
+                            spembed.setDescription(`Added **${sp_data.name}** to custom playlist.`);
+                            await int.editOriginal({ embeds: [spembed.toJSON()], flags: 1 << 6 });
+                            resolve();
+                        }
+                        catch (err) {
+                            await int.editOriginal({ embeds: [embedMessage(`Encountered an error: ${err}`)] });
+                        }
+                        break;
+                    case "soundcloud":
+                        try {
+                            const sinfo = await playdl.soundcloud(video);
+                            const sc_add = {
+                                name: sinfo.name,
+                                url: video
+                            };
+                            data.tracks.push(sc_add);
+                            /** @ts-ignore */
+                            const pagedSoundcloud = await utils.pageTrack(sc_add);
+                            pagedSoundcloud.index = paged.length;
+                            pagedSoundcloud.embed.addField("index", pagedSoundcloud.index.toString(), true);
+                            paged.push(pagedSoundcloud);
+                            const scembed = new builders.EmbedBuilder();
+                            scembed.setDescription(`Added **${sinfo.name}** to custom playlist.`);
+                            await int.editOriginal({ embeds: [scembed.toJSON()], flags: 1 << 6 });
+                            resolve();
+                        }
+                        catch (err) {
+                            await int.editOriginal({ embeds: [embedMessage(`Encountered an error: ${err}`)] });
+                        }
+                        break;
+                }
+            };
+            const onAdd = async (i) => {
+                if (i.data.customID !== addId)
+                    return;
+                const modalRow = new builders.ActionRow();
+                const inputId = rstring.generate();
+                const input = new builders.TextInput(oceanic.TextInputStyles.SHORT, "url", inputId);
+                input.setLabel("song url");
+                input.setRequired(true);
+                modalRow.addComponents(input);
+                /** @ts-ignore */
+                await i.createModal({ components: [modalRow.toJSON()], customID: modalId, title: "Add song to playlist." });
+                let callback;
+                await new Promise((resolve) => {
+                    callback = async (inter) => {
+                        await addCallback(inter, resolve);
+                    };
+                    /** @ts-ignore */
+                    client.on("interactionCreate", callback);
+                    setTimeout(() => {
+                        /** @ts-ignore */
+                        client.off("interactionCreate", async (inter) => {
+                            await addCallback(inter, resolve);
+                        });
+                    }, 180000);
+                });
+                /** @ts-ignore */
+                client.off("interactionCreate", callback);
+                if (data.tracks.length == 1) {
+                    /** @ts-ignore */
+                    await interaction.editOriginal({ embeds: [paged[currentTrack].embed.toJSON()], components: rows.movesDisabled, flags: 1 << 6 });
+                }
+            };
+            /** @ts-ignore */
+            await interaction.editOriginal({ embeds: [paged[currentTrack].embed.toJSON()], components: rows.moveBackDisabled, flags: 1 << 6 });
+            /** @ts-ignore */
+            client.on("interactionCreate", onBack);
+            /** @ts-ignore */
+            client.on("interactionCreate", onNext);
+            /** @ts-ignore */
+            client.on("interactionCreate", onRemove);
+            /** @ts-ignore */
+            client.on("interactionCreate", onAdd);
+            /** @ts-ignore */
+            client.on("interactionCreate", onMoveBack);
+            /** @ts-ignore */
+            client.on("interactionCreate", onMoveUp);
+            /** @ts-ignore */
+            client.on("interactionCreate", onExport);
+        }
+    },
+    {
         data: new builders.ApplicationCommandBuilder(1, "set-volume")
             .setDescription("Set the volume for the bot within the current guild.")
             .addOption({
@@ -1696,15 +2021,13 @@ const commands = [
             const volume = interaction.data.options.getString("volume", true);
             const characterRegex = /^[0-9%.]*$/g;
             if (characterRegex.test(volume)) {
-                const parsed = utils.parseVolumeString(volume);
                 const cg = guilds[interaction.guild.id];
-                cg.volume = parsed;
-                cg.currentResource?.volume?.setVolume(parsed);
+                cg.queue.setVolume(volume);
                 const ap = cg.audioPlayer;
                 ap.stop();
-                if (cg.queuedTracks[cg.currentTrack])
-                    playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], interaction.guildID);
-                await interaction.createMessage({ embeds: [embedMessage(`Set volume for ${interaction.guild.id} to ${volume}, parsed: ${parsed}`)] });
+                if (cg.queue.tracks[cg.queue.internalCurrentIndex])
+                    await cg.queue.play();
+                await interaction.createMessage({ embeds: [embedMessage(`Set volume for ${interaction.guild.id} to ${volume}, parsed: ${utils.parseVolumeString(volume)}`)] });
             }
             else {
                 await interaction.createMessage({ embeds: [embedMessage(`Volume ${volume} contains invalid characters! volume can only contain the characters 0-9, . and %`)] });
@@ -1720,15 +2043,15 @@ const commands = [
             const g = guilds[id];
             const embed = new builders.EmbedBuilder();
             embed.setTitle(`Info for ${interaction.guild.name}`);
-            embed.addField("Current song", g.currentlyPlaying || "None", true);
-            embed.addField("Loop type", g.loopType, true);
-            embed.addField("Volume", g.volume.toString()), true;
+            embed.addField("Current song", g.queue.currentInfo?.name || "None", true);
+            embed.addField("Loop type", g.queue.loopType, true);
+            embed.addField("Volume", utils.parseVolumeString(g.queue.volume).toString()), true;
             embed.addField("Connected channel", g.voiceChannel?.name || "Not connected", true);
-            embed.addField("Current index in queue", g.currentTrack.toString(), true);
-            embed.addField("Current index in song/playlist", g.queuedTracks[g.currentTrack]?.trackNumber.toString() || "No current playlist/song", true);
-            embed.addField("Amount of queued tracks", g.queuedTracks.length.toString(), true);
-            embed.addField("Amount of tracks in current song/playlist", g.queuedTracks[g.currentTrack]?.tracks.length.toString() || "No current playlist/song"), true;
-            embed.addField("Name of current playlist", g.queuedTracks[g.currentTrack]?.name || "No current playlist/song", true);
+            embed.addField("Current index in queue", g.queue.internalCurrentIndex.toString(), true);
+            embed.addField("Current index in song/playlist", g.queue.tracks[g.queue.internalCurrentIndex]?.trackNumber.toString() || "No current playlist/song", true);
+            embed.addField("Amount of queued tracks", g.queue.tracks.length.toString(), true);
+            embed.addField("Amount of tracks in current song/playlist", g.queue.tracks[g.queue.internalCurrentIndex]?.tracks.length.toString() || "No current playlist/song"), true;
+            embed.addField("Name of current playlist", g.queue.tracks[g.queue.internalCurrentIndex]?.name || "No current playlist/song", true);
             await interaction.createMessage({ embeds: [embed.toJSON()] });
         }
     },
@@ -1739,19 +2062,19 @@ const commands = [
         async execute(interaction) {
             const g = interaction.guild;
             const cg = guilds[g.id];
-            const songTime = cg.currentResource?.playbackDuration;
-            const progressTime = cg.songStart;
+            const songTime = cg.queue.currentInfo?.resource?.playbackDuration;
+            const progressTime = cg.queue.currentInfo?.songStart;
             const embed = new builders.EmbedBuilder();
-            if (cg.queuedTracks[cg.currentTrack] !== undefined && songTime && progressTime && cg.currentInfo) {
+            if (cg.queue.tracks[cg.queue.internalCurrentIndex] !== undefined && songTime && progressTime && cg.queue.currentInfo) {
                 const remaining = humanize(songTime - progressTime, { round: true });
-                const ct = cg.queuedTracks[cg.currentTrack];
+                const ct = cg.queue.tracks[cg.queue.internalCurrentIndex];
                 embed.setTitle(`Progress for ${ct.tracks[ct.trackNumber].name}`);
                 embed.addField("Time remaining", remaining);
                 embed.addField("Song duration", humanize(progressTime));
-                embed.addField("Author", cg.currentInfo.video_details.channel?.name || "None found.");
-                embed.addField("Likes", cg.currentInfo.video_details.likes.toString());
-                embed.addField("Views", cg.currentInfo.video_details.views.toString());
-                embed.setImage(utils.getHighestResUrl(cg.currentInfo));
+                embed.addField("Author", cg.queue.currentInfo.info.video_details.channel?.name || "None found.");
+                embed.addField("Likes", cg.queue.currentInfo.info.video_details.likes.toString());
+                embed.addField("Views", cg.queue.currentInfo.info.video_details.views.toString());
+                embed.setImage(utils.getHighestResUrl(cg.queue.currentInfo.info));
             }
             else {
                 embed.setTitle(`No song currently playing or available.`);
@@ -1765,23 +2088,17 @@ client.on('ready', async () => {
         return console.log("why did it ready more than once");
     // add all guilds
     for (const guild of client.guilds.entries()) {
+        const audioPlayer = createAudioPlayer({
+            behaviors: {
+                noSubscriber: NoSubscriberBehavior.Pause
+            }
+        });
         guilds[guild[1].id] = {
-            queuedTracks: [],
+            queue: new QueueHandler(audioPlayer),
             connection: null,
-            loopType: "none",
-            currentTrack: 0,
             voiceChannel: null,
-            currentlyPlaying: null,
-            audioPlayer: createAudioPlayer({
-                behaviors: {
-                    noSubscriber: NoSubscriberBehavior.Pause
-                }
-            }),
-            volume: 1,
-            leaveTimer: null,
-            currentResource: null,
-            songStart: null,
-            currentInfo: null
+            audioPlayer: audioPlayer,
+            leaveTimer: null
         };
         setupGuild(guild[1]);
     }
