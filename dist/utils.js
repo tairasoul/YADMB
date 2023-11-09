@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import lzw from "lzwcompress";
 import base64 from "base-64";
 import playdl from "play-dl";
+import humanizeDuration from 'humanize-duration';
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${__dirname}/enableDebugging`))
@@ -236,6 +237,12 @@ export async function trackPager(array, callback = () => { return new Promise((r
             const info = await playdl.video_basic_info(queued.url);
             debugLog(info.video_details.thumbnails);
             embed.setImage(getHighestResUrl(info));
+            // @ts-ignore
+            embed.addField("Author", info.video_details.channel.name);
+            embed.addField("Likes", info.video_details.likes.toString());
+            embed.addField("Views", info.video_details.views.toString());
+            embed.addField("Duration", humanizeDuration(info.video_details.durationInSec * 1000));
+            embed.addField("Uploaded", new Date(info.video_details.uploadedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
             pages.push({
                 embed: embed,
                 id: queued.name,
@@ -256,6 +263,12 @@ export async function trackPager(array, callback = () => { return new Promise((r
                     const info = await playdl.video_basic_info(queued.url);
                     debugLog(info.video_details.thumbnails);
                     embed.setImage(getHighestResUrl(info));
+                    // @ts-ignore
+                    embed.addField("Author", info.video_details.channel.name);
+                    embed.addField("Likes", info.video_details.likes.toString());
+                    embed.addField("Views", info.video_details.views.toString());
+                    embed.addField("Duration", humanizeDuration(info.video_details.durationInSec * 1000));
+                    embed.addField("Uploaded", new Date(info.video_details.uploadedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
                     pages.push({
                         embed: embed,
                         id: queued.name,
@@ -278,6 +291,12 @@ export async function pageTrack(track) {
         const info = await playdl.video_basic_info(track.url);
         debugLog(info.video_details.thumbnails);
         embed.setImage(getHighestResUrl(info));
+        // @ts-ignore
+        embed.addField("Author", info.video_details.channel.name);
+        embed.addField("Likes", info.video_details.likes.toString());
+        embed.addField("Views", info.video_details.views.toString());
+        embed.addField("Duration", humanizeDuration(info.video_details.durationInSec * 1000));
+        embed.addField("Uploaded", new Date(info.video_details.uploadedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
         return {
             embed: embed,
             id: track.name,
@@ -294,6 +313,12 @@ export async function pageTrack(track) {
                 const info = await playdl.video_basic_info(track.url);
                 debugLog(info.video_details.thumbnails);
                 embed.setImage(getHighestResUrl(info));
+                // @ts-ignore
+                embed.addField("Author", info.video_details.channel.name);
+                embed.addField("Likes", info.video_details.likes.toString());
+                embed.addField("Views", info.video_details.views.toString());
+                embed.addField("Duration", humanizeDuration(info.video_details.durationInSec * 1000));
+                embed.addField("Uploaded", new Date(info.video_details.uploadedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
                 resolve({
                     embed: embed,
                     id: track.name,

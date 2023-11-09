@@ -1,4 +1,3 @@
-import * as oceanic from "oceanic.js";
 import voice, { createAudioResource } from "@discordjs/voice";
 import fs from "node:fs"
 import path from 'path';
@@ -46,6 +45,22 @@ export default class QueueHandler {
         this.audioPlayer = guildAudioPlayer;
     }
 
+    setLoopType(loopType: loopType) {
+        this.internalLoop = loopType;
+    }
+
+    setVolume(volumeString: string) {
+        this.volumeString = volumeString;
+    }
+
+    get loopType() {
+        return this.internalLoop;
+    }
+
+    get volume() {
+        return this.volumeString
+    }
+
     nextTrack() {
         const cur = this.tracks[this.internalCurrentIndex]
         if (this.internalLoop == "song") {
@@ -72,13 +87,16 @@ export default class QueueHandler {
             }
         }
         const newCurrent = this.tracks[this.internalCurrentIndex];
+        if (newCurrent == undefined) {
+            return null;
+        }
         return newCurrent.tracks[newCurrent.trackNumber];
     }
 
     async skip() {
         this.audioPlayer.stop(true);
+        this.tracks.splice(--this.internalCurrentIndex, 1);
         const track = this.nextTrack();
-        await this.play();
         return track;
     }
 
@@ -92,9 +110,11 @@ export default class QueueHandler {
 
     async play() {
         const currentInternal = this.tracks[this.internalCurrentIndex];
+        debugLog(util.inspect(currentInternal, false, 5, true));
+        debugLog(this.internalCurrentIndex);
+        debugLog(util.inspect(this.tracks, false, 5, true));
         const track = currentInternal.tracks[currentInternal.trackNumber];
         if (track == undefined) return false;
-        debugLog(util.inspect(this.tracks, false, 5, true));
         const info = await playdl.video_info(track.url);
         const stream = await playdl.stream_from_info(info);
         const resource = createAudioResource(stream.stream, {
@@ -107,7 +127,7 @@ export default class QueueHandler {
         this.currentInfo = {
             name: track.name,
             resource: resource,
-            songStart: duration,
+            songStart: duration * 1000,
             info: info
         }
     }

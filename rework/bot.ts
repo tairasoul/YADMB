@@ -71,58 +71,13 @@ function setupGuild(guild: oceanic.Guild) {
 
     cg.audioPlayer.on("stateChange", () => {
         if (cg.audioPlayer.state.status === "idle") {
-            if (cg.queuedTracks[cg.currentTrack] != undefined) {
-                debugLog(util.inspect(cg.queuedTracks, false, 3, true))
-                debugLog(cg.currentTrack)
-                switch (cg.loopType) {
-                    case "none":
-                        if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
-                            cg.queuedTracks[cg.currentTrack].tracks.splice(0, 1);
-                            if (cg.queuedTracks[cg.currentTrack].tracks.length === 0) {
-                                cg.queuedTracks.splice(0, 1);
-                                if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])  playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id)
-                            }
-                            else {
-                                if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])  playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id)
-                            }
-                        }
-                        else {
-                            cg.queuedTracks.splice(0, 1);
-                            if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])  playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id)
-                        }
-                        break;
-                    case "song":
-                        if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])  playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id);
-                        break;
-                    case "queue":
-                        debugLog(cg.currentTrack)
-                        if (cg.queuedTracks[cg.currentTrack].type === "playlist") {
-                            cg.queuedTracks[cg.currentTrack].trackNumber += 1;
-                        }
-                        else {
-                            cg.currentTrack += 1;
-                        }
-                        if (cg.currentTrack >= cg.queuedTracks.length) cg.currentTrack = 0;
-                        if (cg.queuedTracks[cg.currentTrack].trackNumber >= cg.queuedTracks[cg.currentTrack].tracks.length) cg.currentTrack += 1
-                        if (cg.currentTrack >= cg.queuedTracks.length) cg.currentTrack = 0;
-                        debugLog(cg.currentTrack)
-                        if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])  playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id)
-                        break;
-                    case "playlist":
-                        if (cg.queuedTracks[cg.currentTrack].tracks.length <= cg.queuedTracks[cg.currentTrack].trackNumber || cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber + 1] === undefined) {
-                            cg.queuedTracks[cg.currentTrack].trackNumber = 0;
-                        }
-                        else {
-                            cg.queuedTracks[cg.currentTrack].trackNumber += 1;
-                        }
-                        if (cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber])  playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], guild.id)
-                        break;
-                }
+            if (cg.queue.nextTrack() != null) {
+                debugLog(util.inspect(cg.queue.tracks, false, 3, true))
+                debugLog(cg.queue.internalCurrentIndex)
+                cg.queue.play();
             }
             else {
-                cg.currentResource = null;
-                cg.songStart = null;
-                cg.currentInfo = null;
+                cg.queue.currentInfo = null;
             }
         }
     })
@@ -222,7 +177,7 @@ client.on("ready", () => {
 })
 
 client.on('error', (error: string | Error) => {
-    console.error(`something went wrong, ${error}`)
+    console.error(`something went wrong, ${typeof error == "string" ? error : util.inspect(error, false, 5, true)}`)
 })
 
 // start commands
@@ -333,7 +288,7 @@ const commands: Command[] = [
                             }
                         }
                         else {
-                            guilds[interaction.guildID].queuedTracks.push(youtubeadd);
+                            guilds[interaction.guildID].queue.tracks.push(youtubeadd);
                         }
                         const yembed = new builders.EmbedBuilder();
                         yembed.setDescription(`Added **${title}** to queue.`);
@@ -375,7 +330,7 @@ const commands: Command[] = [
                             }
                         }
                         else {
-                            guilds[interaction.guildID].queuedTracks.push(deezeradd);                        
+                            guilds[interaction.guildID].queue.tracks.push(deezeradd);                        
                         }
                         const dembed = new builders.EmbedBuilder();
                         dembed.setDescription(`Added **${dvid.title}** to queue.`);
@@ -421,7 +376,7 @@ const commands: Command[] = [
                             }
                         }
                         else {
-                            guilds[interaction.guildID].queuedTracks.push(spotifyadd);
+                            guilds[interaction.guildID].queue.tracks.push(spotifyadd);
                         }
                         const spembed = new builders.EmbedBuilder();
                         spembed.setDescription(`Added **${sp_data.name}** to queue.`);
@@ -454,22 +409,22 @@ const commands: Command[] = [
                             }
                         }
                         else {
-                            guilds[interaction.guildID].queuedTracks.push(sc_add);
+                            guilds[interaction.guildID].queue.tracks.push(sc_add);
                         }
                         const scembed = new builders.EmbedBuilder();
                         scembed.setDescription(`Added **${sinfo.name}** to queue.`);
                         await interaction.editOriginal({embeds: [scembed.toJSON()]})
                         break;
                 }
-                const ctn = guilds[interaction.guildID].currentTrack;
-                const t = guilds[interaction.guildID].queuedTracks[ctn];
+                const ctn = guilds[interaction.guildID].queue.internalCurrentIndex;
+                const t = guilds[interaction.guildID].queue.tracks[ctn];
                 const cst = t.trackNumber;
                 const st = t.tracks[cst];
-                debugLog(ctn);
-                debugLog(t);
-                debugLog(cst);
-                debugLog(st)
-                if (guilds[interaction.guildID].audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) playSong(st, interaction.guildID as string);
+                debugLog(`guilds["${interaction.guildID}"].queue.internalCurrentIndex: ${ctn}`);
+                debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn]: ${util.inspect(t, false, 5, true)}`);
+                debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].trackNumber: ${cst}`);
+                debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].tracks[cst]: ${util.inspect(st, false, 5, true)}`)
+                if (guilds[interaction.guildID].audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guilds[interaction.guildID].connection) await guilds[interaction.guildID].queue.play();
             }
         }
     },
@@ -588,7 +543,6 @@ const commands: Command[] = [
                     ],
                     name: currentVideo.title
                 }
-                guilds[interaction.guildID as string].queuedTracks.push(youtubeadd);
                 const embed = new builders.EmbedBuilder();
                 embed.setDescription(`Added **${currentVideo.title}** to queue.`);
                 await i.editOriginal(
@@ -597,24 +551,26 @@ const commands: Command[] = [
                     }
                 )
                 const g = guilds[interaction.guildID as string]
-                const ct = g.currentTrack;
-                const t = g.queuedTracks[ct];
+                const queue = g.queue
+                const ct = queue.internalCurrentIndex;
+                const t = queue.tracks[ct];
                 const cst = t.trackNumber;
                 const st = t.tracks[cst];
-                g.queuedTracks.push(youtubeadd);
-                debugLog(ct);
-                debugLog(t);
-                debugLog(cst);
-                debugLog(st);
-                if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection) playSong(st, interaction.guildID as string);
+                queue.tracks.push(youtubeadd);
+                debugLog(`guilds["${interaction.guildID}"].queue.internalCurrentIndex: ${ct}`);
+                debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct]: ${util.inspect(t, false, 5, true)}`);
+                debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].trackNumber: ${cst}`);
+                debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].tracks[cst]: ${util.inspect(st, false, 5, true)}`)
+                if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection) await queue.play();
             }
             // play video next
             //@ts-ignore
             const vla = async i => {
                 await i.defer();
                 const g = guilds[interaction.guildID as string]
-                const ct = g.currentTrack;
-                const t = g.queuedTracks[ct];
+                const queue = g.queue;
+                const ct = queue.internalCurrentIndex;
+                const t = queue.tracks[ct];
                 if (t.type === "playlist") {
                     const cst = t.trackNumber;
                     t.tracks.splice(cst + 1, 0, {
@@ -623,7 +579,7 @@ const commands: Command[] = [
                     })
                 }
                 else {
-                    g.queuedTracks.push(
+                    queue.tracks.push(
                         {
                             type: "song",
                             trackNumber: 0,
@@ -686,9 +642,10 @@ const commands: Command[] = [
             await interaction.defer()
             const type: "playlist" | "queue" = interaction.data.options.getString("type", true);
             const g = guilds[interaction.guildID as string];
+            const queue = g.queue
             switch(type) {
                 case "playlist":
-                    const q = g.queuedTracks[g.currentTrack];
+                    const q = queue.tracks[queue.internalCurrentIndex];
                     if (q.type === "song") {
                         const embed = new builders.EmbedBuilder();
                         embed.setDescription("The current track is not a playlist.")
@@ -710,7 +667,7 @@ const commands: Command[] = [
                     ]});
                 case "queue":
                     const qClone: queuedTrack[] = [];
-                    for (const track of g.queuedTracks) {
+                    for (const track of queue.tracks) {
                         qClone.push(track)
                     }
                     for (const clone of qClone) {
@@ -741,6 +698,7 @@ const commands: Command[] = [
         async execute(interaction: oceanic.CommandInteraction) {
             await interaction.defer()
             const g = guilds[interaction.guildID as string];
+            const queue = g.queue;
             const encoded = interaction.data.options.getAttachment("encoded", true);
             const data = await fetch(encoded.url, {
                 method: "GET"
@@ -750,22 +708,22 @@ const commands: Command[] = [
             debugLog(lzd);
             if (lzd?.trackNumber !== undefined) {
                 debugLog("found track number")
-                g.queuedTracks.push(lzd);
+                queue.tracks.push(lzd);
             }
             else {
                 debugLog("no track number, iterating.")
                 for (const track of lzd) {
-                    g.queuedTracks.push(track);
+                    queue.tracks.push(track);
                 }
             }
             const embed = new builders.EmbedBuilder();
             embed.setDescription(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"} from ${encoded.filename}`);
             await interaction.editOriginal({embeds: [embed.toJSON()]});
-            const ct = g.currentTrack;
-            const t = g.queuedTracks[ct];
+            const ct = queue.internalCurrentIndex;
+            const t = queue.tracks[ct];
             const cst = t.trackNumber;
             const st = t.tracks[cst];
-            if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection) playSong(st, interaction.guildID as string);
+            if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection) await queue.play();
         }
     },
     {
@@ -775,9 +733,9 @@ const commands: Command[] = [
         async execute(interaction: oceanic.CommandInteraction) {
             if (interaction.guildID) {
                 await interaction.defer()
-                guilds[interaction.guildID].queuedTracks.splice(0, 5000);
+                guilds[interaction.guildID].queue.tracks.splice(0, 5000);
                 guilds[interaction.guildID].audioPlayer.stop(true);
-                guilds[interaction.guildID].currentTrack = 0;
+                guilds[interaction.guildID].queue.internalCurrentIndex = 0;
                 const embed = new builders.EmbedBuilder()
                 embed.setDescription("Cleared queue.")
                 await interaction.editOriginal({embeds: [embed.toJSON()]});
@@ -817,8 +775,9 @@ const commands: Command[] = [
                         }
                     }
                 })
-                const ct = g.currentTrack;
-                const qt = g.queuedTracks;
+                const queue = g.queue;
+                const ct = queue.internalCurrentIndex;
+                const qt = queue.tracks;
                 const cst = qt[ct]?.trackNumber;
                 const qst = qt[ct]?.tracks;
                 const string = `Joined VC <#${interaction.member.voiceState.channelID}>${qt.length > 0 ? ` starting track **${qst[cst].name}**` : ""}`
@@ -826,7 +785,7 @@ const commands: Command[] = [
                 embed.setDescription(string);
                 await interaction.editOriginal({embeds: [embed.toJSON()]});
                 if (qt.length > 0) {
-                    playSong(qst[cst], interaction.guildID as string);
+                    await queue.play();
                 }
             }
         }
@@ -835,24 +794,40 @@ const commands: Command[] = [
         data: new builders.ApplicationCommandBuilder(1, "pause")
         .setDescription("Pause current track.").setDMPermission(false),
         async execute(interaction: oceanic.CommandInteraction) {
-            await interaction.defer();
             const g = guilds[interaction.guildID as string];
-            g.audioPlayer.pause();
-            const embed = new builders.EmbedBuilder();
-            embed.setDescription(`Paused track ${g.currentlyPlaying}`);
-            await interaction.editOriginal({embeds: [embed.toJSON()]});
+            const queue = g.queue;
+            if (queue.currentInfo) {
+                await interaction.defer();
+                queue.pause();
+                const embed = new builders.EmbedBuilder();
+                embed.setDescription(`Paused track ${queue.currentInfo.name}`);
+                await interaction.editOriginal({embeds: [embed.toJSON()]});
+            }
+            else {
+                const embed = new builders.EmbedBuilder()
+                embed.setDescription(`No track to pause. Has the bot joined a voice channel yet?`);
+                await interaction.editOriginal({embeds: [embed.toJSON()]})
+            }
         }
     },
     {
         data: new builders.ApplicationCommandBuilder(1, "resume")
         .setDescription("Resume current track.").setDMPermission(false),
         async execute(interaction: oceanic.CommandInteraction) {
-            await interaction.defer();
             const g = guilds[interaction.guildID as string];
-            g.audioPlayer.unpause();
-            const embed = new builders.EmbedBuilder();
-            embed.setDescription(`Resumed track ${g.currentlyPlaying}`);
-            await interaction.editOriginal({embeds: [embed.toJSON()]});
+            const queue = g.queue;
+            if (queue.currentInfo) {
+                await interaction.defer();
+                queue.resume();
+                const embed = new builders.EmbedBuilder();
+                embed.setDescription(`Resumed track ${queue.currentInfo.name}`);
+                await interaction.editOriginal({embeds: [embed.toJSON()]});
+            }
+            else {
+                const embed = new builders.EmbedBuilder()
+                embed.setDescription(`No track to resume. Has the bot joined a voice channel yet?`);
+                await interaction.editOriginal({embeds: [embed.toJSON()]})
+            }
         }
     },
     {
@@ -881,25 +856,26 @@ const commands: Command[] = [
             await interaction.defer();
             const shuffleType = interaction.data.options.getString("type", true);
             const g = guilds[interaction.guildID as string];
-            const ct = g.queuedTracks[g.currentTrack];
+            const queue = g.queue;
+            const ct = queue.tracks[queue.internalCurrentIndex];
             if (ct.type === "song" && shuffleType === "playlist") {
                 const embed = new builders.EmbedBuilder();
                 embed.setDescription("The current track is a song, not a playlist.");
                 return await interaction.editOriginal({embeds: [embed.toJSON()]});
             }
             g.audioPlayer.stop(true);
-            g.currentTrack = 0;
+            queue.internalCurrentIndex = 0;
             ct.trackNumber = 0;
             if (shuffleType === "playlist") {
                 utils.shuffleArray(ct.tracks);
             }
             else {
-                utils.shuffleArray(g.queuedTracks);
+                utils.shuffleArray(queue.tracks);
             }
             const embed = new builders.EmbedBuilder();
-            embed.setDescription(`Shuffled queue, now playing ${ct.tracks[0].name}.`);
+            embed.setDescription(`Shuffled queue, now playing ${queue.tracks[queue.internalCurrentIndex].tracks[0].name}.`);
             await interaction.editOriginal({embeds: [embed.toJSON()]});
-            playSong(ct.tracks[0], interaction.guildID as string);
+            await queue.play();
         }
     },
     {
@@ -907,25 +883,18 @@ const commands: Command[] = [
         .setDescription("Skip the current song.")
         .setDMPermission(false),
         async execute(interaction: oceanic.CommandInteraction) {
-            const embed = new builders.EmbedBuilder();
             const g = guilds[interaction.guildID as string];
-            const ct = g.queuedTracks[g.currentTrack];
-            let songName: string;
-            if (ct.type == "song") {
-                songName = ct.tracks[0].name;
-                g.queuedTracks.splice(g.currentTrack, 1);
-                g.currentTrack -= 1;
-                if (g.currentTrack >= g.queuedTracks.length) ct.trackNumber = 0;
+            const queue = g.queue;
+            const embed = new builders.EmbedBuilder();
+            if (queue.currentInfo) {
+                embed.setDescription(`Skipped song ${queue.currentInfo.name}.`);
+                await queue.skip();
+                await queue.play();
             }
             else {
-                songName = ct.tracks[ct.trackNumber].name;
-                ct.tracks.splice(ct.trackNumber, 1);
-                ct.trackNumber -= 1;
-                if (ct.trackNumber >= ct.tracks.length) ct.trackNumber = 0;
+                embed.setDescription(`No song to skip.`);
             }
-            g.audioPlayer.stop();
-            embed.setDescription(`Skipped song ${songName}.`);
-            await interaction.createFollowup({embeds: [embed.toJSON()]})
+            await interaction.createMessage({embeds: [embed.toJSON()]})
         }
     },
     {
@@ -936,10 +905,11 @@ const commands: Command[] = [
             await interaction.defer();
             const embed = new builders.EmbedBuilder();
             const g = guilds[interaction.guildID as string];
-            g.currentTrack -= 1;
+            const queue = g.queue;
+            queue.internalCurrentIndex -= 1;
             g.audioPlayer.stop()
-            g.queuedTracks.splice(g.currentTrack, 1);
-            if (g.currentTrack >= g.queuedTracks.length) g.currentTrack = 0;
+            queue.tracks.splice(queue.internalCurrentIndex, 1);
+            if (queue.internalCurrentIndex >= queue.tracks.length) queue.internalCurrentIndex = 0;
             embed.setDescription(`Skipped current playlist.`);
             await interaction.createFollowup({embeds: [embed.toJSON()]})
         }
@@ -975,7 +945,7 @@ const commands: Command[] = [
             const g = guilds[interaction.guildID as string];
             const embed = new builders.EmbedBuilder();
             embed.setDescription(loopTypeStrs[choice])
-            g.loopType = choice;
+            g.queue.setLoopType(choice);
             await interaction.editOriginal({embeds: [embed.toJSON()]});
         }
     },
@@ -1048,12 +1018,9 @@ const commands: Command[] = [
             const embed = new builders.EmbedBuilder();
             embed.setDescription(`Added **${videos.items.length} tracks** to the queue as a playlist.`);
             const g = guilds[interaction.guildID as string]
-            g.queuedTracks.push(added_playlist);
-            const ct = g.currentTrack;
-            const t = g.queuedTracks[ct];
-            const cst = t.trackNumber;
-            const st = t.tracks[cst];
-            if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection) playSong(st, interaction.guildID as string);
+            const queue = g.queue;
+            queue.tracks.push(added_playlist);
+            if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection) await queue.play();
             await interaction.editOriginal({embeds: [embed.toJSON()]});
         }
     },
@@ -1065,7 +1032,7 @@ const commands: Command[] = [
             await interaction.defer(1 << 6)
             await interaction.editOriginal({embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")], flags: 1 << 6})
             const data: {queued: PageHolder, tracks: PageHolder | null} = {
-                queued: await utils.queuedTrackPager(guilds[interaction.guildID as string].queuedTracks, async (title) => {
+                queued: await utils.queuedTrackPager(guilds[interaction.guildID as string].queue.tracks, async (title) => {
                     await interaction.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6})
                 }),
                 tracks: null
@@ -1170,7 +1137,7 @@ const commands: Command[] = [
             const onExport = async (i: oceanic.ComponentInteraction) => {
                 if (i.data.customID !== exportId) return;
                 await i.defer(1 << 6)
-                const q = guilds[interaction.guildID as string].queuedTracks[currentPage]
+                const q = guilds[interaction.guildID as string].queue.tracks[currentPage]
                 const clone: queuedTrack = {
                     trackNumber: 0,
                     tracks: q.tracks,
@@ -1191,7 +1158,7 @@ const commands: Command[] = [
                 if (i.data.customID !== inspectId) return;
                 currentInspectPage = 0;
                 await i.createMessage({embeds: [embedMessage("Paging tracks for playlist.")], flags: 1 << 6});
-                data.tracks = await utils.trackPager(guilds[interaction.guildID as string].queuedTracks[currentPage].tracks, async (title) => {
+                data.tracks = await utils.trackPager(guilds[interaction.guildID as string].queue.tracks[currentPage].tracks, async (title) => {
                     await i.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6})
                 });
                 isInspecting = true;
@@ -1238,9 +1205,9 @@ const commands: Command[] = [
                 if (i.data.customID !== shuffleId) return;
                 const queueIndex = data.queued.pages[currentPage].index;
                 debugLog(queueIndex);
-                debugLog(guilds[i.guildID as string].queuedTracks[queueIndex].tracks)
-                utils.shuffleArray(guilds[i.guildID as string].queuedTracks[queueIndex].tracks);
-                debugLog(guilds[i.guildID as string].queuedTracks[queueIndex].tracks)
+                debugLog(guilds[i.guildID as string].queue.tracks[queueIndex].tracks)
+                utils.shuffleArray(guilds[i.guildID as string].queue.tracks[queueIndex].tracks);
+                debugLog(guilds[i.guildID as string].queue.tracks[queueIndex].tracks)
                 await i.createMessage({embeds: [embedMessage("Shuffled playlist.")], flags: 1 << 6})
             }
 
@@ -1249,9 +1216,9 @@ const commands: Command[] = [
                 await i.defer()
                 const queueIndex = data.queued.pages[currentPage].index;
                 const g = guilds[i.guildID as string];
-                const queued = g.queuedTracks;
+                const queued = g.queue.tracks;
                 const removed = queued.splice(queueIndex, 1);
-                queued.splice(g.currentTrack, 0, removed[0]);
+                queued.splice(g.queue.internalCurrentIndex, 0, removed[0]);
                 await i.createMessage({embeds: [embedMessage("Playing " + removed[0].name + " next.")], flags: 1 << 6});
             }
 
@@ -1273,7 +1240,7 @@ const commands: Command[] = [
                     track: data.tracks.pages[currentInspectPage].index
                 }
                 const g = guilds[i.guildID as string];
-                g.queuedTracks[queueIndexes.queue].tracks.splice(queueIndexes.track, 1);
+                g.queue.tracks[queueIndexes.queue].tracks.splice(queueIndexes.track, 1);
                 data.tracks?.pages.splice(currentInspectPage, 1);
                 /** @ts-ignore */
                 const embed = data.tracks.pages[currentInspectPage].embed;
@@ -1418,7 +1385,7 @@ const commands: Command[] = [
                 const encoded = base64.encode(lzw.pack(data));
                 await i.createFollowup({content: `Exported playlist **${name}**. Save this as a file:`, files: [
                     {
-                        name: `${(interaction.member as oceanic.Member).id}.${interaction.guildID as string}.${interaction.createdAt.getTime()}.export.txt`,
+                        name: `${(interaction.member as oceanic.Member).username}.playlist.${name}.export.txt`,
                         contents: new Buffer(encoded)
                     }
                 ], flags: 1 << 6})
@@ -1730,9 +1697,16 @@ const commands: Command[] = [
         async execute(interaction: oceanic.CommandInteraction) {
             await interaction.defer(1 << 6);
             const attachment = interaction.data.options.getAttachment("playlist", true);
-            const text = await (await fetch(attachment.proxyURL)).text();
+            const text = await (await fetch(attachment.url)).text();
             const data = utils.decodeStr(text);
             const paged: PageData[] = []
+            for (const queued of data.tracks) {
+                // @ts-ignore
+                const pagedtrack: PageData = await utils.pageTrack(queued);
+                pagedtrack.index = paged.length;
+                pagedtrack.embed.addField("index", pagedtrack.index.toString())
+                paged.push(pagedtrack);
+            }
             let currentTrack = 0;
             await interaction.editOriginal({embeds: [embedMessage("Creating component ids.")], flags: 1 << 6});
             // create component ids
@@ -1792,9 +1766,10 @@ const commands: Command[] = [
                 /** @ts-ignore */
                 await i.editParent({embeds: [paged[currentTrack].embed.toJSON()], components: rows.disabled, flags: 1 << 6})
                 const encoded = base64.encode(lzw.pack(data));
-                await i.createFollowup({content: `Exported playlist **${name}**. Save this as a file:`, files: [
+                debugLog(util.inspect(data, false, 5, true));
+                await i.createFollowup({content: `Exported playlist **${data.name}**. Save this as a file:`, files: [
                     {
-                        name: `${(interaction.member as oceanic.Member).id}.${interaction.guildID as string}.${interaction.createdAt.getTime()}.export.txt`,
+                        name: `${(interaction.member as oceanic.Member).username}.playlist.${data.name}.export.txt`,
                         contents: new Buffer(encoded)
                     }
                 ], flags: 1 << 6})
@@ -2075,7 +2050,7 @@ const commands: Command[] = [
             }
 
             /** @ts-ignore */
-            await interaction.editOriginal({embeds: [embedMessage("No songs yet. Use the components to add some!")], components: rows.movesDisabled, flags: 1 << 6})
+            await interaction.editOriginal({embeds: [paged[currentTrack].embed.toJSON()], components: rows.moveBackDisabled, flags: 1 << 6})
 
             /** @ts-ignore */
             client.on("interactionCreate", onBack);
@@ -2109,14 +2084,12 @@ const commands: Command[] = [
             const volume = interaction.data.options.getString("volume", true);
             const characterRegex = /^[0-9%.]*$/g;
             if (characterRegex.test(volume)) {
-                const parsed = utils.parseVolumeString(volume);
                 const cg = guilds[(interaction.guild as oceanic.Guild).id]
-                cg.volume = parsed;
-                cg.currentResource?.volume?.setVolume(parsed);
+                cg.queue.setVolume(volume);
                 const ap = cg.audioPlayer;
                 ap.stop();
-                if (cg.queuedTracks[cg.currentTrack]) playSong(cg.queuedTracks[cg.currentTrack].tracks[cg.queuedTracks[cg.currentTrack].trackNumber], interaction.guildID as string);
-                await interaction.createMessage({embeds: [embedMessage(`Set volume for ${(interaction.guild as oceanic.Guild).id} to ${volume}, parsed: ${parsed}`)]});
+                if (cg.queue.tracks[cg.queue.internalCurrentIndex]) await cg.queue.play();
+                await interaction.createMessage({embeds: [embedMessage(`Set volume for ${(interaction.guild as oceanic.Guild).id} to ${volume}, parsed: ${utils.parseVolumeString(volume)}`)]});
             }
             else {
                 await interaction.createMessage({embeds: [embedMessage(`Volume ${volume} contains invalid characters! volume can only contain the characters 0-9, . and %`)]});
@@ -2132,15 +2105,15 @@ const commands: Command[] = [
             const g = guilds[id];
             const embed = new builders.EmbedBuilder();
             embed.setTitle(`Info for ${(interaction.guild as oceanic.Guild).name}`);
-            embed.addField("Current song", g.currentlyPlaying || "None", true);
-            embed.addField("Loop type", g.loopType, true);
-            embed.addField("Volume", g.volume.toString()), true;
+            embed.addField("Current song", g.queue.currentInfo?.name || "None", true);
+            embed.addField("Loop type", g.queue.loopType, true);
+            embed.addField("Volume", utils.parseVolumeString(g.queue.volume).toString()), true;
             embed.addField("Connected channel", g.voiceChannel?.name || "Not connected", true);
-            embed.addField("Current index in queue", g.currentTrack.toString(), true);
-            embed.addField("Current index in song/playlist", g.queuedTracks[g.currentTrack]?.trackNumber.toString() || "No current playlist/song", true);
-            embed.addField("Amount of queued tracks", g.queuedTracks.length.toString(), true);
-            embed.addField("Amount of tracks in current song/playlist", g.queuedTracks[g.currentTrack]?.tracks.length.toString() || "No current playlist/song"), true;
-            embed.addField("Name of current playlist", g.queuedTracks[g.currentTrack]?.name || "No current playlist/song", true);
+            embed.addField("Current index in queue", g.queue.internalCurrentIndex.toString(), true);
+            embed.addField("Current index in song/playlist", g.queue.tracks[g.queue.internalCurrentIndex]?.trackNumber.toString() || "No current playlist/song", true);
+            embed.addField("Amount of queued tracks", g.queue.tracks.length.toString(), true);
+            embed.addField("Amount of tracks in current song/playlist", g.queue.tracks[g.queue.internalCurrentIndex]?.tracks.length.toString() || "No current playlist/song"), true;
+            embed.addField("Name of current playlist", g.queue.tracks[g.queue.internalCurrentIndex]?.name || "No current playlist/song", true);
             await interaction.createMessage({embeds: [embed.toJSON()]});
         }
     },
@@ -2151,19 +2124,19 @@ const commands: Command[] = [
         async execute(interaction: oceanic.CommandInteraction) {
             const g = interaction.guild as oceanic.Guild;
             const cg = guilds[g.id];
-            const songTime = cg.currentResource?.playbackDuration;
-            const progressTime = cg.songStart;
+            const songTime = cg.queue.currentInfo?.resource?.playbackDuration;
+            const progressTime = cg.queue.currentInfo?.songStart;
             const embed = new builders.EmbedBuilder();
-            if (cg.queuedTracks[cg.currentTrack] !== undefined && songTime && progressTime && cg.currentInfo) {
+            if (cg.queue.tracks[cg.queue.internalCurrentIndex] !== undefined && songTime && progressTime && cg.queue.currentInfo) {
                 const remaining = humanize(songTime - progressTime, {round: true});
-                const ct = cg.queuedTracks[cg.currentTrack];
+                const ct = cg.queue.tracks[cg.queue.internalCurrentIndex];
                 embed.setTitle(`Progress for ${ct.tracks[ct.trackNumber].name}`);
                 embed.addField("Time remaining", remaining);
                 embed.addField("Song duration", humanize(progressTime));
-                embed.addField("Author", cg.currentInfo.video_details.channel?.name || "None found.");
-                embed.addField("Likes", cg.currentInfo.video_details.likes.toString());
-                embed.addField("Views", cg.currentInfo.video_details.views.toString());
-                embed.setImage(utils.getHighestResUrl(cg.currentInfo));
+                embed.addField("Author", cg.queue.currentInfo.info.video_details.channel?.name || "None found.");
+                embed.addField("Likes", cg.queue.currentInfo.info.video_details.likes.toString());
+                embed.addField("Views", cg.queue.currentInfo.info.video_details.views.toString());
+                embed.setImage(utils.getHighestResUrl(cg.queue.currentInfo.info));
             }
             else {
                 embed.setTitle(`No song currently playing or available.`);
@@ -2177,23 +2150,17 @@ client.on('ready', async () => {
     if (setup) return console.log("why did it ready more than once");
     // add all guilds
     for (const guild of client.guilds.entries()) {
+        const audioPlayer = createAudioPlayer({
+            behaviors: {
+                noSubscriber: NoSubscriberBehavior.Pause
+            }
+        })
         guilds[guild[1].id] = {
-            queuedTracks: [],
+            queue: new QueueHandler(audioPlayer),
             connection: null,
-            loopType: "none",
-            currentTrack: 0,
             voiceChannel: null,
-            currentlyPlaying: null,
-            audioPlayer: createAudioPlayer({
-                behaviors: {
-                    noSubscriber: NoSubscriberBehavior.Pause
-                }
-            }),
-            volume: 1,
-            leaveTimer: null,
-            currentResource: null,
-            songStart: null,
-            currentInfo: null
+            audioPlayer: audioPlayer,
+            leaveTimer: null
         }
 
         setupGuild(guild[1]);
