@@ -68,7 +68,10 @@ export default class QueueHandler {
     }
     async skip() {
         this.audioPlayer.stop(true);
-        this.tracks.splice(--this.internalCurrentIndex, 1);
+        if (this.tracks[this.internalCurrentIndex].type == "song")
+            this.tracks.splice(--this.internalCurrentIndex, 1);
+        else
+            this.tracks[this.internalCurrentIndex].tracks.splice(--this.tracks[this.internalCurrentIndex].trackNumber, 1);
         const track = this.nextTrack();
         return track;
     }
