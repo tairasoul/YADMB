@@ -4,7 +4,7 @@ import * as builders from "@oceanicjs/builders"
 import ytdl from "ytdl-core";
 import playdl from "play-dl";
 import util from "util";
-import voice from "@discordjs/voice"
+import * as voice from "@discordjs/voice";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';

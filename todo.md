@@ -19,13 +19,6 @@
   - and it wont take as much time to do view-queue
 
 - partial code rewrites
-    - rewrite 1
-      - instead of having A LOT of things handled in bot.ts, move some things over to seperate classes
-      - for example, make a Client class extension that has all the queue shit internally.
-      - also have an internal command collection, and an easy way to seperate all the commands into seperate files instead of needing to have them all in the same file.
-      - this will make it so bot.ts isn't as bloated as it is right now, and will make it easier to expand later on
-      - another thing it will have is custom crucial events (ex. a custom InteractionCreate event that passes the guild's info to it aswell)
-      - this will make it so each command can do whatever it needs to do with the queue, without actually accessing anything outside of the arguments given by the event.
     - rewrite 2
       - make more util functions (or maybe just more classes) to handle more things
       - for example, paging. paging is currently mostly done by the command itself, only having some functions generate pages for it.
@@ -34,6 +27,15 @@
 # in progress
 
 # finished + comments
+
+- partial code rewrites
+  - rewrite 1
+    - instead of having A LOT of things handled in bot.ts, move some things over to seperate classes
+    - for example, make a Client class extension that has all the queue shit internally.
+    - also have an internal command collection, and an easy way to seperate all the commands into seperate files instead of needing to have them all in the same file.
+    - this will make it so bot.ts isn't as bloated as it is right now, and will make it easier to expand later on
+    - another thing it will have is custom crucial events (ex. a custom InteractionCreate event that passes the guild's info to it aswell)
+    - this will make it so each command can do whatever it needs to do with the queue, without actually accessing anything outside of the arguments given by the event.
 
 - add a edit-playlist command
   - just added it cause i thought it'd be pretty dumb to have create-playlist and no way to edit a playlist

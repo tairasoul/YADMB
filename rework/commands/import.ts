@@ -2,7 +2,7 @@ import * as oceanic from "oceanic.js";
 import { Guild } from "../client.js";
 import utils from "../utils.js";
 import * as builders from "@oceanicjs/builders";
-import voice from "@discordjs/voice";
+import * as voice from "@discordjs/voice";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
@@ -27,8 +27,7 @@ export default {
     ],
     callback: async (interaction: oceanic.CommandInteraction, guild: Guild) => {
         await interaction.defer()
-        const g = guild;
-        const queue = g.queue;
+        const queue = guild.queue;
         const encoded = interaction.data.options.getAttachment("encoded", true);
         const data = await fetch(encoded.url, {
             method: "GET"
@@ -49,6 +48,6 @@ export default {
         const embed = new builders.EmbedBuilder();
         embed.setDescription(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"} from ${encoded.filename}`);
         await interaction.editOriginal({embeds: [embed.toJSON()]});
-        if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection) await queue.play();
+        if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection) await queue.play();
     }
 }

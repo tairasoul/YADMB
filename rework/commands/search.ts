@@ -4,7 +4,7 @@ import playdl from "play-dl";
 import * as builders from "@oceanicjs/builders";
 import humanize from "humanize-duration";
 import utils from "../utils.js";
-import voice from "@discordjs/voice";
+import * as voice from "@discordjs/voice";
 import fs from "fs";
 import util from "util";
 import path from "path";
@@ -132,8 +132,7 @@ export default {
                     embeds: [embed.toJSON()]
                 }
             )
-            const g = guild;
-            const queue = g.queue
+            const queue = guild.queue
             const ct = queue.internalCurrentIndex;
             const t = queue.tracks[ct];
             const cst = t.trackNumber;
@@ -143,7 +142,7 @@ export default {
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].trackNumber: ${cst}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].tracks[cst]: ${util.inspect(st, false, 5, true)}`)
-            if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection) await queue.play();
+            if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection) await queue.play();
         }
         // play video next
         //@ts-ignore
