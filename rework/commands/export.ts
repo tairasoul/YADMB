@@ -29,8 +29,7 @@ export default {
     callback: async (interaction: oceanic.CommandInteraction, guild: Guild) => {
         await interaction.defer()
         const type: "playlist" | "queue" = interaction.data.options.getString("type", true);
-        const g = guild;
-        const queue = g.queue
+        const queue = guild.queue
         switch(type) {
             case "playlist":
                 const q = queue.tracks[queue.internalCurrentIndex];

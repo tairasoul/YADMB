@@ -1,11 +1,5 @@
 # Changelog for discord-music-bot
 
-Add edit-playlist
-
-Rework queue system (partially) to now use a QueueHandler class
-
-Start using git in VSCode to make commits
-
-Add more fields to utils.pageTrack(), being Author, Duration, Likes, Views and Uploaded
-
-create-playlist now exports the file in format (username).playlist.(playlist-name).export.txt, making it actually identifiable by playlist name.
+Full restructure of how commands are made.
+This has been done by using a oceanic.Client extension class (MusicClient) that handles queues, has a custom .on and .off function with m_interactionCreate that has the interaction, guild and the MusicClient sent in.
+All commands are now split into seperate files, retaining previous functionality.

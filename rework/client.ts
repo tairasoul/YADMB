@@ -20,7 +20,7 @@ export type track = {
     url: string;
 }
 
-type loopType = "none" | "queue" | "song" | "playlist";
+export type loopType = "none" | "queue" | "song" | "playlist";
 
 export type queuedTrack = {
     type: "playlist" | "song";
@@ -48,10 +48,10 @@ interface MusicEvents extends oceanic.ClientEvents {
 }
 
 export default class MusicClient extends Client {
-    private m_guilds: {
+    public m_guilds: {
         [id: string]: Guild
     };
-    private commands: Collection<string, Command>;
+    public commands: Collection<string, Command>;
     private rawCommands: Command[];
     constructor(options: ClientOptions) {
         super(options);
@@ -59,6 +59,12 @@ export default class MusicClient extends Client {
         this.commands = new Collection();
         this.rawCommands = [];
         this.setMaxListeners(0);
+        this.on("guildCreate", () => {
+            this.editStatus("online", [{name: (this.guilds.size).toString() + ' servers', type: 3}]);
+        })
+        this.on("guildDelete", () => {
+            this.editStatus("online", [{name: (this.guilds.size).toString() + ' servers', type: 3}]);
+        })
     }
 
     addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => any) {
@@ -79,7 +85,7 @@ export default class MusicClient extends Client {
             console.log(`creating global command ${command.data.name}`);
             this.commands.set(command.data.name, command);
             // @ts-ignore
-            await client.application.createGlobalCommand(command.data);
+            await this.application.createGlobalCommand(command.data);
             console.log(`created global command ${command.data.name}`);
         }
         this.editStatus("online", [{name: (this.guilds.size).toString() + ' servers', type: 3}]);
@@ -88,7 +94,7 @@ export default class MusicClient extends Client {
     on<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this {
         if (event == "m_interactionCreate") {
             super.on("interactionCreate", (interaction) => 
-            // @ts-ignore
+                // @ts-ignore
                 listener(interaction as oceanic.CommandInteraction, this.m_guilds[interaction.guildID as string], this)
             )
         }
