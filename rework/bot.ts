@@ -719,10 +719,6 @@ const commands: Command[] = [
             const embed = new builders.EmbedBuilder();
             embed.setDescription(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"} from ${encoded.filename}`);
             await interaction.editOriginal({embeds: [embed.toJSON()]});
-            const ct = queue.internalCurrentIndex;
-            const t = queue.tracks[ct];
-            const cst = t.trackNumber;
-            const st = t.tracks[cst];
             if (g.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && g.connection) await queue.play();
         }
     },
