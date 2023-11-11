@@ -4,7 +4,7 @@ import rstring from "randomstring";
 import utils from "../utils.js";
 // @ts-ignore
 import { default as lzw } from "lzwcompress";
-import base64 from "base-64";
+import { Base64 as base64 } from "js-base64";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
