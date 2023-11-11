@@ -4,7 +4,7 @@ import { Client } from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 import path from 'path';
 import { fileURLToPath } from 'url';
-import base64 from "base-64";
+import { Base64 as base64 } from "js-base64";
 import playdl, { InfoData } from "play-dl";
 import humanizeDuration from 'humanize-duration';
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
