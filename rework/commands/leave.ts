@@ -9,7 +9,7 @@ export default {
         await interaction.defer();
         if (guild.connection) {
             guild.connection.disconnect();
-            guild.connection.destroy();
+            guild.connection = null;
             guild.voiceChannel = null;
             const embed = new builders.EmbedBuilder();
             embed.setDescription("Disconnected.");
