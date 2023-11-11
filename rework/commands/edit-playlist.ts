@@ -1,7 +1,7 @@
 import MusicClient, { Guild, track } from "../client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import base64 from "base-64";
+import { Base64 as base64 } from "js-base64";
 import rstring from "randomstring";
 import { PageData } from "../utils.js";
 import fs from "fs";
