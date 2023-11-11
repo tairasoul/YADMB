@@ -9,7 +9,7 @@ import { PageData } from "../utils.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
-import ytdl from "ytdl-core";
+import ytdl from "@distube/ytdl-core";
 import playdl from "play-dl";
 import utils from "../utils.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
