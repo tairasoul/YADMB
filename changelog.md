@@ -1,7 +1,7 @@
 # Changelog for discord-music-bot
 
-Full restructure of how commands are made.
+Move away from LZWCompress, since it is unable to encode non-latin1 characters. This is an issue when it comes to a decent amount of songs and your use case.
 
-This has been done by using a oceanic.Client extension class (MusicClient) that handles queues, has a custom .on and .off function with m_interactionCreate that has the interaction, guild and the MusicClient sent in.
+Some covers on Youtube include non-latin1 characters, meaning you wouldn't be able to export a playlist if even 1 track had a non-latin1 character.
 
-All commands are now split into seperate files, retaining previous functionality.
+This fixes that, meaning there should be no more errors when trying to make a playlist and export it.
