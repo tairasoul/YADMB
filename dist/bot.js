@@ -32,28 +32,30 @@ const client = new MusicClient({
     }
 });
 client.on('voiceStateUpdate', (oldState, newState) => {
-    if (client.getVoiceConnection(oldState.guildID) === undefined && client.m_guilds[oldState.guildID].connection) {
-        const connection = client.m_guilds[oldState.guildID].connection;
+    const guild = client.m_guilds[oldState.guildID];
+    if (client.getVoiceConnection(oldState.guildID) === undefined && guild.connection) {
+        const connection = guild.connection;
         connection.disconnect();
-        client.m_guilds[oldState.guildID].connection = null;
-        client.m_guilds[oldState.guildID].voiceChannel = null;
+        connection.destroy();
+        guild.connection = null;
+        guild.voiceChannel = null;
     }
     else {
-        if (client.m_guilds[oldState.guildID].voiceChannel !== null && client.m_guilds[oldState.guildID].connection) {
-            const channel = client.m_guilds[oldState.guildID].voiceChannel;
-            const connection = client.m_guilds[oldState.guildID].connection;
+        if (guild.voiceChannel !== null && guild.connection) {
+            const channel = guild.voiceChannel;
+            const connection = guild.connection;
             debugLog(channel.voiceMembers.size);
             if (channel.voiceMembers.size == 1) {
-                client.m_guilds[oldState.guildID].leaveTimer = setTimeout(() => {
+                guild.leaveTimer = setTimeout(() => {
                     connection.disconnect();
                     connection.destroy();
-                    client.m_guilds[oldState.guildID].connection = null;
-                    client.m_guilds[oldState.guildID].voiceChannel = null;
+                    guild.connection = null;
+                    guild.voiceChannel = null;
                 }, 60 * 1000);
             }
             else {
-                if (client.m_guilds[oldState.guildID].leaveTimer != null)
-                    clearTimeout(client.m_guilds[oldState.guildID].leaveTimer);
+                if (guild.leaveTimer != null)
+                    clearTimeout(guild.leaveTimer);
             }
         }
     }
