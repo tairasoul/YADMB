@@ -1,6 +1,6 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import ytdl from "ytdl-core";
+import ytdl from "@distube/ytdl-core";
 import playdl from "play-dl";
 import util from "util";
 import * as voice from "@discordjs/voice";

@@ -1,13 +1,11 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-// @ts-ignore
-import { default as lzw } from "lzwcompress";
 import base64 from "base-64";
 import rstring from "randomstring";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
-import ytdl from "ytdl-core";
+import ytdl from "@distube/ytdl-core";
 import playdl from "play-dl";
 import utils from "../utils.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
@@ -125,7 +123,7 @@ export default {
                 return;
             /** @ts-ignore */
             await i.editParent({ embeds: [paged[currentTrack].embed.toJSON()], components: rows.disabled, flags: 1 << 6 });
-            const encoded = base64.encode(lzw.pack(data));
+            const encoded = base64.encode(JSON.stringify(data));
             await i.createFollowup({ content: `Exported playlist **${name}**. Save this as a file:`, files: [
                     {
                         name: `${interaction.member.username}.playlist.${name}.export.txt`,

@@ -84,9 +84,19 @@ export default class MusicClient extends Client {
         for (const command of this.rawCommands) {
             console.log(`creating global command ${command.data.name}`);
             this.commands.set(command.data.name, command);
-            // @ts-ignore
-            await this.application.createGlobalCommand(command.data);
-            console.log(`created global command ${command.data.name}`);
+            try {
+                // @ts-ignore
+                await this.application.createGlobalCommand(command.data);
+            }
+            catch {
+                console.log(`uh oh! encountered an error trying to create global command ${command.data.name}!\nretrying in 5 seconds.`);
+                await new Promise<void>((resolve) => setTimeout(resolve, 5000));
+                // @ts-ignore
+                await this.application.createGlobalCommand(command.data);
+            }
+            finally {
+                console.log(`created global command ${command.data.name}`)
+            }
         }
         this.editStatus("online", [{name: (this.guilds.size).toString() + ' servers', type: 3}]);
     }
