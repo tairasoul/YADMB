@@ -28,3 +28,31 @@ download discord-music-bot-installer-linux if on linux, otherwise discord-music-
 # Changelog
 
 Changelog has been moved to [changelog.md](https://github.com/tairasoul/discord-music-bot/blob/main/changelog.md)
+
+# features
+
+- you can set the volume to whatever (yes, this means you can destroy your friend's eardrums)
+
+- you can add an entire playlist or channel
+
+- add songs from youtube, spotify, soundcloud and deezer (not sure how well they will work since im just using default play-dl)
+
+- can create custom playlists
+    - these playlists are saved on your pc, with each playlist being its own file formatted as (username).playlist.(playlst name).export.txt, meaning you don't have to rely on the bot to save it in a reliable manner and it works across multiple instances of the bot
+
+- edit custom playlists
+
+- export the entire queue or playlist
+    - like the queue you currently have? just export it!
+
+- import an exported queue or custom playlist
+
+- loop the song, playlist or queue
+
+- a progress command that gives you time left, total duration, author, likes and views for current song
+
+- search for anything on youtube as long as it's not age-restricted
+
+- skip individual songs or an entire playlist
+
+- view a snapshot of the queue

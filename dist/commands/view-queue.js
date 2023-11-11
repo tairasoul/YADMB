@@ -41,7 +41,6 @@ export default {
         const nextEmbedId = rstring.generate();
         const prevEmbedId = rstring.generate();
         const inspectId = rstring.generate();
-        const shuffleId = rstring.generate();
         const playNextId = rstring.generate();
         const nextInspectedId = rstring.generate();
         const prevInspectedId = rstring.generate();
@@ -54,7 +53,6 @@ export default {
         const nextEmbed = new builders.Button(oceanic.ButtonStyles.PRIMARY, nextEmbedId);
         const prevEmbed = new builders.Button(oceanic.ButtonStyles.PRIMARY, prevEmbedId);
         const inspect = new builders.Button(oceanic.ButtonStyles.PRIMARY, inspectId);
-        const shuffle = new builders.Button(oceanic.ButtonStyles.PRIMARY, shuffleId);
         const playNext = new builders.Button(oceanic.ButtonStyles.PRIMARY, playNextId);
         const nextInspected = new builders.Button(oceanic.ButtonStyles.PRIMARY, nextInspectedId);
         const prevInspected = new builders.Button(oceanic.ButtonStyles.PRIMARY, prevInspectedId);
@@ -67,7 +65,6 @@ export default {
         nextEmbed.setLabel("Next");
         prevEmbed.setLabel("Previous");
         inspect.setLabel("Inspect");
-        shuffle.setLabel("Shuffle");
         playNext.setLabel("Play next");
         nextInspected.setLabel("Next song");
         prevInspected.setLabel("Previous song");
@@ -82,7 +79,7 @@ export default {
                 new builders.ActionRow().addComponents(prevEmbed, exit, nextEmbed).toJSON()
             ],
             playlist: [
-                new builders.ActionRow().addComponents(inspect, shuffle, playNext, exportB).toJSON(),
+                new builders.ActionRow().addComponents(inspect, playNext, exportB).toJSON(),
                 new builders.ActionRow().addComponents(prevEmbed, exit, nextEmbed).toJSON(),
             ],
             inspected: [
@@ -95,7 +92,7 @@ export default {
                     new builders.ActionRow().addComponents(prevEmbed.disable(), exit.disable(), nextEmbed.disable()).toJSON()
                 ],
                 playlist: [
-                    new builders.ActionRow().addComponents(inspect.disable(), shuffle.disable(), playNext.disable(), exportB.disable()).toJSON(),
+                    new builders.ActionRow().addComponents(inspect.disable(), playNext.disable(), exportB.disable()).toJSON(),
                     new builders.ActionRow().addComponents(prevEmbed.disable(), exit.disable(), nextEmbed.disable()).toJSON()
                 ],
                 inspected: [
@@ -199,16 +196,6 @@ export default {
                 await i.editParent({ content: "", embeds: current.embed.toJSON(true), components: current.type === "playlist" ? actionRows.playlist : actionRows.song, flags: 1 << 6 });
             }
         };
-        const onShuffle = async (i) => {
-            if (i.data.customID !== shuffleId)
-                return;
-            const queueIndex = data.queued.pages[currentPage].index;
-            debugLog(queueIndex);
-            debugLog(guild.queue.tracks[queueIndex].tracks);
-            utils.shuffleArray(guild.queue.tracks[queueIndex].tracks);
-            debugLog(guild.queue.tracks[queueIndex].tracks);
-            await i.createMessage({ embeds: [embedMessage("Shuffled playlist.")], flags: 1 << 6 });
-        };
         const onPlayNext = async (i) => {
             if (i.data.customID !== playNextId)
                 return;
@@ -251,8 +238,6 @@ export default {
         /** @ts-ignore */
         client.on("interactionCreate", onInspect);
         /** @ts-ignore */
-        client.on("interactionCreate", onShuffle);
-        /** @ts-ignore */
         client.on("interactionCreate", onPlayNext);
         /** @ts-ignore */
         client.on("interactionCreate", onExitInspect);
@@ -272,8 +257,6 @@ export default {
             client.off("interactionCreate", onPrev);
             /** @ts-ignore */
             client.off("interactionCreate", onInspect);
-            /** @ts-ignore */
-            client.off("interactionCreate", onShuffle);
             /** @ts-ignore */
             client.off("interactionCreate", onPlayNext);
             /** @ts-ignore */
