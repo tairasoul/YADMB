@@ -1,7 +1,5 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-// @ts-ignore
-import { default as lzw } from "lzwcompress";
 import base64 from "base-64";
 export default {
     name: "export",
@@ -42,8 +40,8 @@ export default {
                     type: "playlist",
                     name: q.name
                 };
-                const c = lzw.pack(clone);
-                const encoded = base64.encode(c.toString());
+                const c = JSON.stringify(clone);
+                const encoded = base64.encode(c);
                 await interaction.editOriginal({ content: "Exported playlist. Save this as a file:", files: [
                         {
                             name: `${interaction.member.id}.${interaction.guildID}.${interaction.createdAt.getTime()}.export.txt`,
@@ -58,8 +56,8 @@ export default {
                 for (const clone of qClone) {
                     clone.trackNumber = 0;
                 }
-                const lzp = lzw.pack(qClone);
-                const q_enc = base64.encode(lzp.toString());
+                const lzp = JSON.stringify(qClone);
+                const q_enc = base64.encode(lzp);
                 await interaction.editOriginal({ content: "Exported queue. Save this as a file:", files: [
                         {
                             name: `${interaction.member.id}.${interaction.guildID}.${interaction.createdAt.getTime()}.export.txt`,

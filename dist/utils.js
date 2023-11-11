@@ -3,8 +3,6 @@ import * as oceanic from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 import path from 'path';
 import { fileURLToPath } from 'url';
-/** @ts-ignore */
-import lzw from "lzwcompress";
 import base64 from "base-64";
 import playdl from "play-dl";
 import humanizeDuration from 'humanize-duration';
@@ -94,21 +92,14 @@ export function LFGIC(client, guildid, userid, customid, callback) {
         await callback(i);
     });
 }
-export function encodeArray(array) {
-    const arr = lzw.pack(array).toString();
+export function encode(array) {
+    const arr = JSON.stringify(array);
     return base64.encode(arr);
 }
 export function decodeStr(str) {
     const decoded = base64.decode(str);
     debugLog(decoded);
-    const split = decoded.split(",");
-    debugLog(split);
-    const lzwArray = [];
-    for (const string of split) {
-        lzwArray.push(parseInt(string));
-    }
-    debugLog(lzwArray);
-    return lzw.unpack(lzwArray);
+    return JSON.parse(decoded);
 }
 export class Page {
     iembed;
@@ -334,7 +325,7 @@ export default {
     shuffleArray,
     ComponentCallback,
     LFGIC,
-    encodeArray,
+    encode,
     decodeStr,
     Pager,
     queuedTrackPager,
