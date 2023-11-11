@@ -36,7 +36,6 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     if (client.getVoiceConnection(oldState.guildID) === undefined && guild.connection) {
         const connection = guild.connection;
         connection.disconnect();
-        connection.destroy();
         guild.connection = null;
         guild.voiceChannel = null;
     }
@@ -48,7 +47,6 @@ client.on('voiceStateUpdate', (oldState, newState) => {
             if (channel.voiceMembers.size == 1) {
                 guild.leaveTimer = setTimeout(() => {
                     connection.disconnect();
-                    connection.destroy();
                     guild.connection = null;
                     guild.voiceChannel = null;
                 }, 60 * 1000);

@@ -40,7 +40,6 @@ client.on('voiceStateUpdate', (oldState: oceanic.Member, newState: oceanic.JSONV
     if (client.getVoiceConnection(oldState.guildID) === undefined && guild.connection) {
         const connection = guild.connection as voice.VoiceConnection;
         connection.disconnect();
-        connection.destroy();
         guild.connection = null;
         guild.voiceChannel = null;
     }
@@ -52,7 +51,6 @@ client.on('voiceStateUpdate', (oldState: oceanic.Member, newState: oceanic.JSONV
             if (channel.voiceMembers.size == 1) {
                 guild.leaveTimer = setTimeout(() => {
                     connection.disconnect();
-                    connection.destroy();
                     guild.connection = null;
                     guild.voiceChannel = null;
                 }, 60 * 1000)
