@@ -57,6 +57,12 @@ export default class MusicClient extends Client {
                     this.resolvers.playlistResolvers.push(playlistResolver);
         }
     }
+    registerAddonCommands() {
+        for (const command of this.addonCommands) {
+            // @ts-ignore
+            this.addCommand(command.name, command.description, command.options, command.callback);
+        }
+    }
     addCommand(name, description, options, callback) {
         const command = new builders.ApplicationCommandBuilder(1, name);
         for (const option of options)

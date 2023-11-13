@@ -48,6 +48,7 @@ export default class MusicClient extends Client {
     constructor(options: ClientOptions);
     addAddon(addon: AddonInfo): void;
     registerAddons(): void;
+    registerAddonCommands(): void;
     addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => any): void;
     registerCommands(): Promise<void>;
     on<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this;

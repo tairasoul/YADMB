@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import commands from "./commands/index.js";
 import MusicClient from './client.js';
+import addonLoader from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${__dirname}/enableDebugging`))
@@ -11,6 +12,7 @@ function debugLog(text) {
     if (debug)
         console.log(text);
 }
+const addonPath = `${__dirname}/addons`;
 const { token } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 const client = new MusicClient({
     auth: token,
@@ -31,6 +33,7 @@ const client = new MusicClient({
         connectionTimeout: 900000
     }
 });
+const loader = new addonLoader(addonPath, client);
 client.on('voiceStateUpdate', (oldState, newState) => {
     const guild = client.m_guilds[oldState.guildID];
     if (client.getVoiceConnection(oldState.guildID) === undefined && guild.connection) {
@@ -64,6 +67,10 @@ for (const command of commands) {
     client.addCommand(command.name, command.description, command.options != undefined ? command.options : [], command.callback);
 }
 client.on("ready", async () => {
+    await loader.readAddons();
+    loader.loadAddons();
+    loader.registerAddons();
+    client.registerAddonCommands();
     for (const guild of client.guilds.values()) {
         debugLog(`adding guild ${guild.id}`);
         client.addGuild(guild);
@@ -91,4 +98,3 @@ client.on("m_interactionCreate", async (interaction, resolvers, guild, m_client)
     }
 });
 await client.connect();
-export default client;

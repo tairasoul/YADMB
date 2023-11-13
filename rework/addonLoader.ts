@@ -96,9 +96,11 @@ export type AddonInfo = {
 
 export default class addonLoader {
     private addonPath: string;
-    addons: AddonInfo[] = [];
-    constructor(addonPath: string) {
+    private _client: MusicClient;
+    private addons: AddonInfo[] = [];
+    constructor(addonPath: string, client: MusicClient) {
         this.addonPath = addonPath;
+        this._client = client;
     }
 
     async readAddons() {
@@ -106,5 +108,13 @@ export default class addonLoader {
             const addonInfo: AddonInfo = await import(`file://${this.addonPath}/${addon}`).then(m => m.default);
             this.addons.push(addonInfo);
         }
+    }
+
+    loadAddons() {
+        for (const addon of this.addons) this._client.addAddon(addon);
+    }
+
+    registerAddons() {
+        this._client.registerAddons();
     }
 }

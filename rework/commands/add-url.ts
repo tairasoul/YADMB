@@ -31,18 +31,6 @@ function startsWith(str: string, strings: string[]) {
     return false
 }
 
-function getProvider(url: string) {
-    // no clue if these are all, please open an issue if they are not
-    const youtube = ["https://www.youtube.com", "https://youtu.be", "https://music.youtube.com"];
-    const sc = ["https://soundcloud.com", "https://on.soundcloud.com"];
-    const deezer = ["https://www.deezer.com"];
-    const spotify = ["https://open.spotify.com"];
-    if (startsWith(url, youtube)) return "youtube";
-    if (startsWith(url, sc)) return "soundcloud";
-    if (startsWith(url, deezer)) return "deezer";
-    if (startsWith(url, spotify)) return "spotify";
-}
-
 export default {
     name: "add-url",
     description: "Add a link to the queue.",
@@ -60,22 +48,14 @@ export default {
             required: false
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild) => {
         await interaction.defer();
         const video = interaction.data.options.getString("link", true);
         const next = interaction.data.options.getBoolean("next");
-        const provider = getProvider(video);
+        const provider = await resolvers.songResolvers.find(async (resolver) => await resolver.resolve(video))?.resolve(video);
         if (provider === undefined) {
             const embed = new builders.EmbedBuilder();
-            embed.setDescription(`Could not get video/music provider for the link you provided.
-            Does it start with any of the following URLs?
-            https://www.youtube.com
-            https://youtu.be
-            https://music.youtube.com
-            https://soundcloud.com
-            https://on.soundcloud.com
-            https://www.deezer.com
-            https://open.spotify.com`)
+            embed.setDescription(`Could not get video/music provider for the link you provided.`)
             return await interaction.editOriginal({embeds: [embed.toJSON()]});
         }
         if (interaction.guildID) {
@@ -243,6 +223,42 @@ export default {
                     const scembed = new builders.EmbedBuilder();
                     scembed.setDescription(`Added **${sinfo.name}** to queue.`);
                     await interaction.editOriginal({embeds: [scembed.toJSON()]})
+                    break;
+                default:
+                    const resolver = resolvers.songDataResolvers.find((resolver) => resolver.regexMatches.find((reg) => reg.test(video)));
+                    if (resolver) {
+                        const song_data = await resolver.resolve(video);
+                        const song_add: queuedTrack = {
+                            type: "song",
+                            trackNumber: 0,
+                            tracks: [
+                                {
+                                    name: song_data.title,
+                                    url: song_data.url
+                                }
+                            ],
+                            name: song_data.title
+                        }
+                        if (next) {
+                            if (nowPlaying.type === "playlist") {
+                                nowPlaying.tracks.push(
+                                    {
+                                        name: song_data.title,
+                                        url: song_data.url
+                                    }
+                                )
+                            }
+                            else {
+                                qt.splice(ct + 1, 0, song_add)
+                            }
+                        }
+                        else {
+                            queue.tracks.push(song_add);
+                        }
+                        const embed = new builders.EmbedBuilder();
+                        embed.setDescription(`Added **${song_data.title}** to queue.`);
+                        await interaction.editOriginal({embeds: [embed.toJSON()]})
+                    }
                     break;
             }
             const ctn = queue.internalCurrentIndex;
