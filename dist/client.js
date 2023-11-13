@@ -17,6 +17,7 @@ function debugLog(text) {
 export default class MusicClient extends Client {
     m_guilds;
     commands;
+    addons = [];
     rawCommands;
     constructor(options) {
         super(options);
@@ -30,6 +31,11 @@ export default class MusicClient extends Client {
         this.on("guildDelete", () => {
             this.editStatus("online", [{ name: (this.guilds.size).toString() + ' servers', type: 3 }]);
         });
+    }
+    addAddon(addon) {
+        this.addons.push(addon);
+    }
+    registerAddons() {
     }
     addCommand(name, description, options, callback) {
         const command = new builders.ApplicationCommandBuilder(1, name);

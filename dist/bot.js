@@ -73,12 +73,12 @@ client.on("ready", async () => {
 });
 client.on("guildCreate", async (guild) => client.addGuild(guild));
 client.on("guildDelete", (guild) => client.removeGuild(guild));
-client.on("m_interactionCreate", async (interaction, guild, m_client) => {
+client.on("m_interactionCreate", async (interaction, resolvers, guild, m_client) => {
     const command = client.commands.get(interaction.data.name);
     if (!command)
         return;
     try {
-        await command.execute(interaction, guild, m_client);
+        await command.execute(interaction, resolvers, guild, m_client);
     }
     catch (error) {
         if (error)
@@ -91,3 +91,4 @@ client.on("m_interactionCreate", async (interaction, guild, m_client) => {
     }
 });
 await client.connect();
+export default client;
