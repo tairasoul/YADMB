@@ -20,32 +20,32 @@ export type addon = {
     name: string;
     description: string;
     version: string;
-    sources: string[];
+    sources?: string[];
     credits: string;
     resolvers: resolver[];
-    private: boolean;
+    private?: boolean;
     type: "songResolver";
 } | {
     name: string;
     description: string;
     version: string;
-    sources: string[];
+    sources?: string[];
     credits: string;
     patches: patch[];
-    private: boolean;
+    private?: boolean;
     type: "patch";
 }
 
 export default class addonLoader {
     private addonPath: string;
-    private addons: addon[] = [];
+    addons: addon[] = [];
     constructor(addonPath: string) {
         this.addonPath = addonPath;
     }
 
     async readAddons() {
         for (const addon of fs.readdirSync(this.addonPath)) {
-            const addonInfo: addon = await import(`${this.addonPath}/${addon}`).then((m) => m.default);
+            const addonInfo: addon = await import(`file://${this.addonPath}/${addon}`).then(m => m.default);
             this.addons.push(addonInfo);
         }
     }
