@@ -7,6 +7,7 @@ import QueueHandler from "./queueSystem.js";
 import voice, { NoSubscriberBehavior, createAudioPlayer } from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
 import util from "node:util"
+import { addon, resolver } from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
@@ -40,11 +41,11 @@ export type Guild = {
 
 export type Command = {
     data: builders.ApplicationCommandBuilder, 
-    execute: ((interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => Promise<any>)
+    execute: ((interaction: oceanic.CommandInteraction, resolvers: resolver[], guild: Guild, client: MusicClient) => Promise<any>)
 }
 
 interface MusicEvents extends oceanic.ClientEvents {
-    "m_interactionCreate": [interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient];
+    "m_interactionCreate": [interaction: oceanic.CommandInteraction, resolvers: resolver[], guild: Guild, client: MusicClient];
 }
 
 export default class MusicClient extends Client {
@@ -52,6 +53,7 @@ export default class MusicClient extends Client {
         [id: string]: Guild
     };
     public commands: Collection<string, Command>;
+    private addons: addon[] = [];
     private rawCommands: Command[];
     constructor(options: ClientOptions) {
         super(options);
@@ -67,7 +69,15 @@ export default class MusicClient extends Client {
         })
     }
 
-    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => any) {
+    addAddon(addon: addon) {
+        this.addons.push(addon);
+    }
+
+    registerAddons() {
+
+    }
+
+    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, resolvers: resolver[], guild: Guild, client: MusicClient) => any) {
         const command = new builders.ApplicationCommandBuilder(1, name);
         for (const option of options) command.addOption(option);
         command.setDescription(description);
