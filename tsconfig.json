@@ -10,6 +10,8 @@
     "skipLibCheck": true,                               /* Skip type checking all .d.ts files. */
     "module": "ES2022",
     "target": "ES2022",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "declarationDir": "./defs",
+    "declaration": true
   }
 }

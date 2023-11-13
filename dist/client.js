@@ -18,6 +18,12 @@ export default class MusicClient extends Client {
     m_guilds;
     commands;
     addons = [];
+    resolvers = {
+        songResolvers: [],
+        songDataResolvers: [],
+        playlistResolvers: []
+    };
+    addonCommands = [];
     rawCommands;
     constructor(options) {
         super(options);
@@ -36,6 +42,20 @@ export default class MusicClient extends Client {
         this.addons.push(addon);
     }
     registerAddons() {
+        for (const addon of this.addons) {
+            if (addon.type == "songResolver")
+                for (const resolver of addon.resolvers)
+                    this.resolvers.songResolvers.push(resolver);
+            else if (addon.type == "command")
+                for (const command of addon.commands)
+                    this.addonCommands.push(command);
+            else if (addon.type == "songDataResolver")
+                for (const songResolver of addon.dataResolvers)
+                    this.resolvers.songDataResolvers.push(songResolver);
+            else if (addon.type == "playlistDataResolver")
+                for (const playlistResolver of addon.playlistResolvers)
+                    this.resolvers.playlistResolvers.push(playlistResolver);
+        }
     }
     addCommand(name, description, options, callback) {
         const command = new builders.ApplicationCommandBuilder(1, name);
@@ -74,7 +94,7 @@ export default class MusicClient extends Client {
         if (event == "m_interactionCreate") {
             super.on("interactionCreate", (interaction) => 
             // @ts-ignore
-            listener(interaction, this.m_guilds[interaction.guildID], this));
+            listener(interaction, this.resolvers, this.m_guilds[interaction.guildID], this));
         }
         else {
             // @ts-ignore
@@ -86,7 +106,7 @@ export default class MusicClient extends Client {
         if (event == "m_interactionCreate") {
             super.off("interactionCreate", (interaction) => 
             // @ts-ignore
-            listener(interaction, this.m_guilds[interaction.guildID], this));
+            listener(interaction, this.resolvers, this.m_guilds[interaction.guildID], this));
         }
         else {
             // @ts-ignore

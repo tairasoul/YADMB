@@ -8,6 +8,28 @@ export type resolver = {
     resolve: (url: string) => Promise<string>;
 }
 
+export type songData = {
+    title: string;
+    url: string;
+}
+
+export type playlistData = {
+    title: string;
+    songs: songData[];
+}
+
+export type dataResolver = {
+    name: string;
+    regexMatches: RegExp[];
+    resolve: (url: string) => Promise<songData>;
+}
+
+export type playlistResolver = {
+    name: string;
+    regexMatches: RegExp[];
+    resolve: (url: string) => Promise<playlistData>;
+}
+
 /*export type patch = {
     prefix: {
         
@@ -52,6 +74,24 @@ export type addon = {
     commands: command[];
     private?: boolean;
     type: "command";
+} | {
+    name: string;
+    description: string;
+    version: string;
+    sources?: string[];
+    credits: string;
+    dataResolvers: dataResolver[];
+    private?: boolean;
+    type: "songDataResolver";
+} | {
+    name: string;
+    description: string;
+    version: string;
+    sources?: string[];
+    credits: string;
+    playlistResolvers: playlistResolver[];
+    private?: boolean;
+    type: "playlistDataResolver";
 }
 
 export default class addonLoader {
