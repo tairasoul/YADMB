@@ -2,7 +2,7 @@ import * as builders from "@oceanicjs/builders";
 export default {
     name: "clear-queue",
     description: "Clear the queue.",
-    callback: async (interaction, guild) => {
+    callback: async (interaction, _resolvers, guild) => {
         await interaction.defer();
         guild.queue.tracks.splice(0, 5000);
         guild.audioPlayer.stop(true);

@@ -17,7 +17,7 @@ export default {
             description: "The volume to set to. Can contain a percent (ex. 50%) or a decimal number (ex. 1.2)."
         }
     ],
-    callback: async (interaction, guild, client) => {
+    callback: async (interaction, _resolvers, guild) => {
         const volume = interaction.data.options.getString("volume", true);
         const characterRegex = /^[0-9%.]*$/g;
         if (characterRegex.test(volume)) {

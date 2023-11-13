@@ -21,7 +21,8 @@ export default class MusicClient extends Client {
     resolvers = {
         songResolvers: [],
         songDataResolvers: [],
-        playlistResolvers: []
+        playlistResolvers: [],
+        audioResourceResolvers: []
     };
     addonCommands = [];
     rawCommands;
@@ -56,6 +57,9 @@ export default class MusicClient extends Client {
             else if (addon.type == "playlistDataResolver")
                 for (const playlistResolver of addon.playlistResolvers)
                     this.resolvers.playlistResolvers.push(playlistResolver);
+            else if (addon.type == "audioResourceResolver")
+                for (const audioResolver of addon.resourceResolvers)
+                    this.resolvers.audioResourceResolvers.push(audioResolver);
         }
     }
     registerAddonCommands() {
@@ -145,7 +149,7 @@ export default class MusicClient extends Client {
                 if (cg.queue.nextTrack() != null) {
                     debugLog(util.inspect(cg.queue.tracks, false, 3, true));
                     debugLog(cg.queue.internalCurrentIndex);
-                    cg.queue.play();
+                    cg.queue.play(this.resolvers);
                 }
                 else {
                     cg.queue.currentInfo = null;

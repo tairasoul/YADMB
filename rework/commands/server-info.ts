@@ -1,4 +1,4 @@
-import { Guild } from "../client.js";
+import { Guild, ResolverInformation } from "../client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import utils from "../utils.js"
@@ -6,7 +6,7 @@ import utils from "../utils.js"
 export default {
     name: "server-info",
     description: "See info about the server as the bot has it stored.",
-    callback: async (interaction: oceanic.CommandInteraction, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild) => {
         const embed = new builders.EmbedBuilder();
         embed.setTitle(`Info for ${(interaction.guild as oceanic.Guild).name}`);
         embed.addField("Current song", guild.queue.currentInfo?.name || "None", true);

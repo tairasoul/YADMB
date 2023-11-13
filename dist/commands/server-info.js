@@ -3,7 +3,7 @@ import utils from "../utils.js";
 export default {
     name: "server-info",
     description: "See info about the server as the bot has it stored.",
-    callback: async (interaction, guild) => {
+    callback: async (interaction, _resolvers, guild) => {
         const embed = new builders.EmbedBuilder();
         embed.setTitle(`Info for ${interaction.guild.name}`);
         embed.addField("Current song", guild.queue.currentInfo?.name || "None", true);

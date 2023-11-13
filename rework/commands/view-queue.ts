@@ -1,4 +1,4 @@
-import MusicClient, { Guild, queuedTrack } from "../client.js";
+import MusicClient, { Guild, ResolverInformation, queuedTrack } from "../client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import rstring from "randomstring";
@@ -26,7 +26,7 @@ function embedMessage(text: string) {
 export default {
     name: "view-queue",
     description: "View the queue.",
-    callback: async (interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild, client: MusicClient) => {
         await interaction.defer(1 << 6)
         await interaction.editOriginal({embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")], flags: 1 << 6})
         const data: {queued: PageHolder, tracks: PageHolder | null} = {

@@ -1,5 +1,5 @@
 import * as oceanic from "oceanic.js";
-import MusicClient, { Guild, queuedTrack } from "../client.js";
+import MusicClient, { Guild, ResolverInformation, queuedTrack } from "../client.js";
 import playdl from "play-dl";
 import * as builders from "@oceanicjs/builders";
 import humanize from "humanize-duration";
@@ -46,7 +46,7 @@ export default {
             type: oceanic.ApplicationCommandOptionTypes.BOOLEAN
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => {
         await interaction.defer();
         const term = interaction.data.options.getString('term', true);
         const excludes = [];
@@ -142,7 +142,7 @@ export default {
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].trackNumber: ${cst}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].tracks[cst]: ${util.inspect(st, false, 5, true)}`)
-            if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection) await queue.play();
+            if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection) await queue.play(resolvers);
         }
         // play video next
         //@ts-ignore

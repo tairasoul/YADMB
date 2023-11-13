@@ -2,7 +2,7 @@ import * as builders from "@oceanicjs/builders";
 export default {
     name: "skip-playlist",
     description: "Skip the current playlist.",
-    callback: async (interaction, guild) => {
+    callback: async (interaction, _resolvers, guild) => {
         await interaction.defer();
         const embed = new builders.EmbedBuilder();
         const queue = guild.queue;

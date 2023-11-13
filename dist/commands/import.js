@@ -24,7 +24,7 @@ export default {
             required: true
         }
     ],
-    callback: async (interaction, guild) => {
+    callback: async (interaction, resolvers, guild) => {
         await interaction.defer();
         const queue = guild.queue;
         const encoded = interaction.data.options.getAttachment("encoded", true);
@@ -48,6 +48,6 @@ export default {
         embed.setDescription(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"} from ${encoded.filename}`);
         await interaction.editOriginal({ embeds: [embed.toJSON()] });
         if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection)
-            await queue.play();
+            await queue.play(resolvers);
     }
 };

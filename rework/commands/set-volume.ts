@@ -1,6 +1,6 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import MusicClient, { Guild } from "../client.js";
+import MusicClient, { Guild, ResolverInformation } from "../client.js";
 import utils from "../utils.js";
 
 function embedMessage(text: string) {
@@ -20,7 +20,7 @@ export default {
             description: "The volume to set to. Can contain a percent (ex. 50%) or a decimal number (ex. 1.2)."
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation,  guild: Guild) => {
         const volume = interaction.data.options.getString("volume", true);
         const characterRegex = /^[0-9%.]*$/g;
         if (characterRegex.test(volume)) {

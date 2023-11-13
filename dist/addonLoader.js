@@ -7,7 +7,7 @@ export default class addonLoader {
         this._client = client;
     }
     async readAddons(addonPath) {
-        const exclusions = ["exclusions.json"];
+        const exclusions = ["exclusions.json", "node_modules", "package.json", "package-lock.json"];
         if (fs.existsSync(`${addonPath}/exclusions.json`)) {
             const newExclusions = JSON.parse(fs.readFileSync(`${addonPath}/exclusions.json`, 'utf8'));
             for (const exclusion of newExclusions)

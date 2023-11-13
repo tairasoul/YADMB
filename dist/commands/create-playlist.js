@@ -5,8 +5,6 @@ import rstring from "randomstring";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
-import ytdl from "@distube/ytdl-core";
-import playdl from "play-dl";
 import utils from "../utils.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
@@ -249,145 +247,31 @@ export default {
             if (provider == undefined) {
                 return int.editOriginal({ embeds: [embedMessage("Invalid song link.")], flags: 1 << 6 });
             }
-            switch (provider) {
-                case "youtube":
-                    try {
-                        if (!ytdl.validateURL(video)) {
-                            const embed = new builders.EmbedBuilder();
-                            embed.setDescription("Invalid link.");
-                            return await int.editOriginal({ embeds: [embed.toJSON()], flags: 1 << 6 });
-                        }
-                        const info = await playdl.video_basic_info(video);
-                        const title = info.video_details.title;
-                        const youtubeadd = {
-                            name: title,
-                            url: video
-                        };
-                        data.tracks.push(youtubeadd);
-                        /** @ts-ignore */
-                        const pagedTrack = await utils.pageTrack(youtubeadd);
-                        pagedTrack.index = paged.length;
-                        pagedTrack.embed.addField("index", pagedTrack.index.toString(), true);
-                        paged.push(pagedTrack);
-                        const yembed = new builders.EmbedBuilder();
-                        yembed.setDescription(`Added **${title}** to custom playlist.`);
-                        await int.editOriginal({ embeds: [yembed.toJSON()], flags: 1 << 6 });
-                        resolve();
-                    }
-                    catch (err) {
-                        await int.editOriginal({ embeds: [embedMessage(`Encountered an error: ${err}`)] });
-                    }
-                    break;
-                // both deezer and spotify need to be searched up on youtube
-                case "deezer":
-                    try {
-                        const dvid = await playdl.deezer(video);
-                        if (dvid.type !== "track") {
-                            const dembed = new builders.EmbedBuilder();
-                            dembed.setDescription(`**${dvid.title}** is not a Deezer track! This only supports singular tracks.`);
-                            return await int.editOriginal({ embeds: [dembed.toJSON()], flags: 1 << 6 });
-                        }
-                        const yvid = (await playdl.search(dvid.title, {
-                            limit: 1
-                        }))[0];
-                        const deezeradd = {
-                            name: dvid.title,
-                            url: yvid.url
-                        };
-                        data.tracks.push(deezeradd);
-                        /** @ts-ignore */
-                        const pagedDeezer = await utils.pageTrack(deezeradd);
-                        pagedDeezer.index = paged.length;
-                        pagedDeezer.embed.addField("index", pagedDeezer.index.toString(), true);
-                        paged.push(pagedDeezer);
-                        const dembed = new builders.EmbedBuilder();
-                        dembed.setDescription(`Added **${dvid.title}** to custom playlist.`);
-                        await int.editOriginal({ embeds: [dembed.toJSON()], flags: 1 << 6 });
-                        resolve();
-                    }
-                    catch (err) {
-                        await int.editOriginal({ embeds: [embedMessage(`Encountered an error: ${err}`)] });
-                    }
-                    break;
-                case "spotify":
-                    try {
-                        try {
-                            if (playdl.is_expired()) {
-                                await playdl.refreshToken(); // This will check if access token has expired or not. If yes, then refresh the token.
-                            }
-                        }
-                        catch { }
-                        const sp_data = await playdl.spotify(video);
-                        if (sp_data.type !== "track") {
-                            const dembed = new builders.EmbedBuilder();
-                            dembed.setDescription(`**${sp_data.name}** is not a Spotify track! This only supports singular tracks.`);
-                            return await int.editOriginal({ embeds: [dembed.toJSON()], flags: 1 << 6 });
-                        }
-                        const search = (await playdl.search(sp_data.name, { limit: 1 }))[0];
-                        const spotifyadd = {
-                            name: sp_data.name,
-                            url: search.url
-                        };
-                        data.tracks.push(spotifyadd);
-                        /** @ts-ignore */
-                        const pagedSpotify = await utils.pageTrack(spotifyadd);
-                        pagedSpotify.index = paged.length;
-                        pagedSpotify.embed.addField("index", pagedSpotify.index.toString(), true);
-                        paged.push(pagedSpotify);
-                        const spembed = new builders.EmbedBuilder();
-                        spembed.setDescription(`Added **${sp_data.name}** to custom playlist.`);
-                        await int.editOriginal({ embeds: [spembed.toJSON()], flags: 1 << 6 });
-                        resolve();
-                    }
-                    catch (err) {
-                        await int.editOriginal({ embeds: [embedMessage(`Encountered an error: ${err}`)] });
-                    }
-                    break;
-                case "soundcloud":
-                    try {
-                        const sinfo = await playdl.soundcloud(video);
-                        const sc_add = {
-                            name: sinfo.name,
-                            url: video
-                        };
-                        data.tracks.push(sc_add);
-                        /** @ts-ignore */
-                        const pagedSoundcloud = await utils.pageTrack(sc_add);
-                        pagedSoundcloud.index = paged.length;
-                        pagedSoundcloud.embed.addField("index", pagedSoundcloud.index.toString(), true);
-                        paged.push(pagedSoundcloud);
-                        const scembed = new builders.EmbedBuilder();
-                        scembed.setDescription(`Added **${sinfo.name}** to custom playlist.`);
-                        await int.editOriginal({ embeds: [scembed.toJSON()], flags: 1 << 6 });
-                        resolve();
-                    }
-                    catch (err) {
-                        await int.editOriginal({ embeds: [embedMessage(`Encountered an error: ${err}`)] });
-                    }
-                    break;
-                default:
-                    const dataResolver = resolvers.songDataResolvers.find((resolver) => resolver.regexMatches.find((resolver) => resolver.test(video)));
-                    if (dataResolver) {
-                        const vdata = await dataResolver.resolve(video);
-                        const add = {
-                            name: vdata.title,
-                            url: vdata.url
-                        };
-                        data.tracks.push(add);
-                        // @ts-ignore
-                        const pagedd = await utils.pageTrack(add);
-                        pagedd.index = paged.length;
-                        pagedd.embed.addField("index", pagedd.index.toString(), true);
-                        paged.push(pagedd);
-                        const embed = new builders.EmbedBuilder();
-                        embed.setDescription(`Added **${vdata.title}** to custom playlist.`);
-                        await int.editOriginal({ embeds: [embed.toJSON()], flags: 1 << 6 });
-                        resolve();
-                    }
-                    else {
-                        await int.editOriginal({ embeds: [embedMessage(`No resolver found for provider ${provider}.`)] });
-                    }
-                    break;
+            const dataResolver = resolvers.songDataResolvers.find((resolver) => resolver.regexMatches.find((resolver) => resolver.test(video)));
+            if (dataResolver) {
+                const vdata = await dataResolver.resolve(video);
+                if (typeof vdata != "string") {
+                    const add = {
+                        name: vdata.title,
+                        url: vdata.url
+                    };
+                    data.tracks.push(add);
+                    // @ts-ignore
+                    const pagedd = await utils.pageTrack(add);
+                    pagedd.index = paged.length;
+                    pagedd.embed.addField("index", pagedd.index.toString(), true);
+                    paged.push(pagedd);
+                    const embed = new builders.EmbedBuilder();
+                    embed.setDescription(`Added **${vdata.title}** to custom playlist.`);
+                    await int.editOriginal({ embeds: [embed.toJSON()], flags: 1 << 6 });
+                    resolve();
+                }
+                else {
+                    await int.editOriginal({ embeds: [embedMessage(vdata)] });
+                }
+            }
+            else {
+                await int.editOriginal({ embeds: [embedMessage(`No resolver found for provider ${provider}.`)] });
             }
         };
         const onAdd = async (i) => {

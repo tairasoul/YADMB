@@ -1,12 +1,12 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import MusicClient, { Guild } from "../client.js";
+import MusicClient, { Guild, ResolverInformation } from "../client.js";
 import * as voice from "@discordjs/voice";
 
 export default {
     name: "join",
     description: "Join a VC and start playing tracks if available.",
-    callback: async (interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => {
         await interaction.defer();
         if (interaction.member?.voiceState?.channelID) {
             if (guild.connection) {
@@ -45,7 +45,7 @@ export default {
             embed.setDescription(string);
             await interaction.editOriginal({embeds: [embed.toJSON()]});
             if (qt.length > 0) {
-                await queue.play();
+                await queue.play(resolvers);
             }
         }
     }

@@ -1,11 +1,11 @@
 import * as oceanic from "oceanic.js";
-import { Guild } from "../client.js";
+import { Guild, ResolverInformation } from "../client.js";
 import * as builders from "@oceanicjs/builders";
 
 export default {
     name: "clear-queue",
     description: "Clear the queue.",
-    callback: async (interaction: oceanic.CommandInteraction, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild) => {
         await interaction.defer()
         guild.queue.tracks.splice(0, 5000);
         guild.audioPlayer.stop(true);

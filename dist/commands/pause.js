@@ -2,7 +2,7 @@ import * as builders from "@oceanicjs/builders";
 export default {
     name: "pause",
     description: "Pause current track.",
-    callback: async (interaction, guild) => {
+    callback: async (interaction, _resolvers, guild) => {
         const queue = guild.queue;
         if (queue.currentInfo) {
             queue.pause();

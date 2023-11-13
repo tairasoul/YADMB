@@ -2,7 +2,7 @@ import * as builders from "@oceanicjs/builders";
 export default {
     name: "join",
     description: "Join a VC and start playing tracks if available.",
-    callback: async (interaction, guild, client) => {
+    callback: async (interaction, resolvers, guild, client) => {
         await interaction.defer();
         if (interaction.member?.voiceState?.channelID) {
             if (guild.connection) {
@@ -41,7 +41,7 @@ export default {
             embed.setDescription(string);
             await interaction.editOriginal({ embeds: [embed.toJSON()] });
             if (qt.length > 0) {
-                await queue.play();
+                await queue.play(resolvers);
             }
         }
     }

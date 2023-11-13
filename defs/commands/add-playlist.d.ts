@@ -9,6 +9,6 @@ declare const _default: {
         required: boolean;
         type: number;
     }[];
-    callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild) => Promise<void>;
+    callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild) => Promise<oceanic.Message<oceanic.AnyInteractionChannel | oceanic.Uncached> | undefined>;
 };
 export default _default;
