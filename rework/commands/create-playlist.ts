@@ -382,6 +382,7 @@ export default {
                     else {
                         await int.editOriginal({embeds: [embedMessage(`No resolver found for provider ${provider}.`)]});
                     }
+                    break;
             }
         }
 

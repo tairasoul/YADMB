@@ -22,29 +22,6 @@ function embedMessage(text) {
     embed.setDescription(text);
     return embed.toJSON();
 }
-// util functions
-function startsWith(str, strings) {
-    for (const string of strings) {
-        if (str.startsWith(string))
-            return true;
-    }
-    return false;
-}
-function getProvider(url) {
-    // no clue if these are all, please open an issue if they are not
-    const youtube = ["https://www.youtube.com", "https://youtu.be", "https://music.youtube.com"];
-    const sc = ["https://soundcloud.com", "https://on.soundcloud.com"];
-    const deezer = ["https://www.deezer.com"];
-    const spotify = ["https://open.spotify.com"];
-    if (startsWith(url, youtube))
-        return "youtube";
-    if (startsWith(url, sc))
-        return "soundcloud";
-    if (startsWith(url, deezer))
-        return "deezer";
-    if (startsWith(url, spotify))
-        return "spotify";
-}
 export default {
     name: "edit-playlist",
     description: "Edit a custom playlist.",
@@ -56,7 +33,7 @@ export default {
             description: "Playlist file."
         }
     ],
-    callback: async (interaction, guild, client) => {
+    callback: async (interaction, resolvers, guild, client) => {
         await interaction.defer(1 << 6);
         const attachment = interaction.data.options.getAttachment("playlist", true);
         const text = await (await fetch(attachment.url)).text();
@@ -265,7 +242,7 @@ export default {
             if (!int.acknowledged)
                 await int.defer(1 << 6);
             const video = int.data.components[0].components[0].value;
-            const provider = getProvider(video);
+            const provider = await resolvers.songResolvers.find(async (resolver) => await resolver.resolve(video))?.resolve(video);
             if (provider == undefined) {
                 return int.editOriginal({ embeds: [embedMessage("Invalid song link.")], flags: 1 << 6 });
             }
@@ -383,6 +360,29 @@ export default {
                     }
                     catch (err) {
                         await int.editOriginal({ embeds: [embedMessage(`Encountered an error: ${err}`)] });
+                    }
+                    break;
+                default:
+                    const dataResolver = resolvers.songDataResolvers.find((resolver) => resolver.regexMatches.find((resolver) => resolver.test(video)));
+                    if (dataResolver) {
+                        const vdata = await dataResolver.resolve(video);
+                        const add = {
+                            name: vdata.title,
+                            url: vdata.url
+                        };
+                        data.tracks.push(add);
+                        // @ts-ignore
+                        const pagedd = await utils.pageTrack(add);
+                        pagedd.index = paged.length;
+                        pagedd.embed.addField("index", pagedd.index.toString(), true);
+                        paged.push(pagedd);
+                        const embed = new builders.EmbedBuilder();
+                        embed.setDescription(`Added **${vdata.title}** to custom playlist.`);
+                        await int.editOriginal({ embeds: [embed.toJSON()], flags: 1 << 6 });
+                        resolve();
+                    }
+                    else {
+                        await int.editOriginal({ embeds: [embedMessage(`No resolver found for provider ${provider}.`)] });
                     }
                     break;
             }

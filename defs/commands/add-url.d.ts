@@ -1,5 +1,5 @@
 import * as oceanic from "oceanic.js";
-import { Guild } from "../client.js";
+import { Guild, ResolverInformation } from "../client.js";
 declare const _default: {
     name: string;
     description: string;
@@ -9,6 +9,6 @@ declare const _default: {
         description: string;
         required: boolean;
     }[];
-    callback: (interaction: oceanic.CommandInteraction, guild: Guild) => Promise<oceanic.Message<oceanic.AnyInteractionChannel | oceanic.Uncached> | undefined>;
+    callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild) => Promise<oceanic.Message<oceanic.AnyInteractionChannel | oceanic.Uncached> | undefined>;
 };
 export default _default;

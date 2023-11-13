@@ -98,6 +98,13 @@ export default class MusicClient extends Client {
         }
     }
 
+    registerAddonCommands() {
+        for (const command of this.addonCommands) {
+            // @ts-ignore
+            this.addCommand(command.name, command.description, command.options, command.callback);
+        }
+    }
+
     addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => any) {
         const command = new builders.ApplicationCommandBuilder(1, name);
         for (const option of options) command.addOption(option);

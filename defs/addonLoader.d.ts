@@ -68,7 +68,10 @@ export type AddonInfo = {
 };
 export default class addonLoader {
     private addonPath;
-    addons: AddonInfo[];
-    constructor(addonPath: string);
+    private _client;
+    private addons;
+    constructor(addonPath: string, client: MusicClient);
     readAddons(): Promise<void>;
+    loadAddons(): void;
+    registerAddons(): void;
 }
