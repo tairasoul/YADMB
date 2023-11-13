@@ -38,7 +38,7 @@ const client = new MusicClient({
     }
 });
 
-const loader = new addonLoader(addonPath, client);
+const loader = new addonLoader(client);
 
 client.on('voiceStateUpdate', (oldState: oceanic.Member, newState: oceanic.JSONVoiceState | null) => {
     const guild = client.m_guilds[oldState.guildID];
@@ -74,7 +74,7 @@ for (const command of commands) {
 }
 
 client.on("ready", async () => {
-    await loader.readAddons();
+    await loader.readAddons(addonPath);
     loader.loadAddons();
     loader.registerAddons();
     client.registerAddonCommands();

@@ -33,7 +33,7 @@ const client = new MusicClient({
         connectionTimeout: 900000
     }
 });
-const loader = new addonLoader(addonPath, client);
+const loader = new addonLoader(client);
 client.on('voiceStateUpdate', (oldState, newState) => {
     const guild = client.m_guilds[oldState.guildID];
     if (client.getVoiceConnection(oldState.guildID) === undefined && guild.connection) {
@@ -67,7 +67,7 @@ for (const command of commands) {
     client.addCommand(command.name, command.description, command.options != undefined ? command.options : [], command.callback);
 }
 client.on("ready", async () => {
-    await loader.readAddons();
+    await loader.readAddons(addonPath);
     loader.loadAddons();
     loader.registerAddons();
     client.registerAddonCommands();

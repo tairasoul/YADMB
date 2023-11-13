@@ -1,33 +1,19 @@
 import fs from "fs";
 export default class addonLoader {
-    addonPath;
     _client;
     addons = [];
-    constructor(addonPath, client) {
-        this.addonPath = addonPath;
+    constructor(client) {
         this._client = client;
     }
-    async readAddons() {
-        for (const addon of fs.readdirSync(this.addonPath)) {
+    async readAddons(addonPath) {
+        for (const addon of fs.readdirSync(addonPath)) {
             console.log(`reading addon ${addon}`);
-            if (fs.statSync(`${this.addonPath}/${addon}`).isDirectory()) {
+            if (fs.statSync(`${addonPath}/${addon}`).isDirectory()) {
                 console.log(`addon ${addon} is dir, reading from all files in ${addon}`);
-                for (const subaddon of fs.readdirSync(`${this.addonPath}/${addon}`)) {
-                    console.log(`reading addon ${addon}/${subaddon}`);
-                    const addonInfo = await import(`file://${this.addonPath}/${addon}/${subaddon}`).then(m => m.default);
-                    if (addonInfo instanceof Array) {
-                        console.log(`addon ${subaddon} has multiple addons, iterating.`);
-                        addonInfo.forEach((saddon) => {
-                            console.log(`reading addon ${saddon.name} from ${subaddon}`);
-                            this.addons.push(saddon);
-                        });
-                    }
-                    else
-                        this.addons.push(addonInfo);
-                }
+                await this.readAddons(`${addonPath}/${addon}`);
             }
             else {
-                const addonInfo = await import(`file://${this.addonPath}/${addon}`).then(m => m.default);
+                const addonInfo = await import(`file://${addonPath}/${addon}`).then(m => m.default);
                 if (addonInfo instanceof Array) {
                     console.log(`addon ${addon} has multiple addons, iterating.`);
                     addonInfo.forEach((saddon) => {
