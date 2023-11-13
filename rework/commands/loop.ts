@@ -1,6 +1,6 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import { Guild, loopType } from "../client.js";
+import { Guild, ResolverInformation, loopType } from "../client.js";
 
 const loopTypeStrs = {
     "none": "No longer looping anything.",
@@ -34,7 +34,7 @@ export default {
             required: true
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild) => {
         await interaction.defer();
         const choice: loopType = interaction.data.options.getString("type", true);
         const embed = new builders.EmbedBuilder();

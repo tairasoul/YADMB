@@ -1,5 +1,5 @@
 import * as oceanic from "oceanic.js";
-import MusicClient, { Guild } from "../client.js";
+import { Guild, ResolverInformation } from "../client.js";
 declare const _default: {
     name: string;
     description: string;
@@ -9,6 +9,6 @@ declare const _default: {
         required: boolean;
         description: string;
     }[];
-    callback: (interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => Promise<void>;
+    callback: (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild) => Promise<void>;
 };
 export default _default;

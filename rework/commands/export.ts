@@ -1,5 +1,5 @@
 import * as oceanic from "oceanic.js";
-import { Guild, queuedTrack } from "../client.js";
+import { Guild, ResolverInformation, queuedTrack } from "../client.js";
 import * as builders from "@oceanicjs/builders"
 import { Base64 as base64 } from "js-base64";
 
@@ -24,7 +24,7 @@ export default {
             ]
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild) => {
         await interaction.defer()
         const type: "playlist" | "queue" = interaction.data.options.getString("type", true);
         const queue = guild.queue

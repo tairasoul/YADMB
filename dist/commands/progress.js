@@ -1,10 +1,9 @@
 import * as builders from "@oceanicjs/builders";
-import utils from "../utils.js";
 import humanize from "humanize-duration";
 export default {
     name: "progress",
     description: "Get progress of current song (if any).",
-    callback: async (interaction, guild) => {
+    callback: async (interaction, _resolvers, guild) => {
         const songTime = guild.queue.currentInfo?.resource?.playbackDuration;
         const progressTime = guild.queue.currentInfo?.songStart;
         const embed = new builders.EmbedBuilder();
@@ -14,10 +13,10 @@ export default {
             embed.setTitle(`Progress for ${ct.tracks[ct.trackNumber].name}`);
             embed.addField("Time remaining", remaining);
             embed.addField("Song duration", humanize(progressTime));
-            embed.addField("Author", guild.queue.currentInfo.info.video_details.channel?.name || "None found.");
-            embed.addField("Likes", guild.queue.currentInfo.info.video_details.likes.toString());
-            embed.addField("Views", guild.queue.currentInfo.info.video_details.views.toString());
-            embed.setImage(utils.getHighestResUrl(guild.queue.currentInfo.info));
+            embed.addField("Author", guild.queue.currentInfo.info.channelName || "None found.");
+            embed.addField("Likes", guild.queue.currentInfo.info.likes);
+            embed.addField("Views", guild.queue.currentInfo.info.views);
+            embed.setImage(guild.queue.currentInfo.info.highestResUrl);
         }
         else {
             embed.setTitle(`No song currently playing or available.`);

@@ -1,11 +1,11 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import { Guild } from "../client";
+import { Guild, ResolverInformation } from "../client.js";
 
 export default {
     name: "resume",
     description: "Resume current track.",
-    callback: async (interaction: oceanic.CommandInteraction, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild) => {
         const queue = guild.queue;
         if (queue.currentInfo) {
             queue.resume();

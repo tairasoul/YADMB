@@ -1,5 +1,5 @@
 import * as oceanic from "oceanic.js";
-import { Guild } from "../client.js";
+import { Guild, ResolverInformation } from "../client.js";
 import utils from "../utils.js";
 import * as builders from "@oceanicjs/builders";
 import * as voice from "@discordjs/voice";
@@ -25,7 +25,7 @@ export default {
             required: true
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild) => {
         await interaction.defer()
         const queue = guild.queue;
         const encoded = interaction.data.options.getAttachment("encoded", true);
@@ -48,6 +48,6 @@ export default {
         const embed = new builders.EmbedBuilder();
         embed.setDescription(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"} from ${encoded.filename}`);
         await interaction.editOriginal({embeds: [embed.toJSON()]});
-        if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection) await queue.play();
+        if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection) await queue.play(resolvers);
     }
 }

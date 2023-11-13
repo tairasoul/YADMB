@@ -30,7 +30,7 @@ export default {
             required: true
         }
     ],
-    callback: async (interaction, guild) => {
+    callback: async (interaction, _resolvers, guild) => {
         await interaction.defer();
         const choice = interaction.data.options.getString("type", true);
         const embed = new builders.EmbedBuilder();

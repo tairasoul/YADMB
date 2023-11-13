@@ -45,7 +45,7 @@ export default {
             type: oceanic.ApplicationCommandOptionTypes.BOOLEAN
         }
     ],
-    callback: async (interaction, guild, client) => {
+    callback: async (interaction, resolvers, guild, client) => {
         await interaction.defer();
         const term = interaction.data.options.getString('term', true);
         const excludes = [];
@@ -145,7 +145,7 @@ export default {
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].trackNumber: ${cst}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].tracks[cst]: ${util.inspect(st, false, 5, true)}`);
             if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection)
-                await queue.play();
+                await queue.play(resolvers);
         };
         // play video next
         //@ts-ignore

@@ -25,9 +25,12 @@ export type AudioResolver = {
      */
     regexMatches: RegExp[];
     /**
-     * Function that turns a song URL into an audio resource from @discordjs/voice
+     * Function that turns a song URL into an audio resource from discordjs/voice and into infoData
      */
-    resolve: (url: string) => Promise<AudioResource | undefined>;
+    resolve: (url: string) => Promise<{
+        resource: AudioResource<any>;
+        info: infoData;
+    }>;
 };
 export type songData = {
     /**
@@ -61,7 +64,7 @@ export type dataResolver = {
     /**
      * Function that resolves the URL into song data.
      */
-    resolve: (url: string) => Promise<songData>;
+    resolve: (url: string) => Promise<songData | string>;
 };
 export type playlistResolver = {
     /**
@@ -75,7 +78,7 @@ export type playlistResolver = {
     /**
      * Function that resolves the URL into playlist data.
      */
-    resolve: (url: string) => Promise<playlistData>;
+    resolve: (url: string) => Promise<playlistData | string>;
 };
 export type command = {
     /**
@@ -255,7 +258,7 @@ export type AddonInfo = {
     /**
      * List of playlist resolvers.
      */
-    playlistResolvers: AudioResolver[];
+    resourceResolvers: AudioResolver[];
     /**
      * Is this addon private?
      * Addons will not be shown when the user checks addons through /view-addons if it is.
@@ -265,6 +268,30 @@ export type AddonInfo = {
      * An addon that resolves a song URL into an Audio Resource
      */
     type: "audioResourceResolver";
+};
+export type infoData = {
+    /**
+     * The uploader of the song.
+     */
+    channelName: string;
+    /**
+     * Likes for the song.
+     * Set to "Unable to fetch likes" if you can't.
+     */
+    likes: string;
+    /**
+     * Views, if possible to be fetched.
+     * Set to "Unable to fetch views" if you can't.
+     */
+    views: string;
+    /**
+     * Highest resolution URL for the thumbnail.
+     */
+    highestResUrl: string;
+    /**
+     * Duration in miliseconds.
+     */
+    durationInMs: number;
 };
 export default class addonLoader {
     private _client;

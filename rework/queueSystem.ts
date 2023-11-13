@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 import util from "node:util";
 import playdl, { InfoData } from "play-dl";
 import utils from "./utils.js"
+import { ResolverInformation } from "./client.js";
+import { infoData } from "./addonLoader.js";
 
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
@@ -38,7 +40,7 @@ export default class QueueHandler {
         name: string;
         resource: voice.AudioResource<any>;
         songStart: number;
-        info: InfoData
+        info: infoData;
     } | null = null;
 
     constructor(guildAudioPlayer: voice.AudioPlayer) {
@@ -109,27 +111,26 @@ export default class QueueHandler {
         return this.audioPlayer.unpause();
     }
 
-    async play() {
+    async play(resolvers: ResolverInformation) {
         const currentInternal = this.tracks[this.internalCurrentIndex];
         debugLog(util.inspect(currentInternal, false, 5, true));
         debugLog(this.internalCurrentIndex);
         debugLog(util.inspect(this.tracks, false, 5, true));
         const track = currentInternal.tracks[currentInternal.trackNumber];
-        if (track == undefined) return false;
-        const info = await playdl.video_info(track.url);
-        const stream = await playdl.stream_from_info(info);
-        const resource = createAudioResource(stream.stream, {
-            inlineVolume: true,
-            inputType: stream.type
-        })
-        resource.volume?.setVolume(utils.parseVolumeString(this.volumeString));
-        this.audioPlayer.play(resource);
-        const duration = info.video_details.durationInSec;
-        this.currentInfo = {
-            name: track.name,
-            resource: resource,
-            songStart: duration * 1000,
-            info: info
+        const currentURL = track.url
+        const resolver = resolvers.audioResourceResolvers.find((resolver) => resolver.regexMatches.find((reg) => reg.test(currentURL)));
+        if (resolver) {
+            const audioResource = await resolver.resolve(currentURL);
+            if (audioResource) {
+                audioResource.resource.volume?.setVolume(utils.parseVolumeString(this.volumeString));
+                this.audioPlayer.play(audioResource.resource);
+                this.currentInfo = {
+                    name: track.name,
+                    resource: audioResource.resource,
+                    songStart: audioResource.info.durationInMs,
+                    info: audioResource.info
+                }
+            }
         }
     }
 }

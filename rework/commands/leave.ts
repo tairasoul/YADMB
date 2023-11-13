@@ -1,11 +1,11 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import { Guild } from "../client.js";
+import { Guild, ResolverInformation } from "../client.js";
 
 export default {
     name: "leave",
     description: "Leave the current VC.",
-    callback: async (interaction: oceanic.CommandInteraction, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild) => {
         await interaction.defer();
         if (guild.connection) {
             guild.connection.disconnect();

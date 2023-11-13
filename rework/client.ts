@@ -7,7 +7,7 @@ import QueueHandler from "./queueSystem.js";
 import voice, { NoSubscriberBehavior, createAudioPlayer } from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
 import util from "node:util"
-import { AddonInfo, command, dataResolver, playlistResolver, resolver } from "./addonLoader.js";
+import { AddonInfo, AudioResolver, command, dataResolver, playlistResolver, resolver } from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
@@ -43,6 +43,7 @@ export type ResolverInformation = {
     songResolvers: resolver[];
     songDataResolvers: dataResolver[];
     playlistResolvers: playlistResolver[];
+    audioResourceResolvers: AudioResolver[];
 }
 
 export type Command = {
@@ -63,7 +64,8 @@ export default class MusicClient extends Client {
     private resolvers: ResolverInformation = {
         songResolvers: [],
         songDataResolvers: [],
-        playlistResolvers: []
+        playlistResolvers: [],
+        audioResourceResolvers: []
     }
     private addonCommands: command[] = [];
     private rawCommands: Command[];
@@ -96,6 +98,8 @@ export default class MusicClient extends Client {
                 for (const songResolver of addon.dataResolvers) this.resolvers.songDataResolvers.push(songResolver);
             else if (addon.type == "playlistDataResolver")
                 for (const playlistResolver of addon.playlistResolvers) this.resolvers.playlistResolvers.push(playlistResolver);
+            else if (addon.type == "audioResourceResolver")
+                for (const audioResolver of addon.resourceResolvers) this.resolvers.audioResourceResolvers.push(audioResolver);
         }
     }
 
@@ -195,7 +199,7 @@ export default class MusicClient extends Client {
                 if (cg.queue.nextTrack() != null) {
                     debugLog(util.inspect(cg.queue.tracks, false, 3, true))
                     debugLog(cg.queue.internalCurrentIndex)
-                    cg.queue.play();
+                    cg.queue.play(this.resolvers);
                 }
                 else {
                     cg.queue.currentInfo = null;

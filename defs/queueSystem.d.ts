@@ -1,5 +1,6 @@
 import voice from "@discordjs/voice";
-import { InfoData } from "play-dl";
+import { ResolverInformation } from "./client.js";
+import { infoData } from "./addonLoader.js";
 type track = {
     name: string;
     url: string;
@@ -21,7 +22,7 @@ export default class QueueHandler {
         name: string;
         resource: voice.AudioResource<any>;
         songStart: number;
-        info: InfoData;
+        info: infoData;
     } | null;
     constructor(guildAudioPlayer: voice.AudioPlayer);
     setLoopType(loopType: loopType): void;
@@ -32,6 +33,6 @@ export default class QueueHandler {
     skip(): Promise<track | null | undefined>;
     pause(): boolean;
     resume(): boolean;
-    play(): Promise<false | undefined>;
+    play(resolvers: ResolverInformation): Promise<void>;
 }
 export {};

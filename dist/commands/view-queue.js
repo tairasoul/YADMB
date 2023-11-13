@@ -24,7 +24,7 @@ function embedMessage(text) {
 export default {
     name: "view-queue",
     description: "View the queue.",
-    callback: async (interaction, guild, client) => {
+    callback: async (interaction, _resolvers, guild, client) => {
         await interaction.defer(1 << 6);
         await interaction.editOriginal({ embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")], flags: 1 << 6 });
         const data = {

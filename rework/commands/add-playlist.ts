@@ -37,6 +37,11 @@ export default {
             }
             else {
                 const resolved = await resolver.resolve(playlist);
+                if (typeof resolved == "string") {
+                    const embed = new builders.EmbedBuilder();
+                    embed.setDescription(resolved);
+                    return await interaction.editOriginal({embeds: [embed.toJSON()]});
+                }
                 videos = resolved;
             }
         }
@@ -68,7 +73,7 @@ export default {
             embed.setDescription(`Added **${videos.items.length} tracks** to the queue as a playlist.`);
             const queue = guild.queue;
             queue.tracks.push(added_playlist);
-            if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection) await queue.play();
+            if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection) await queue.play(resolvers);
             await interaction.editOriginal({embeds: [embed.toJSON()]});
         }
     }

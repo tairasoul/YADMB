@@ -4,7 +4,7 @@ import { Client, Collection, ClientOptions } from "oceanic.js";
 import QueueHandler from "./queueSystem.js";
 import voice from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
-import { AddonInfo, dataResolver, playlistResolver, resolver } from "./addonLoader.js";
+import { AddonInfo, AudioResolver, dataResolver, playlistResolver, resolver } from "./addonLoader.js";
 export type track = {
     name: string;
     url: string;
@@ -28,6 +28,7 @@ export type ResolverInformation = {
     songResolvers: resolver[];
     songDataResolvers: dataResolver[];
     playlistResolvers: playlistResolver[];
+    audioResourceResolvers: AudioResolver[];
 };
 export type Command = {
     data: builders.ApplicationCommandBuilder;

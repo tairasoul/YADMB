@@ -2,7 +2,7 @@ import * as builders from "@oceanicjs/builders";
 export default {
     name: "leave",
     description: "Leave the current VC.",
-    callback: async (interaction, guild) => {
+    callback: async (interaction, _resolvers, guild) => {
         await interaction.defer();
         if (guild.connection) {
             guild.connection.disconnect();

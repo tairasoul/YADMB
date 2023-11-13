@@ -22,7 +22,7 @@ export default {
             ]
         }
     ],
-    callback: async (interaction, guild) => {
+    callback: async (interaction, _resolvers, guild) => {
         await interaction.defer();
         const type = interaction.data.options.getString("type", true);
         const queue = guild.queue;

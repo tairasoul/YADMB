@@ -22,7 +22,7 @@ export default {
             ]
         }
     ],
-    callback: async (interaction, guild) => {
+    callback: async (interaction, resolvers, guild) => {
         await interaction.defer();
         const shuffleType = interaction.data.options.getString("type", true);
         const queue = guild.queue;
@@ -44,6 +44,6 @@ export default {
         const embed = new builders.EmbedBuilder();
         embed.setDescription(`Shuffled queue, now playing ${queue.tracks[queue.internalCurrentIndex].tracks[0].name}.`);
         await interaction.editOriginal({ embeds: [embed.toJSON()] });
-        await queue.play();
+        await queue.play(resolvers);
     }
 };
