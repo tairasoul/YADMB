@@ -2,7 +2,7 @@ import { AddonInfo } from "../../addonLoader.js";
 
 const addon: AddonInfo = {
     name: "Base Resolvers",
-    description: "The base resolvers for DMB.",
+    description: "The base resolvers for YADMB.",
     credits: "tairasoul",
     version: "1.0.0",
     sources: [
