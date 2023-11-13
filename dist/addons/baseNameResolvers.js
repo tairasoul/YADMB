@@ -8,8 +8,8 @@ const addon = {
         {
             name: "youtube",
             regexMatches: [
-                /https:\/\/*.youtube.com\/watch\?v=*/,
-                /https:\/\/youtu.be\/watch\?v=*/
+                /https:\/\/(?:music|www)\.youtube\.com\/watch\?v=./,
+                /https:\/\/youtu.be\/watch\?v=./
             ],
             async resolve(url) {
                 if (this.regexMatches.find((reg) => reg.test(url)))
@@ -19,8 +19,8 @@ const addon = {
         {
             name: "soundcloud",
             regexMatches: [
-                /https:\/\/soundcloud.com\/*/,
-                /https:\/\/on.soundcloud.com\/*/
+                /https:\/\/soundcloud.com\/./,
+                /https:\/\/on.soundcloud.com\/./
             ],
             async resolve(url) {
                 if (this.regexMatches.find((reg) => reg.test(url)))
@@ -30,7 +30,7 @@ const addon = {
         {
             name: "deezer",
             regexMatches: [
-                /https:\/\/deezer.[com|.page.link]\/*/
+                /https:\/\/deezer.(?:com|.page.link)\/./
             ],
             async resolve(url) {
                 if (this.regexMatches.find((reg) => reg.test(url)))
@@ -40,7 +40,7 @@ const addon = {
         {
             name: "spotify",
             regexMatches: [
-                /https:\/\/open.spotify.com\/track\/*/
+                /https:\/\/open.spotify.com\/track\/./
             ],
             async resolve(url) {
                 if (this.regexMatches.find((reg) => reg.test(url)))

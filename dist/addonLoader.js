@@ -9,13 +9,17 @@ export default class addonLoader {
     }
     async readAddons() {
         for (const addon of fs.readdirSync(this.addonPath)) {
+            console.log(`reading addon ${addon}`);
             const addonInfo = await import(`file://${this.addonPath}/${addon}`).then(m => m.default);
             this.addons.push(addonInfo);
+            console.log(`addon ${addon} has been read`);
         }
     }
     loadAddons() {
-        for (const addon of this.addons)
+        for (const addon of this.addons) {
+            console.log(`loading addon ${addon.name}`);
             this._client.addAddon(addon);
+        }
     }
     registerAddons() {
         this._client.registerAddons();

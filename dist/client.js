@@ -43,6 +43,7 @@ export default class MusicClient extends Client {
     }
     registerAddons() {
         for (const addon of this.addons) {
+            console.log(`registering addon ${addon.name}`);
             if (addon.type == "songResolver")
                 for (const resolver of addon.resolvers)
                     this.resolvers.songResolvers.push(resolver);
@@ -59,6 +60,7 @@ export default class MusicClient extends Client {
     }
     registerAddonCommands() {
         for (const command of this.addonCommands) {
+            console.log(`registering addon command ${command.name}`);
             // @ts-ignore
             this.addCommand(command.name, command.description, command.options, command.callback);
         }
