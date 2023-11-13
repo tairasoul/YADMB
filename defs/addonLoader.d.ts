@@ -67,11 +67,10 @@ export type AddonInfo = {
     type: "playlistDataResolver";
 };
 export default class addonLoader {
-    private addonPath;
     private _client;
     private addons;
-    constructor(addonPath: string, client: MusicClient);
-    readAddons(): Promise<void>;
+    constructor(client: MusicClient);
+    readAddons(addonPath: string): Promise<void>;
     loadAddons(): void;
     registerAddons(): void;
 }
