@@ -8,7 +8,7 @@ export type resolver = {
     resolve: (url: string) => Promise<string>;
 }
 
-export type patch = {
+/*export type patch = {
     prefix: {
         
     } | undefined;
@@ -16,7 +16,7 @@ export type patch = {
 
     } | undefined;
     name: string;
-}
+}*/
 
 export type command = {
     name: string;
@@ -34,7 +34,7 @@ export type addon = {
     resolvers: resolver[];
     private?: boolean;
     type: "songResolver";
-} | {
+}/* | {
     name: string;
     description: string;
     version: string;
@@ -43,7 +43,7 @@ export type addon = {
     patches: patch[];
     private?: boolean;
     type: "patch";
-} | {
+}*/ | {
     name: string;
     description: string;
     version: string;
