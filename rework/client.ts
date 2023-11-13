@@ -38,7 +38,7 @@ export type Guild = {
     leaveTimer: NodeJS.Timeout | null;
 }
 
-type Command = {
+export type Command = {
     data: builders.ApplicationCommandBuilder, 
     execute: ((interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => Promise<any>)
 }
