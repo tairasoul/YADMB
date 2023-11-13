@@ -26,16 +26,16 @@
 
 # in progress
 
+# finished + comments
+
 - addons
   - i had an idea very suddenly and it seems interesting so im working on it
-  - basically, a way to create custom addons, alongside patching some of my own methods and adding commands.
+  - basically, a way to create custom addons, ~~alongside patching some of my own methods~~ and adding commands.
   - this may be difficult as i have NO clue how to do it but fuck it we ball
   - idk how useful this'll be but fuck it
   - the idea is to make it so you don't have to depend on me or a fork of my bot to add support for a platform
   - instead, if you have coding experience you can just make an addon and add it in
-
-# finished + comments
-
+ 
 - partial code rewrites
   - rewrite 1
     - instead of having A LOT of things handled in bot.ts, move some things over to seperate classes
