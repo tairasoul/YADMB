@@ -7,7 +7,7 @@ import QueueHandler from "./queueSystem.js";
 import voice, { NoSubscriberBehavior, createAudioPlayer } from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
 import util from "node:util"
-import { addon, resolver } from "./addonLoader.js";
+import { addon, command, dataResolver, playlistResolver, resolver } from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
@@ -39,13 +39,19 @@ export type Guild = {
     leaveTimer: NodeJS.Timeout | null;
 }
 
+type internalResolverInformation = {
+    songResolvers: resolver[];
+    songDataResolvers: dataResolver[];
+    playlistResolvers: playlistResolver[];
+}
+
 export type Command = {
     data: builders.ApplicationCommandBuilder, 
-    execute: ((interaction: oceanic.CommandInteraction, resolvers: resolver[], guild: Guild, client: MusicClient) => Promise<any>)
+    execute: ((interaction: oceanic.CommandInteraction, resolvers: internalResolverInformation, guild: Guild, client: MusicClient) => Promise<any>)
 }
 
 interface MusicEvents extends oceanic.ClientEvents {
-    "m_interactionCreate": [interaction: oceanic.CommandInteraction, resolvers: resolver[], guild: Guild, client: MusicClient];
+    "m_interactionCreate": [interaction: oceanic.CommandInteraction, resolvers: internalResolverInformation, guild: Guild, client: MusicClient];
 }
 
 export default class MusicClient extends Client {
@@ -54,6 +60,12 @@ export default class MusicClient extends Client {
     };
     public commands: Collection<string, Command>;
     private addons: addon[] = [];
+    private resolvers: internalResolverInformation = {
+        songResolvers: [],
+        songDataResolvers: [],
+        playlistResolvers: []
+    }
+    private addonCommands: command[] = [];
     private rawCommands: Command[];
     constructor(options: ClientOptions) {
         super(options);
@@ -74,10 +86,19 @@ export default class MusicClient extends Client {
     }
 
     registerAddons() {
-
+        for (const addon of this.addons) {
+            if (addon.type == "songResolver") 
+                for (const resolver of addon.resolvers) this.resolvers.songResolvers.push(resolver);
+            else if (addon.type == "command") 
+                for (const command of addon.commands) this.addonCommands.push(command);
+            else if (addon.type == "songDataResolver")
+                for (const songResolver of addon.dataResolvers) this.resolvers.songDataResolvers.push(songResolver);
+            else if (addon.type == "playlistDataResolver")
+                for (const playlistResolver of addon.playlistResolvers) this.resolvers.playlistResolvers.push(playlistResolver);
+        }
     }
 
-    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, resolvers: resolver[], guild: Guild, client: MusicClient) => any) {
+    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, resolvers: internalResolverInformation, guild: Guild, client: MusicClient) => any) {
         const command = new builders.ApplicationCommandBuilder(1, name);
         for (const option of options) command.addOption(option);
         command.setDescription(description);
@@ -115,7 +136,7 @@ export default class MusicClient extends Client {
         if (event == "m_interactionCreate") {
             super.on("interactionCreate", (interaction) => 
                 // @ts-ignore
-                listener(interaction as oceanic.CommandInteraction, this.m_guilds[interaction.guildID as string], this)
+                listener(interaction as oceanic.CommandInteraction, this.resolvers, this.m_guilds[interaction.guildID as string], this)
             )
         }
         else {
@@ -129,7 +150,7 @@ export default class MusicClient extends Client {
         if (event == "m_interactionCreate") {
             super.off("interactionCreate", (interaction) => 
             // @ts-ignore
-                listener(interaction as oceanic.CommandInteraction, this.m_guilds[interaction.guildID as string], this)
+                listener(interaction as oceanic.CommandInteraction, this.resolvers, this.m_guilds[interaction.guildID as string], this)
             )
         }
         else {
