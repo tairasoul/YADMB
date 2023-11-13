@@ -11,6 +11,10 @@ if you want a different, probably more stable music bot, check out [jagrosh's mu
 
 installing addons is as simple as putting their provided file or folder into dist/addons, and making sure the bot runs correctly!
 
+# addon docs
+
+addon docs can be found [here](https://github.com/tairasoul/YADMB/blob/main/addon-docs.md)
+
 # how to use
 
 simply install all the required packages, change your-token to your bot's token in config.json, and run node dist/bot
@@ -62,7 +66,3 @@ Changelog has been moved to [changelog.md](https://github.com/tairasoul/YADMB/bl
 - view a snapshot of the queue
 
 - make addons if you want support for other services
-
-# addon docs
-
-addon docs can be found [here](https://github.com/tairasoul/YADMB/blob/main/addon-docs.md)
