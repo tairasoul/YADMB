@@ -1,3 +1,3 @@
-import { AddonInfo } from "../addonLoader.js";
+import { AddonInfo } from "../../addonLoader.js";
 declare const addon: AddonInfo;
 export default addon;
