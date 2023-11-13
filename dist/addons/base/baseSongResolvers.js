@@ -28,6 +28,9 @@ const addon = {
     credits: "tairasoul",
     version: "1.0.0",
     type: "songDataResolver",
+    sources: [
+        "https://github.com/tairasoul/YADMB/blob/main/rework/addons/base/baseSongResolvers.ts"
+    ],
     dataResolvers: [
         {
             name: "base",

@@ -60,7 +60,7 @@ export default class MusicClient extends Client {
         [id: string]: Guild
     };
     public commands: Collection<string, Command>;
-    private addons: AddonInfo[] = [];
+    public readonly addons: AddonInfo[] = [];
     private resolvers: ResolverInformation = {
         songResolvers: [],
         songDataResolvers: [],

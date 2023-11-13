@@ -42,7 +42,7 @@ export default class MusicClient extends Client {
         [id: string]: Guild;
     };
     commands: Collection<string, Command>;
-    private addons;
+    readonly addons: AddonInfo[];
     private resolvers;
     private addonCommands;
     private rawCommands;

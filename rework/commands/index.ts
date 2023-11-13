@@ -18,6 +18,7 @@ import shuffle from "./shuffle.js";
 import skipPlaylist from "./skip-playlist.js";
 import skipSong from "./skip-song.js";
 import updatePlaylist from "./update-playlist.js";
+import viewAddons from "./view-addons.js";
 import viewQueue from "./view-queue.js";
 
 export default [
@@ -41,5 +42,6 @@ export default [
     skipPlaylist,
     skipSong,
     updatePlaylist,
+    viewAddons,
     viewQueue
 ];
