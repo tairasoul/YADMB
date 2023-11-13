@@ -1,4 +1,6 @@
 import fs from "fs";
+import * as oceanic from "oceanic.js";
+import { Guild, default as MusicClient } from "./client.js";
 
 export type resolver = {
     name: string;
@@ -14,6 +16,13 @@ export type patch = {
 
     } | undefined;
     name: string;
+}
+
+export type command = {
+    name: string;
+    description: string;
+    options: oceanic.ApplicationCommandOptions[];
+    callback: (interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => any;
 }
 
 export type addon = {
@@ -34,6 +43,15 @@ export type addon = {
     patches: patch[];
     private?: boolean;
     type: "patch";
+} | {
+    name: string;
+    description: string;
+    version: string;
+    sources?: string[];
+    credits: string;
+    commands: command[];
+    private?: boolean;
+    type: "command";
 }
 
 export default class addonLoader {
