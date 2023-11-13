@@ -24,17 +24,17 @@ export type Guild = {
     id: string;
     leaveTimer: NodeJS.Timeout | null;
 };
-type internalResolverInformation = {
+export type ResolverInformation = {
     songResolvers: resolver[];
     songDataResolvers: dataResolver[];
     playlistResolvers: playlistResolver[];
 };
 export type Command = {
     data: builders.ApplicationCommandBuilder;
-    execute: ((interaction: oceanic.CommandInteraction, resolvers: internalResolverInformation, guild: Guild, client: MusicClient) => Promise<any>);
+    execute: ((interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => Promise<any>);
 };
 interface MusicEvents extends oceanic.ClientEvents {
-    "m_interactionCreate": [interaction: oceanic.CommandInteraction, resolvers: internalResolverInformation, guild: Guild, client: MusicClient];
+    "m_interactionCreate": [interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient];
 }
 export default class MusicClient extends Client {
     m_guilds: {
@@ -48,7 +48,7 @@ export default class MusicClient extends Client {
     constructor(options: ClientOptions);
     addAddon(addon: addon): void;
     registerAddons(): void;
-    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, resolvers: internalResolverInformation, guild: Guild, client: MusicClient) => any): void;
+    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => any): void;
     registerCommands(): Promise<void>;
     on<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this;
     off<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this;

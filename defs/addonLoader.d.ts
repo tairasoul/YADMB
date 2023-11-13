@@ -3,7 +3,7 @@ import { Guild, default as MusicClient } from "./client.js";
 export type resolver = {
     name: string;
     regexMatches: RegExp[];
-    resolve: (url: string) => Promise<string>;
+    resolve: (url: string) => Promise<string | undefined>;
 };
 export type songData = {
     title: string;
@@ -11,7 +11,7 @@ export type songData = {
 };
 export type playlistData = {
     title: string;
-    songs: songData[];
+    items: songData[];
 };
 export type dataResolver = {
     name: string;

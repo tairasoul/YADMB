@@ -19,37 +19,55 @@ export default {
             type: 5
         }
     ],
-    callback: async (interaction, guild) => {
+    callback: async (interaction, resolvers, guild) => {
         await interaction.defer();
         const playlist = interaction.data.options.getString("playlist", true);
         const shuffle = interaction.data.options.getBoolean("shuffle");
+        let videos = undefined;
         if (!ytpl.validateID(playlist)) {
+            const resolver = resolvers.playlistResolvers.find((resolver) => resolver.regexMatches.find((reg) => reg.test(playlist)));
+            if (resolver == undefined) {
+                const embed = new builders.EmbedBuilder();
+                embed.setDescription("Invalid playlist link.");
+                await interaction.editOriginal({ embeds: [embed.toJSON()] });
+            }
+            else {
+                const resolved = await resolver.resolve(playlist);
+                videos = resolved;
+            }
+        }
+        else {
+            // @ts-ignore
+            videos = await ytpl(playlist);
+        }
+        if (videos == undefined) {
             const embed = new builders.EmbedBuilder();
             embed.setDescription("Invalid playlist link.");
             await interaction.editOriginal({ embeds: [embed.toJSON()] });
         }
-        const videos = await ytpl(playlist);
-        const added_playlist = {
-            trackNumber: 0,
-            tracks: [],
-            type: "playlist",
-            name: videos.title
-        };
-        for (const video of videos.items) {
-            const obj = {
-                name: video.title,
-                url: video.url
+        else {
+            const added_playlist = {
+                trackNumber: 0,
+                tracks: [],
+                type: "playlist",
+                name: videos.title
             };
-            added_playlist.tracks.push(obj);
+            for (const video of videos.items) {
+                const obj = {
+                    name: video.title,
+                    url: video.url
+                };
+                added_playlist.tracks.push(obj);
+            }
+            if (shuffle)
+                utils.shuffleArray(added_playlist.tracks);
+            const embed = new builders.EmbedBuilder();
+            embed.setDescription(`Added **${videos.items.length} tracks** to the queue as a playlist.`);
+            const queue = guild.queue;
+            queue.tracks.push(added_playlist);
+            if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection)
+                await queue.play();
+            await interaction.editOriginal({ embeds: [embed.toJSON()] });
         }
-        if (shuffle)
-            utils.shuffleArray(added_playlist.tracks);
-        const embed = new builders.EmbedBuilder();
-        embed.setDescription(`Added **${videos.items.length} tracks** to the queue as a playlist.`);
-        const queue = guild.queue;
-        queue.tracks.push(added_playlist);
-        if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection)
-            await queue.play();
-        await interaction.editOriginal({ embeds: [embed.toJSON()] });
     }
 };
