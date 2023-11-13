@@ -1,3 +1,3 @@
-import { addon } from "../addonLoader.js";
-declare const TestAddon: addon;
-export default TestAddon;
+import { AddonInfo } from "../addonLoader.js";
+declare const addon: AddonInfo;
+export default addon;

@@ -29,7 +29,7 @@ export type command = {
     options: oceanic.ApplicationCommandOptions[];
     callback: (interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => any;
 };
-export type addon = {
+export type AddonInfo = {
     name: string;
     description: string;
     version: string;
@@ -68,7 +68,7 @@ export type addon = {
 };
 export default class addonLoader {
     private addonPath;
-    addons: addon[];
+    addons: AddonInfo[];
     constructor(addonPath: string);
     readAddons(): Promise<void>;
 }
