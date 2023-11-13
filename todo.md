@@ -19,12 +19,20 @@
   - and it wont take as much time to do view-queue
 
 - partial code rewrites
-    - rewrite 2
-      - make more util functions (or maybe just more classes) to handle more things
-      - for example, paging. paging is currently mostly done by the command itself, only having some functions generate pages for it.
-      - paging may be done easier if it's mapped internally instead of within just the command.
+  - rewrite 2
+    - make more util functions (or maybe just more classes) to handle more things
+    - for example, paging. paging is currently mostly done by the command itself, only having some functions generate pages for it.
+    - paging may be done easier if it's mapped internally instead of within just the command.
 
 # in progress
+
+- addons
+  - i had an idea very suddenly and it seems interesting so im working on it
+  - basically, a way to create custom addons, alongside patching some of my own methods and adding commands.
+  - this may be difficult as i have NO clue how to do it but fuck it we ball
+  - idk how useful this'll be but fuck it
+  - the idea is to make it so you don't have to depend on me or a fork of my bot to add support for a platform
+  - instead, if you have coding experience you can just make an addon and add it in
 
 # finished + comments
 
