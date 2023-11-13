@@ -1,4 +1,4 @@
-# discord-music-bot
+# Yet Another Discord Music Bot
 a music bot because i got bored and made one
 
 started in december 2022, this is one of the projects i've been working on the longest.
@@ -27,7 +27,7 @@ download discord-music-bot-installer-linux if on linux, otherwise discord-music-
 
 # Changelog
 
-Changelog has been moved to [changelog.md](https://github.com/tairasoul/discord-music-bot/blob/main/changelog.md)
+Changelog has been moved to [changelog.md](https://github.com/tairasoul/YADMB/blob/main/changelog.md)
 
 # features
 
