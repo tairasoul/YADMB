@@ -56,3 +56,9 @@ Changelog has been moved to [changelog.md](https://github.com/tairasoul/YADMB/bl
 - skip individual songs or an entire playlist
 
 - view a snapshot of the queue
+
+- make addons if you want support for other services
+
+# addon docs
+
+addon docs can be found [here](https://github.com/tairasoul/YADMB/blob/main/addon-docs.md)
