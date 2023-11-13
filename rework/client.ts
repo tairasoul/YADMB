@@ -7,7 +7,7 @@ import QueueHandler from "./queueSystem.js";
 import voice, { NoSubscriberBehavior, createAudioPlayer } from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
 import util from "node:util"
-import { addon, command, dataResolver, playlistResolver, resolver } from "./addonLoader.js";
+import { AddonInfo, command, dataResolver, playlistResolver, resolver } from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
@@ -59,7 +59,7 @@ export default class MusicClient extends Client {
         [id: string]: Guild
     };
     public commands: Collection<string, Command>;
-    private addons: addon[] = [];
+    private addons: AddonInfo[] = [];
     private resolvers: ResolverInformation = {
         songResolvers: [],
         songDataResolvers: [],
@@ -81,7 +81,7 @@ export default class MusicClient extends Client {
         })
     }
 
-    addAddon(addon: addon) {
+    addAddon(addon: AddonInfo) {
         this.addons.push(addon);
     }
 

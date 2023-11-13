@@ -4,7 +4,7 @@ import { Client, Collection, ClientOptions } from "oceanic.js";
 import QueueHandler from "./queueSystem.js";
 import voice from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
-import { addon, dataResolver, playlistResolver, resolver } from "./addonLoader.js";
+import { AddonInfo, dataResolver, playlistResolver, resolver } from "./addonLoader.js";
 export type track = {
     name: string;
     url: string;
@@ -46,7 +46,7 @@ export default class MusicClient extends Client {
     private addonCommands;
     private rawCommands;
     constructor(options: ClientOptions);
-    addAddon(addon: addon): void;
+    addAddon(addon: AddonInfo): void;
     registerAddons(): void;
     addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => any): void;
     registerCommands(): Promise<void>;

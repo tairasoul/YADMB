@@ -47,7 +47,7 @@ export type command = {
     callback: (interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => any;
 }
 
-export type addon = {
+export type AddonInfo = {
     name: string;
     description: string;
     version: string;
@@ -96,14 +96,14 @@ export type addon = {
 
 export default class addonLoader {
     private addonPath: string;
-    addons: addon[] = [];
+    addons: AddonInfo[] = [];
     constructor(addonPath: string) {
         this.addonPath = addonPath;
     }
 
     async readAddons() {
         for (const addon of fs.readdirSync(this.addonPath)) {
-            const addonInfo: addon = await import(`file://${this.addonPath}/${addon}`).then(m => m.default);
+            const addonInfo: AddonInfo = await import(`file://${this.addonPath}/${addon}`).then(m => m.default);
             this.addons.push(addonInfo);
         }
     }

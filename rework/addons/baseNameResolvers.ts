@@ -1,6 +1,6 @@
-import { addon } from "../addonLoader.js";
+import { AddonInfo } from "../addonLoader.js";
 
-const TestAddon: addon = {
+const addon: AddonInfo = {
     name: "Base Resolvers",
     description: "The base resolvers for DMB.",
     credits: "tairasoul",
@@ -52,4 +52,4 @@ const TestAddon: addon = {
     ]
 }
 
-export default TestAddon;
+export default addon;

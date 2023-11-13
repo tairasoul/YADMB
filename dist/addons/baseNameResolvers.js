@@ -1,4 +1,4 @@
-const TestAddon = {
+const addon = {
     name: "Base Resolvers",
     description: "The base resolvers for DMB.",
     credits: "tairasoul",
@@ -49,4 +49,4 @@ const TestAddon = {
         }
     ]
 };
-export default TestAddon;
+export default addon;
