@@ -1,32 +1,88 @@
 import fs from "fs";
 import * as oceanic from "oceanic.js";
-import { Guild, default as MusicClient } from "./client.js";
+import { Guild, default as MusicClient, ResolverInformation } from "./client.js";
+import path from "path";
+import { AudioResource } from "@discordjs/voice";
 
 export type resolver = {
+    /**
+     * Name of the resolver.
+     */
     name: string;
+    /**
+     * RegEx patterns that can be used internally or to identify if this resolver should be used.
+     */
     regexMatches: RegExp[];
+    /**
+     * Function that resolves the URL into something like "youtube" or something more specific if necessary.
+     */
     resolve: (url: string) => Promise<string | undefined>;
 }
 
+export type AudioResolver = {
+    /**
+     * Name of the resolver.
+     */
+    name: string;
+    /**
+     * RegEx patterns that can be used internally or to identify if this resolver should be used.
+     */
+    regexMatches: RegExp[];
+    /**
+     * Function that turns a song URL into an audio resource from @discordjs/voice
+     */
+    resolve: (url: string) => Promise<AudioResource | undefined>;
+}
+
 export type songData = {
+    /**
+     * Title of song.
+     */
     title: string;
+    /**
+     * Url of song.
+     */
     url: string;
 }
 
 export type playlistData = {
+    /**
+     * Title of playlist.
+     */
     title: string;
+    /**
+     * Items in playlist.
+     */
     items: songData[];
 }
 
 export type dataResolver = {
+    /**
+     * Name of the resolver.
+     */
     name: string;
+    /**
+     * RegEx patterns that can be used internally or to identify if this resolver should be used.
+     */
     regexMatches: RegExp[];
+    /**
+     * Function that resolves the URL into song data.
+     */
     resolve: (url: string) => Promise<songData>;
 }
 
 export type playlistResolver = {
+    /**
+     * Name of the resolver.
+     */
     name: string;
+    /**
+     * RegEx patterns that can be used internally or to identify if this resolver should be used.
+     */
     regexMatches: RegExp[];
+    /**
+     * Function that resolves the URL into playlist data.
+     */
     resolve: (url: string) => Promise<playlistData>;
 }
 
@@ -41,57 +97,194 @@ export type playlistResolver = {
 }*/
 
 export type command = {
+    /**
+     * Name of command.
+     */
     name: string;
+    /**
+     * Description of command.
+     */
     description: string;
+    /**
+     * The command options.
+     */
     options: oceanic.ApplicationCommandOptions[];
-    callback: (interaction: oceanic.CommandInteraction, guild: Guild, client: MusicClient) => any;
+    /**
+     * Callback for this command.
+     */
+    callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => any;
 }
 
 export type AddonInfo = {
+    /**
+     * The name of your addon.
+     */
     name: string;
+    /**
+     * Description of your addon.
+     */
     description: string;
+    /**
+     * Addon version.
+     */
     version: string;
+    /**
+     * Where can other people find the source of this addon?
+     */
     sources?: string[];
+    /**
+     * Credits for this addon.
+     */
     credits: string;
+    /**
+     * Song resolvers.
+     */
     resolvers: resolver[];
+    /**
+     * Is this addon private?
+     * Addons will not be shown when the user checks addons through /view-addons if it is.
+     */
     private?: boolean;
+    /**
+     * A provider resolver.
+     */
     type: "songResolver";
-}/* | {
+} | {
+    /**
+     * The name of your addon.
+     */
     name: string;
+    /**
+     * Description of your addon.
+     */
     description: string;
+    /**
+     * Addon version.
+     */
     version: string;
+    /**
+     * Where can other people find the source of this addon?
+     */
     sources?: string[];
+    /**
+     * Credits for this addon.
+     */
     credits: string;
-    patches: patch[];
-    private?: boolean;
-    type: "patch";
-}*/ | {
-    name: string;
-    description: string;
-    version: string;
-    sources?: string[];
-    credits: string;
+    /**
+     * Commands this addon adds.
+     */
     commands: command[];
+    /**
+     * Is this addon private?
+     * Addons will not be shown when the user checks addons through /view-addons if it is.
+     */
     private?: boolean;
+    /**
+     * An addon that adds its own commands.
+     */
     type: "command";
 } | {
+    /**
+     * The name of your addon.
+     */
     name: string;
+    /**
+     * Description of your addon.
+     */
     description: string;
+    /**
+     * Addon version.
+     */
     version: string;
+    /**
+     * Where can other people find the source of this addon?
+     */
     sources?: string[];
+    /**
+     * Credits for this addon.
+     */
     credits: string;
+    /**
+     * List of song data resolvers.
+     */
     dataResolvers: dataResolver[];
+    /**
+     * Is this addon private?
+     * Addons will not be shown when the user checks addons through /view-addons if it is.
+     */
     private?: boolean;
+    /**
+     * An addon that resolves song data into something usable.
+     */
     type: "songDataResolver";
 } | {
+    /**
+     * The name of your addon.
+     */
     name: string;
+    /**
+     * Description of your addon.
+     */
     description: string;
+    /**
+     * Addon version.
+     */
     version: string;
+    /**
+     * Where can other people find the source of this addon?
+     */
     sources?: string[];
+    /**
+     * Credits for this addon.
+     */
     credits: string;
+    /**
+     * List of playlist resolvers.
+     */
     playlistResolvers: playlistResolver[];
+    /**
+     * Is this addon private?
+     * Addons will not be shown when the user checks addons through /view-addons if it is.
+     */
     private?: boolean;
+    /**
+     * An addon that resolves playlists into usable data.
+     */
     type: "playlistDataResolver";
+} | {
+    /**
+     * The name of your addon.
+     */
+    name: string;
+    /**
+     * Description of your addon.
+     */
+    description: string;
+    /**
+     * Addon version.
+     */
+    version: string;
+    /**
+     * Where can other people find the source of this addon?
+     */
+    sources?: string[];
+    /**
+     * Credits for this addon.
+     */
+    credits: string;
+    /**
+     * List of playlist resolvers.
+     */
+    playlistResolvers: AudioResolver[];
+    /**
+     * Is this addon private?
+     * Addons will not be shown when the user checks addons through /view-addons if it is.
+     */
+    private?: boolean;
+    /**
+     * An addon that resolves a song URL into an Audio Resource
+     */
+    type: "audioResourceResolver";
 }
 
 export default class addonLoader {
@@ -102,12 +295,21 @@ export default class addonLoader {
     }
 
     async readAddons(addonPath: string) {
+        const exclusions: string[] = ["exclusions.json"];
+        if (fs.existsSync(`${addonPath}/exclusions.json`)) {
+            const newExclusions = JSON.parse(fs.readFileSync(`${addonPath}/exclusions.json`, 'utf8'));
+            for (const exclusion of newExclusions) exclusions.push(exclusion);
+        }
+        console.log(`exclusions found for ${path.basename(addonPath)}: ${exclusions.join(", ")}`)
         for (const addon of fs.readdirSync(addonPath)) {
+            if (exclusions.includes(addon)) continue;
             console.log(`reading addon ${addon}`);
+            // if addon is dir, re-call readAddons for addonPath/addon
             if (fs.statSync(`${addonPath}/${addon}`).isDirectory()) {
                 console.log(`addon ${addon} is dir, reading from all files in ${addon}`)
                 await this.readAddons(`${addonPath}/${addon}`);
             }
+            // else, continue as normal with importing addon.
             else {
                 const addonInfo: AddonInfo | AddonInfo[] = await import(`file://${addonPath}/${addon}`).then(m => m.default);
                 if (addonInfo instanceof Array) {
