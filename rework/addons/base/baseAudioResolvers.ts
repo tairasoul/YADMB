@@ -5,7 +5,7 @@ import utils from "../../utils.js";
 
 const addon: AddonInfo = {
     name: "Base Audio Resolvers",
-    description: "The base audio resolvers for DMB.",
+    description: "The base audio resolvers for YADMB.",
     credits: "tairasoul",
     version: "1.0.0",
     type: "audioResourceResolver",

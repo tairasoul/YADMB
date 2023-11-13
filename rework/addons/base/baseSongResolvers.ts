@@ -26,7 +26,7 @@ function getProvider(url: string) {
 
 const addon: AddonInfo = {
     name: "Base Song Data Resolvers",
-    description: "The base song data resolvers for DMB.",
+    description: "The base song data resolvers for YADMB.",
     credits: "tairasoul",
     version: "1.0.0",
     type: "songDataResolver",

@@ -3,7 +3,7 @@ import { createAudioResource } from "@discordjs/voice";
 import utils from "../../utils.js";
 const addon = {
     name: "Base Audio Resolvers",
-    description: "The base audio resolvers for DMB.",
+    description: "The base audio resolvers for YADMB.",
     credits: "tairasoul",
     version: "1.0.0",
     type: "audioResourceResolver",
