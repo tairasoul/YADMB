@@ -12,7 +12,9 @@ An addon looks something like [this base addon](https://github.com/tairasoul/YAD
 
 ## Addon types
 
-You have 4 types of addons:
+You have 5 types of addons:
+
+- Custom commands
 
 - Audio resolvers
 
@@ -49,3 +51,11 @@ The URL should be playable through one of the audio resolvers, otherwise an erro
 ### Playlist data resolvers
 
 Playlist data resolvers resolve a playlist URL into a table, containing an array called items that contains all the song data, and the title of the playlist.
+
+## Commands
+
+Commands are simple / commands, that work the same as the built in commands.
+
+They get the same parameters and have the same capabilities.
+
+You can take a look at any command in the rework/commands folder to see how one should be structured.
