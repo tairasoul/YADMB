@@ -7,6 +7,9 @@ const addon = {
     credits: "tairasoul",
     version: "1.0.0",
     type: "audioResourceResolver",
+    sources: [
+        "https://github.com/tairasoul/YADMB/blob/main/rework/addons/base/baseAudioResolvers.ts"
+    ],
     resourceResolvers: [
         {
             name: "baseResolvers",

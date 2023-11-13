@@ -3,6 +3,9 @@ const addon = {
     description: "The base resolvers for DMB.",
     credits: "tairasoul",
     version: "1.0.0",
+    sources: [
+        "https://github.com/tairasoul/YADMB/blob/main/rework/addons/base/baseNameResolvers.ts"
+    ],
     type: "songResolver",
     resolvers: [
         {
