@@ -1,5 +1,5 @@
 import * as oceanic from "oceanic.js";
-import { Guild, queuedTrack } from "../client.js";
+import { Guild, ResolverInformation, queuedTrack } from "../client.js";
 import * as builders from "@oceanicjs/builders"
 import ytdl from "@distube/ytdl-core";
 import playdl from "play-dl";

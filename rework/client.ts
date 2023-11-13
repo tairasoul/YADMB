@@ -39,7 +39,7 @@ export type Guild = {
     leaveTimer: NodeJS.Timeout | null;
 }
 
-type internalResolverInformation = {
+export type ResolverInformation = {
     songResolvers: resolver[];
     songDataResolvers: dataResolver[];
     playlistResolvers: playlistResolver[];
@@ -47,11 +47,11 @@ type internalResolverInformation = {
 
 export type Command = {
     data: builders.ApplicationCommandBuilder, 
-    execute: ((interaction: oceanic.CommandInteraction, resolvers: internalResolverInformation, guild: Guild, client: MusicClient) => Promise<any>)
+    execute: ((interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => Promise<any>)
 }
 
 interface MusicEvents extends oceanic.ClientEvents {
-    "m_interactionCreate": [interaction: oceanic.CommandInteraction, resolvers: internalResolverInformation, guild: Guild, client: MusicClient];
+    "m_interactionCreate": [interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient];
 }
 
 export default class MusicClient extends Client {
@@ -60,7 +60,7 @@ export default class MusicClient extends Client {
     };
     public commands: Collection<string, Command>;
     private addons: addon[] = [];
-    private resolvers: internalResolverInformation = {
+    private resolvers: ResolverInformation = {
         songResolvers: [],
         songDataResolvers: [],
         playlistResolvers: []
@@ -98,7 +98,7 @@ export default class MusicClient extends Client {
         }
     }
 
-    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, resolvers: internalResolverInformation, guild: Guild, client: MusicClient) => any) {
+    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => any) {
         const command = new builders.ApplicationCommandBuilder(1, name);
         for (const option of options) command.addOption(option);
         command.setDescription(description);
