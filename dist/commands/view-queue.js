@@ -23,7 +23,7 @@ function embedMessage(text) {
 }
 export default {
     name: "view-queue",
-    description: "View the queue.",
+    description: "View a snapshot of the queue.",
     callback: async (interaction, _resolvers, guild, client) => {
         await interaction.defer(1 << 6);
         await interaction.editOriginal({ embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")], flags: 1 << 6 });
@@ -45,7 +45,6 @@ export default {
         const nextInspectedId = rstring.generate();
         const prevInspectedId = rstring.generate();
         const exitInspectId = rstring.generate();
-        const removeInspectedId = rstring.generate();
         const exportId = rstring.generate();
         const exitId = rstring.generate();
         // setup buttons
@@ -57,7 +56,6 @@ export default {
         const nextInspected = new builders.Button(oceanic.ButtonStyles.PRIMARY, nextInspectedId);
         const prevInspected = new builders.Button(oceanic.ButtonStyles.PRIMARY, prevInspectedId);
         const exitInspect = new builders.Button(oceanic.ButtonStyles.PRIMARY, exitInspectId);
-        const removeInspected = new builders.Button(oceanic.ButtonStyles.PRIMARY, removeInspectedId);
         const exportB = new builders.Button(oceanic.ButtonStyles.PRIMARY, exportId);
         const exit = new builders.Button(oceanic.ButtonStyles.PRIMARY, exitId);
         // setup labels
@@ -69,7 +67,6 @@ export default {
         nextInspected.setLabel("Next song");
         prevInspected.setLabel("Previous song");
         exitInspect.setLabel("Exit inspect mode");
-        removeInspected.setLabel("Remove inspected song");
         exportB.setLabel("Export viewed playlist");
         exit.setLabel("Stop viewing queue");
         // setup action rows
@@ -83,7 +80,7 @@ export default {
                 new builders.ActionRow().addComponents(prevEmbed, exit, nextEmbed).toJSON(),
             ],
             inspected: [
-                new builders.ActionRow().addComponents(removeInspected, exitInspect).toJSON(),
+                new builders.ActionRow().addComponents(exitInspect).toJSON(),
                 new builders.ActionRow().addComponents(prevInspected, nextInspected).toJSON()
             ],
             disabled: {
@@ -96,7 +93,7 @@ export default {
                     new builders.ActionRow().addComponents(prevEmbed.disable(), exit.disable(), nextEmbed.disable()).toJSON()
                 ],
                 inspected: [
-                    new builders.ActionRow().addComponents(removeInspected.disable(), exitInspect.disable()).toJSON(),
+                    new builders.ActionRow().addComponents(exitInspect.disable()).toJSON(),
                     new builders.ActionRow().addComponents(prevInspected.disable(), nextInspected.disable()).toJSON()
                 ],
             }
@@ -111,13 +108,9 @@ export default {
             /** @ts-ignore */
             client.off("interactionCreate", onInspect);
             /** @ts-ignore */
-            client.off("interactionCreate", onShuffle);
-            /** @ts-ignore */
             client.off("interactionCreate", onPlayNext);
             /** @ts-ignore */
             client.off("interactionCreate", onExitInspect);
-            /** @ts-ignore */
-            client.off("interactionCreate", onRemoveInspected);
             /** @ts-ignore */
             client.off("interactionCreate", onExport);
             /** @ts-ignore */
@@ -215,22 +208,6 @@ export default {
             /** @ts-ignore */
             await interaction.editOriginal({ content: "", embeds: current.embed.toJSON(true), components: current.type === "playlist" ? actionRows.playlist : actionRows.song, flags: 1 << 6 });
         };
-        const onRemoveInspected = async (i) => {
-            if (i.data.customID !== removeInspectedId)
-                return;
-            await i.defer();
-            const queueIndexes = {
-                queue: data.queued.pages[currentPage].index,
-                /** @ts-ignore */
-                track: data.tracks.pages[currentInspectPage].index
-            };
-            guild.queue.tracks[queueIndexes.queue].tracks.splice(queueIndexes.track, 1);
-            data.tracks?.pages.splice(currentInspectPage, 1);
-            /** @ts-ignore */
-            const embed = data.tracks.pages[currentInspectPage].embed;
-            /** @ts-ignore */
-            await i.editParent({ content: "", embeds: [embed.toJSON()], components: actionRows.inspected, flags: 1 << 6 });
-        };
         /** @ts-ignore */
         client.on("interactionCreate", onNext);
         /** @ts-ignore */
@@ -241,8 +218,6 @@ export default {
         client.on("interactionCreate", onPlayNext);
         /** @ts-ignore */
         client.on("interactionCreate", onExitInspect);
-        /** @ts-ignore */
-        client.on("interactionCreate", onRemoveInspected);
         /** @ts-ignore */
         client.on("interactionCreate", onExport);
         /** @ts-ignore */

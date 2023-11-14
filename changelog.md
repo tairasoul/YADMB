@@ -1,9 +1,5 @@
 # Changelog for YADMB
 
-Add an addon framework.
+Start relying fully on the base addons for resolving audio, songs and playlists.
 
-This makes it possible to add custom commands or resolvers for audio, name, song and playlist.
-
-This also means you no longer have to rely on me to add support for something, and can instead just make your own addon for it.
-
-Rename repo to YADMB, for Yet Another Discord Music Bot.
+Remove Spotify support, since I'm not fully sure how to add it. (maybe someone can make an addon for it?)

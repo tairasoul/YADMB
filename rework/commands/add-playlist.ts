@@ -28,26 +28,20 @@ export default {
         const playlist = interaction.data.options.getString("playlist", true);
         const shuffle = interaction.data.options.getBoolean("shuffle");
         let videos: playlistData | undefined = undefined;
-        if (!ytpl.validateID(playlist)) {
-            const resolver = resolvers.playlistResolvers.find((resolver) => resolver.regexMatches.find((reg) => reg.test(playlist)));
-            if (resolver == undefined) {
-                const embed = new builders.EmbedBuilder();
-                embed.setDescription("Invalid playlist link.");
-                await interaction.editOriginal({embeds: [embed.toJSON()]});
-            }
-            else {
-                const resolved = await resolver.resolve(playlist);
-                if (typeof resolved == "string") {
-                    const embed = new builders.EmbedBuilder();
-                    embed.setDescription(resolved);
-                    return await interaction.editOriginal({embeds: [embed.toJSON()]});
-                }
-                videos = resolved;
-            }
+        const resolver = resolvers.playlistResolvers.find((resolver) => resolver.regexMatches.find((reg) => reg.test(playlist)));
+        if (resolver == undefined) {
+            const embed = new builders.EmbedBuilder();
+            embed.setDescription("Invalid playlist link.");
+            await interaction.editOriginal({embeds: [embed.toJSON()]});
         }
         else {
-            // @ts-ignore
-            videos = await ytpl(playlist);
+            const resolved = await resolver.resolve(playlist);
+            if (typeof resolved == "string") {
+                const embed = new builders.EmbedBuilder();
+                embed.setDescription(resolved);
+                return await interaction.editOriginal({embeds: [embed.toJSON()]});
+            }
+            videos = resolved;
         }
         if (videos == undefined) {
             const embed = new builders.EmbedBuilder();

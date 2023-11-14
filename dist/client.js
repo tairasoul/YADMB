@@ -69,7 +69,13 @@ export default class MusicClient extends Client {
             this.addCommand(command.name, command.description, command.options, command.callback);
         }
     }
-    addCommand(name, description, options, callback) {
+    async loadCommands() {
+        for (const command of fs.readdirSync(`${__dirname}/commands`)) {
+            const cmd = await import(`file://${__dirname}/commands/${command}`).then(m => m.default);
+            this.addCommand(cmd.name, cmd.description, cmd.options, cmd.callback);
+        }
+    }
+    addCommand(name, description, options = [], callback) {
         const command = new builders.ApplicationCommandBuilder(1, name);
         for (const option of options)
             command.addOption(option);
