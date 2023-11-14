@@ -43,7 +43,7 @@ Changelog has been moved to [changelog.md](https://github.com/tairasoul/YADMB/bl
 
 - you can add an entire playlist or channel
 
-- add songs from youtube, spotify, soundcloud and deezer (not sure how well they will work since im just using default play-dl)
+- add songs from youtube, soundcloud and deezer (not sure how well they will work since im just using default play-dl)
 
 - can create custom playlists
     - these playlists are saved on your pc, with each playlist being its own file formatted as (username).playlist.(playlst name).export.txt, meaning you don't have to rely on the bot to save it in a reliable manner and it works across multiple instances of the bot

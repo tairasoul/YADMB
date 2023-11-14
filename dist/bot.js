@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from 'path';
 import { fileURLToPath } from 'url';
-import commands from "./commands/index.js";
 import MusicClient from './client.js';
 import addonLoader from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
@@ -61,14 +60,18 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         }
     }
 });
-for (const command of commands) {
-    debugLog(`calling client.addCommand("${command.name}", command.options, command.callback)`);
-    // @ts-ignore
-    client.addCommand(command.name, command.description, command.options != undefined ? command.options : [], command.callback);
-}
+client.on('error', (error) => {
+    if (error instanceof Error) {
+        console.log(`uh oh! an error has occured within MusicClient! error message: ${error.message}\nerror name: ${error.name}\nerror stack: ${error.stack || "none"}\nerror cause: ${error.cause || "no cause found"}`);
+    }
+    else {
+        console.log(`uh oh! an error has occured within MusicClient! error is ${error}`);
+    }
+});
 client.on("ready", async () => {
     await loader.readAddons(addonPath);
     loader.loadAddons();
+    await client.loadCommands();
     loader.registerAddons();
     client.registerAddonCommands();
     for (const guild of client.guilds.values()) {
@@ -91,7 +94,7 @@ client.on("m_interactionCreate", async (interaction, resolvers, guild, m_client)
         if (error)
             console.error(error);
         if (!interaction.acknowledged) {
-            await interaction.createFollowup({ content: `There was an error while executing this command, error is ${error}` });
+            await interaction.createMessage({ content: `There was an error while executing this command, error is ${error}` });
         }
         else
             await interaction.editOriginal({ content: `There was an error while executing this command, error is ${error}` });

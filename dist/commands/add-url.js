@@ -47,7 +47,7 @@ export default {
         await interaction.defer();
         const video = interaction.data.options.getString("link", true);
         const next = interaction.data.options.getBoolean("next");
-        const provider = await resolvers.songResolvers.find(async (resolver) => await resolver.resolve(video))?.resolve(video);
+        const provider = resolvers.songResolvers.find((resolver) => resolver.regexMatches.find((regex) => regex.test(video)));
         if (provider === undefined) {
             const embed = new builders.EmbedBuilder();
             embed.setDescription(`Could not get video/music provider for the link you provided.`);

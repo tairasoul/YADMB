@@ -1,6 +1,6 @@
 const addon = {
-    name: "Base Resolvers",
-    description: "The base resolvers for YADMB.",
+    name: "Base Name Resolvers",
+    description: "The base name resolvers for YADMB.",
     credits: "tairasoul",
     version: "1.0.0",
     sources: [
@@ -11,8 +11,8 @@ const addon = {
         {
             name: "youtube",
             regexMatches: [
-                /https:\/\/(?:music|www)\.youtube\.com\/watch\?v=./,
-                /https:\/\/youtu.be\/watch\?v=./
+                /https:\/\/(?:music|www)\.youtube\.com\/./,
+                /https:\/\/youtu\.be\/./
             ],
             async resolve(url) {
                 if (this.regexMatches.find((reg) => reg.test(url)))
@@ -22,8 +22,8 @@ const addon = {
         {
             name: "soundcloud",
             regexMatches: [
-                /https:\/\/soundcloud.com\/./,
-                /https:\/\/on.soundcloud.com\/./
+                /https:\/\/soundcloud.\com\/./,
+                /https:\/\/on\.soundcloud\.com\/./
             ],
             async resolve(url) {
                 if (this.regexMatches.find((reg) => reg.test(url)))
@@ -33,21 +33,11 @@ const addon = {
         {
             name: "deezer",
             regexMatches: [
-                /https:\/\/deezer.(?:com|.page.link)\/./
+                /https:\/\/deezer\.(?:com|page\.link)\/./
             ],
             async resolve(url) {
                 if (this.regexMatches.find((reg) => reg.test(url)))
                     return "deezer";
-            }
-        },
-        {
-            name: "spotify",
-            regexMatches: [
-                /https:\/\/open.spotify.com\/track\/./
-            ],
-            async resolve(url) {
-                if (this.regexMatches.find((reg) => reg.test(url)))
-                    return "spotify";
             }
         }
     ]

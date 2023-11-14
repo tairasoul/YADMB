@@ -111,7 +111,19 @@ export default class MusicClient extends Client {
         }
     }
 
-    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[], callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => any) {
+    async loadCommands() {
+        for (const command of fs.readdirSync(`${__dirname}/commands`)) {
+            const cmd: {
+                name: string;
+                description: string;
+                options: oceanic.ApplicationCommandOptions[];
+                callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => any;
+            } = await import(`file://${__dirname}/commands/${command}`).then(m => m.default);
+            this.addCommand(cmd.name, cmd.description, cmd.options, cmd.callback);
+        }
+    }
+
+    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[] = [], callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => any) {
         const command = new builders.ApplicationCommandBuilder(1, name);
         for (const option of options) command.addOption(option);
         command.setDescription(description);
