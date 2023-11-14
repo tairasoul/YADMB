@@ -1,6 +1,6 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import MusicClient, { Guild, ResolverInformation } from "../client.js";
+import { Guild, ResolverInformation } from "../client.js";
 import utils from "../utils.js";
 
 function embedMessage(text: string) {

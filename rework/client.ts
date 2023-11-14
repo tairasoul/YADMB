@@ -157,6 +157,20 @@ export default class MusicClient extends Client {
         this.editStatus("online", [{name: (this.guilds.size).toString() + ' servers', type: 3}]);
     }
 
+    /**
+     * Remove commands registered on this application that are unknown to MusicClient.
+     */
+
+    async removeUnknownCommands() {
+        for (const globalCommand of await this.application.getGlobalCommands()) {
+            if (!this.rawCommands.find((cmd) => cmd.data.name == globalCommand.name)) {
+                console.log(`command ${globalCommand.name} was not found in MusicClient.rawCommands, deleting.`)
+                await globalCommand.delete();
+                console.log(`deleted command ${globalCommand.name}`);
+            }
+        }
+    }
+
     on<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this {
         if (event == "m_interactionCreate") {
             super.on("interactionCreate", (interaction) => 

@@ -75,13 +75,16 @@ client.on("ready", async () => {
     loader.registerAddons();
     client.registerAddonCommands();
     for (const guild of client.guilds.values()) {
-        debugLog(`adding guild ${guild.id}`);
+        console.log(`adding guild ${guild.id}`);
         client.addGuild(guild);
     }
-    debugLog("registering commands");
+    console.log("registering commands");
     await client.registerCommands();
+    console.log("removing commands unknown to this client");
+    await client.removeUnknownCommands();
+    console.log("setup done");
 });
-client.on("guildCreate", async (guild) => client.addGuild(guild));
+client.on("guildCreate", (guild) => client.addGuild(guild));
 client.on("guildDelete", (guild) => client.removeGuild(guild));
 client.on("m_interactionCreate", async (interaction, resolvers, guild, m_client) => {
     const command = client.commands.get(interaction.data.name);

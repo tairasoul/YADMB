@@ -1,7 +1,6 @@
 import { Guild, ResolverInformation } from "../client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import utils from "../utils.js"
 import humanize from "humanize-duration";
 
 export default {

@@ -1,7 +1,6 @@
 import * as oceanic from "oceanic.js";
 import { Guild, ResolverInformation, queuedTrack } from "../client.js";
 import * as builders from "@oceanicjs/builders"
-import ytdl from "@distube/ytdl-core";
 import playdl from "play-dl";
 import util from "util";
 import * as voice from "@discordjs/voice";
@@ -23,13 +22,6 @@ playdl.getFreeClientID().then((val) =>
         }
     })
 )
-
-function startsWith(str: string, strings: string[]) {
-    for (const string of strings) {
-        if (str.startsWith(string)) return true;
-    }
-    return false
-}
 
 export default {
     name: "add-url",

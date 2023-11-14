@@ -19,13 +19,6 @@ playdl.getFreeClientID().then((val) => playdl.setToken({
         client_id: val
     }
 }));
-function startsWith(str, strings) {
-    for (const string of strings) {
-        if (str.startsWith(string))
-            return true;
-    }
-    return false;
-}
 export default {
     name: "add-url",
     description: "Add a link to the queue.",
