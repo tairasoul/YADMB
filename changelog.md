@@ -1,5 +1,5 @@
 # Changelog for YADMB
 
-Start relying fully on the base addons for resolving audio, songs and playlists.
+Since addons now can add commands, the bot will now go through all commands registered by it and if it doesn't recognize it (aka the command isn't in the rawCommands array) it will delete it.
 
-Remove Spotify support, since I'm not fully sure how to add it. (maybe someone can make an addon for it?)
+Remove unnecessary imports for multiple files.

@@ -1,7 +1,5 @@
 import * as oceanic from "oceanic.js";
-import * as builders from "@oceanicjs/builders";
 import MusicClient from "../client.js";
-import utils from "../utils.js";
 
 export default {
     name: "view-addons",
@@ -17,7 +15,7 @@ export default {
         }
         await interaction.editOriginal({files: [
             {
-                name: "yadmb.instance.addons.txt",
+                name: `yadmb.instance.${client.user.username}.addons.txt`,
                 contents: new Buffer(fileData)
             }
         ]})

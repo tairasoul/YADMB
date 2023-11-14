@@ -24,6 +24,13 @@
     - for example, paging. paging is currently mostly done by the command itself, only having some functions generate pages for it.
     - paging may be done easier if it's mapped internally instead of within just the command.
 
+- dynamic import system (?)
+  - the idea i have in mind is:
+    - you are making an addon, and need certain npmjs packages
+    - you declare those in a packages.json file, and if the bot doesn't already have that package version or higher installed it'll install it.
+    - if it's a strict version, and you NEED that specific version, it'll install it in the folder the addon is in.
+    - if one of the packages goes unused (not declared in any packages.json file) it'll uninstall it
+
 # in progress
 
 # finished + comments

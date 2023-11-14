@@ -13,7 +13,7 @@ export default {
         }
         await interaction.editOriginal({ files: [
                 {
-                    name: "yadmb.instance.addons.txt",
+                    name: `yadmb.instance.${client.user.username}.addons.txt`,
                     contents: new Buffer(fileData)
                 }
             ] });

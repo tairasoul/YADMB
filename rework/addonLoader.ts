@@ -86,16 +86,6 @@ export type playlistResolver = {
     resolve: (url: string) => Promise<playlistData | string>;
 }
 
-/*export type patch = {
-    prefix: {
-        
-    } | undefined;
-    postfix: {
-
-    } | undefined;
-    name: string;
-}*/
-
 export type command = {
     /**
      * Name of command.
