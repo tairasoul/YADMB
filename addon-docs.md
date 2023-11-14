@@ -2,7 +2,7 @@
 
 First, start by installing yadmb-types from npmjs.
 
-These types are used for autocomplete, but are useful otherwise.
+These types are used for autocomplete.
 
 ## Project setup
 
