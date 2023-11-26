@@ -2,6 +2,7 @@ import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import { Guild, ResolverInformation } from "../client.js";
 import utils from "../utils.js";
+import ResolverUtils from "../resolverUtils.js";
 
 export default {
     name: "shuffle",
@@ -24,7 +25,7 @@ export default {
             ]
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild) => {
         await interaction.defer();
         const shuffleType = interaction.data.options.getString("type", true);
         const queue = guild.queue;

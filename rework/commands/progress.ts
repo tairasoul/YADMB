@@ -2,11 +2,12 @@ import { Guild, ResolverInformation } from "../client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import humanize from "humanize-duration";
+import ResolverUtils from "../resolverUtils.js";
 
 export default {
     name: "progress",
     description: "Get progress of current song (if any).",
-    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverUtils, guild: Guild) => {
         const songTime = guild.queue.currentInfo?.resource?.playbackDuration;
         const progressTime = guild.queue.currentInfo?.songStart;
         const embed = new builders.EmbedBuilder();

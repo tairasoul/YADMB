@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { Base64 as base64 } from "js-base64";
 import playdl, { InfoData } from "play-dl";
 import humanizeDuration from 'humanize-duration';
+import { queuedTrack, track } from './client.js';
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
@@ -167,18 +168,6 @@ export function Pager(pages: PageHolderData) {
         PageClasses.push(new Page(page.embed, page.id, page.index, page.type));
     }
     return new PageHolder(PageClasses);
-}
-
-type track = {
-    name: string;
-    url: string;
-}
-
-type queuedTrack = {
-    type: "playlist" | "song" | "inspectedSong";
-    tracks: track[];
-    trackNumber: number;
-    name: string;
 }
 
 export async function queuedTrackPager(array: queuedTrack[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}) {
@@ -376,7 +365,7 @@ export default {
     Pager,
     queuedTrackPager,
     trackPager,
-    getHighestResUrl,
     pageTrack,
+    getHighestResUrl,
     parseVolumeString
 }

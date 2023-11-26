@@ -9,6 +9,7 @@ import { Base64 as base64} from "js-base64";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
+import ResolverUtils from "../resolverUtils.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
@@ -26,7 +27,7 @@ function embedMessage(text: string) {
 export default {
     name: "view-queue",
     description: "View a snapshot of the queue.",
-    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild, client: MusicClient) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverUtils, guild: Guild, client: MusicClient) => {
         await interaction.defer(1 << 6)
         await interaction.editOriginal({embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")], flags: 1 << 6})
         const data: {queued: PageHolder, tracks: PageHolder | null} = {

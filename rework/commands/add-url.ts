@@ -7,6 +7,7 @@ import * as voice from "@discordjs/voice";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
+import ResolverUtils from "../resolverUtils.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
@@ -40,11 +41,11 @@ export default {
             required: false
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild) => {
         await interaction.defer();
         const video = interaction.data.options.getString("link", true);
         const next = interaction.data.options.getBoolean("next");
-        const provider = resolvers.songResolvers.find((resolver) => resolver.regexMatches.find((regex) => regex.test(video)));
+        const provider = resolvers.findNameResolver(video);
         if (provider === undefined) {
             const embed = new builders.EmbedBuilder();
             embed.setDescription(`Could not get video/music provider for the link you provided.`)
@@ -55,7 +56,7 @@ export default {
             const ct = queue.internalCurrentIndex;
             const nowPlaying = queue.tracks[ct];
             const qt = queue.tracks;
-            const resolver = resolvers.songDataResolvers.find((resolver) => resolver.regexMatches.find((reg) => reg.test(video)));
+            const resolver = resolvers.findSongResolver(video)
             if (resolver) {
                 const song_data = await resolver.resolve(video);
                 if (typeof song_data != "string") {

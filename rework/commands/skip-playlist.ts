@@ -1,11 +1,12 @@
 import { Guild, ResolverInformation } from "../client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
+import ResolverUtils from "../resolverUtils.js";
 
 export default {
     name: "skip-playlist",
     description: "Skip the current playlist.",
-    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverUtils, guild: Guild) => {
         await interaction.defer();
         const embed = new builders.EmbedBuilder();
         const queue = guild.queue;

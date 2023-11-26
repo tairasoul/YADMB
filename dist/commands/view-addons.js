@@ -8,7 +8,7 @@ export default {
         for (const addon of client.addons) {
             if (addon.private == true)
                 continue;
-            const string = `${addon.name} ${addon.version}\n${addon.description}\nCredits: ${addon.credits}${addon.sources ? "\nSources:\n" + addon.sources.join("\n") : ""}\n\n`;
+            const string = `${addon.name} v${addon.version}\n${addon.description}\nCredits: ${addon.credits}${addon.sources ? "\nSources:\n" + addon.sources.join("\n") : ""}\n\n`;
             fileData += string;
         }
         await interaction.editOriginal({ files: [

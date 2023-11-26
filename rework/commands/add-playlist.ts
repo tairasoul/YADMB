@@ -1,10 +1,12 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import { Guild, ResolverInformation, queuedTrack, track } from "../client.js";
-import ytpl from "ytpl";
+import { Guild, queuedTrack, track } from "../client.js";
 import utils from "../utils.js";
 import * as voice from "@discordjs/voice";
 import { playlistData } from "../addonLoader.js";
+import ResolverUtils from "../resolverUtils.js";
+import humanizeDuration from "humanize-duration";
+import playdl from "play-dl";
 
 export default {
     name: "add-playlist",
@@ -23,12 +25,12 @@ export default {
             type: 5
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild) => {
         await interaction.defer();
         const playlist = interaction.data.options.getString("playlist", true);
         const shuffle = interaction.data.options.getBoolean("shuffle");
         let videos: playlistData | undefined = undefined;
-        const resolver = resolvers.playlistResolvers.find((resolver) => resolver.regexMatches.find((reg) => reg.test(playlist)));
+        const resolver = resolvers.findPlaylistResolver(playlist);
         if (resolver == undefined) {
             const embed = new builders.EmbedBuilder();
             embed.setDescription("Invalid playlist link.");

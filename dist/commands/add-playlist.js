@@ -23,7 +23,7 @@ export default {
         const playlist = interaction.data.options.getString("playlist", true);
         const shuffle = interaction.data.options.getBoolean("shuffle");
         let videos = undefined;
-        const resolver = resolvers.playlistResolvers.find((resolver) => resolver.regexMatches.find((reg) => reg.test(playlist)));
+        const resolver = resolvers.findPlaylistResolver(playlist);
         if (resolver == undefined) {
             const embed = new builders.EmbedBuilder();
             embed.setDescription("Invalid playlist link.");

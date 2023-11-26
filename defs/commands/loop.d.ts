@@ -1,5 +1,6 @@
 import * as oceanic from "oceanic.js";
-import { Guild, ResolverInformation } from "../client.js";
+import { Guild } from "../client.js";
+import ResolverUtils from "../resolverUtils.js";
 declare const _default: {
     name: string;
     description: string;
@@ -13,6 +14,6 @@ declare const _default: {
         }[];
         required: boolean;
     }[];
-    callback: (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild) => Promise<void>;
+    callback: (interaction: oceanic.CommandInteraction, _resolvers: ResolverUtils, guild: Guild) => Promise<void>;
 };
 export default _default;

@@ -9,6 +9,7 @@ import fs from "fs";
 import util from "util";
 import path from "path";
 import { fileURLToPath } from 'url';
+import ResolverUtils from "../resolverUtils.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
@@ -46,7 +47,7 @@ export default {
             type: oceanic.ApplicationCommandOptionTypes.BOOLEAN
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => {
         await interaction.defer();
         const term = interaction.data.options.getString('term', true);
         const excludes = [];
@@ -154,12 +155,20 @@ export default {
             const t = queue.tracks[ct];
             if (t.type === "playlist") {
                 const cst = t.trackNumber;
+                const track_embed = new builders.EmbedBuilder();
+                const track_thumbnail = await resolvers.getSongThumbnail(currentVideo.url);
+                track_embed.setTitle(currentVideo.title);
+                if (track_thumbnail) track_embed.setThumbnail(track_thumbnail);
                 t.tracks.splice(cst + 1, 0, {
                     name: currentVideo.title,
                     url: currentVideo.url
                 })
             }
             else {
+                const track_embed = new builders.EmbedBuilder();
+                const track_thumbnail = await resolvers.getSongThumbnail(currentVideo.url);
+                track_embed.setTitle(currentVideo.title);
+                if (track_thumbnail) track_embed.setThumbnail(track_thumbnail);
                 queue.tracks.push(
                     {
                         type: "song",

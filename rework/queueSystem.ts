@@ -1,12 +1,12 @@
-import voice, { createAudioResource } from "@discordjs/voice";
+import voice from "@discordjs/voice";
 import fs from "node:fs"
 import path from 'path';
 import { fileURLToPath } from 'url';
 import util from "node:util";
-import playdl, { InfoData } from "play-dl";
 import utils from "./utils.js"
-import { ResolverInformation } from "./client.js";
+import { queuedTrack, loopType } from "./client.js";
 import { infoData } from "./addonLoader.js";
+import ResolverUtils from "./resolverUtils.js";
 
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
@@ -14,20 +14,6 @@ if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
 
 function debugLog(text: any) {
     if (debug) console.log(text)
-}
-
-type track = {
-    name: string;
-    url: string;
-}
-
-type loopType = "none" | "queue" | "song" | "playlist";
-
-type queuedTrack = {
-    type: "playlist" | "song";
-    tracks: track[];
-    trackNumber: number;
-    name: string;
 }
 
 export default class QueueHandler {
@@ -111,14 +97,14 @@ export default class QueueHandler {
         return this.audioPlayer.unpause();
     }
 
-    async play(resolvers: ResolverInformation) {
+    async play(resolvers: ResolverUtils) {
         const currentInternal = this.tracks[this.internalCurrentIndex];
         debugLog(util.inspect(currentInternal, false, 5, true));
         debugLog(this.internalCurrentIndex);
         debugLog(util.inspect(this.tracks, false, 5, true));
         const track = currentInternal.tracks[currentInternal.trackNumber];
         const currentURL = track.url
-        const resolver = resolvers.audioResourceResolvers.find((resolver) => resolver.regexMatches.find((reg) => reg.test(currentURL)));
+        const resolver = resolvers.findAudioResolver(currentURL);
         if (resolver) {
             const audioResource = await resolver.resolve(currentURL);
             if (audioResource) {

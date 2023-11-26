@@ -40,7 +40,7 @@ export default {
         await interaction.defer();
         const video = interaction.data.options.getString("link", true);
         const next = interaction.data.options.getBoolean("next");
-        const provider = resolvers.songResolvers.find((resolver) => resolver.regexMatches.find((regex) => regex.test(video)));
+        const provider = resolvers.findNameResolver(video);
         if (provider === undefined) {
             const embed = new builders.EmbedBuilder();
             embed.setDescription(`Could not get video/music provider for the link you provided.`);
@@ -51,7 +51,7 @@ export default {
             const ct = queue.internalCurrentIndex;
             const nowPlaying = queue.tracks[ct];
             const qt = queue.tracks;
-            const resolver = resolvers.songDataResolvers.find((resolver) => resolver.regexMatches.find((reg) => reg.test(video)));
+            const resolver = resolvers.findSongResolver(video);
             if (resolver) {
                 const song_data = await resolver.resolve(video);
                 if (typeof song_data != "string") {

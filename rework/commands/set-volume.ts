@@ -2,6 +2,7 @@ import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import { Guild, ResolverInformation } from "../client.js";
 import utils from "../utils.js";
+import ResolverUtils from "../resolverUtils.js";
 
 function embedMessage(text: string) {
     const embed = new builders.EmbedBuilder();
@@ -20,7 +21,7 @@ export default {
             description: "The volume to set to. Can contain a percent (ex. 50%) or a decimal number (ex. 1.2)."
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation,  guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverUtils,  guild: Guild) => {
         const volume = interaction.data.options.getString("volume", true);
         const characterRegex = /^[0-9%.]*$/g;
         if (characterRegex.test(volume)) {

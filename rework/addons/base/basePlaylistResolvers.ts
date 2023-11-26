@@ -1,5 +1,5 @@
 import { AddonInfo, playlistData } from "../../addonLoader.js";
-import playdl, { DeezerAlbum, DeezerPlaylist, SoundCloudPlaylist, SoundCloudTrack, SpotifyAlbum, SpotifyPlaylist } from "play-dl";
+import playdl, { DeezerAlbum, DeezerPlaylist, SoundCloudPlaylist } from "play-dl";
 
 function getProvider(url: string) {
     // no clue if these are all, please open an issue if they are not
@@ -31,7 +31,8 @@ const addon: AddonInfo = {
                 const prov = getProvider(url);
                 const returnVal: playlistData = {
                     title: "temp",
-                    items: []
+                    items: [],
+                    url: url
                 }
                 switch(prov) {
                     case "deezer":

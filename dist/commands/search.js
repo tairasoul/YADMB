@@ -157,12 +157,22 @@ export default {
             const t = queue.tracks[ct];
             if (t.type === "playlist") {
                 const cst = t.trackNumber;
+                const track_embed = new builders.EmbedBuilder();
+                const track_thumbnail = await resolvers.getSongThumbnail(currentVideo.url);
+                track_embed.setTitle(currentVideo.title);
+                if (track_thumbnail)
+                    track_embed.setThumbnail(track_thumbnail);
                 t.tracks.splice(cst + 1, 0, {
                     name: currentVideo.title,
                     url: currentVideo.url
                 });
             }
             else {
+                const track_embed = new builders.EmbedBuilder();
+                const track_thumbnail = await resolvers.getSongThumbnail(currentVideo.url);
+                track_embed.setTitle(currentVideo.title);
+                if (track_thumbnail)
+                    track_embed.setThumbnail(track_thumbnail);
                 queue.tracks.push({
                     type: "song",
                     trackNumber: 0,

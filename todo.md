@@ -2,27 +2,14 @@
 
 - add capability to filter with regex to add-playlist and add-search
   - won't be too hard as then i just have to add an optional argument
- 
+
 - add more view-queue options
   - for example, making it so you can import a playlist and concat it with a viewed playlist
   - moving a song around the queue
   - exporting playlist
   - others (suggest in issues)
- 
+
 - add optional DJ role (if specified, only that role can use commands)
-
-- rewrite the commands that use pages, so the PageHolder class is ACTUALLY used
-  - currently bot.ts handles the paging instead of just.. using the functions
- 
-- instead of paging at command execute time, page when a song is added and add some embeds for each song if playlist
-  - this means live-updating view-queue will be easier
-  - and it wont take as much time to do view-queue
-
-- partial code rewrites
-  - rewrite 2
-    - make more util functions (or maybe just more classes) to handle more things
-    - for example, paging. paging is currently mostly done by the command itself, only having some functions generate pages for it.
-    - paging may be done easier if it's mapped internally instead of within just the command.
 
 - dynamic import system (?)
   - the idea i have in mind is:
@@ -30,6 +17,25 @@
     - you declare those in a packages.json file, and if the bot doesn't already have that package version or higher installed it'll install it.
     - if it's a strict version, and you NEED that specific version, it'll install it in the folder the addon is in.
     - if one of the packages goes unused (not declared in any packages.json file) it'll uninstall it
+
+- partial code rewrites
+  - rewrite 2
+    - make more util functions (or maybe just more classes) to handle more things
+    - for example, paging. paging is currently mostly done by the command itself, only having some functions generate pages for it.
+    - paging may be done easier if it's mapped internally instead of within just the command.
+
+- rewrite the commands that use pages, so the PageHolder class is ACTUALLY used
+  - currently bot.ts handles the paging instead of just.. using the functions
+
+- instead of paging at command execute time, page when a song is added and add some embeds for each song if playlist
+  - ~~this means live-updating view-queue will be easier~~ it's just a snapshot now so
+  - and it wont take as much time to do view-queue
+
+- update utils.ts
+  - what to update:
+    - pager functions
+    - they all assume that the track is a youtube track.
+    - this means that it will error sometimes if it isn't a youtube track
 
 # in progress
 
@@ -42,7 +48,7 @@
   - idk how useful this'll be but fuck it
   - the idea is to make it so you don't have to depend on me or a fork of my bot to add support for a platform
   - instead, if you have coding experience you can just make an addon and add it in
- 
+
 - partial code rewrites
   - rewrite 1
     - instead of having A LOT of things handled in bot.ts, move some things over to seperate classes
@@ -78,7 +84,7 @@
 
 - fix the issue where it sometimes just stops the current song and plays the next one
   - need to add support for soundcloud and spotify next
- 
+
 - make it so you can skip a whole playlist or just a single song
   - reworked music system but it introduced a few bugs, those will be fixed
 
@@ -102,7 +108,7 @@
 
 - hopefully increase the speed of add-playlist
   - no longer tells you every song added, was very unnecessary
- 
+
 - rewrite
   - done rewriting
   - old code had parts from 7 months ago and i wanted to change up the queue system a lil bit
@@ -111,8 +117,3 @@
 
 - change libraries from ytdl to use [youtube-stream-url](https://www.npmjs.com/package/youtube-stream-url)
   - the resulting url doesn't work
-
-# known issues + potential fixes
-
-- sometmies doesn't properly connect to VC, causing you to have to do /join again
-  - after joining, check if it properly connected, if not retry
