@@ -7,6 +7,10 @@ if you encounter any problems or have any suggestions, open an issue.
 
 if you want a different, probably more stable music bot, check out [jagrosh's music bot](https://github.com/jagrosh/MusicBot)
 
+also, turns out there's another bot called [YADMB](https://github.com/TheTipo01/YADMB) made by [TheTipo01](https://github.com/TheTipo01) and made with GO instead of ts.
+
+go check it out!
+
 # installing addons
 
 installing addons is as simple as putting their provided file or folder into dist/addons, and making sure the bot runs correctly!
