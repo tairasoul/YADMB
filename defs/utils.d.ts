@@ -4,6 +4,7 @@ import * as oceanic from 'oceanic.js';
 import { Client } from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 import { InfoData } from "play-dl";
+import { queuedTrack, track } from './client.js';
 export declare function getHighestResUrl(data: InfoData): string;
 export declare function SelectMenu(options: Array<{
     name: string;
@@ -46,16 +47,6 @@ export interface PageHolderData {
     pages: PageData[];
 }
 export declare function Pager(pages: PageHolderData): PageHolder;
-type track = {
-    name: string;
-    url: string;
-};
-type queuedTrack = {
-    type: "playlist" | "song" | "inspectedSong";
-    tracks: track[];
-    trackNumber: number;
-    name: string;
-};
 export declare function queuedTrackPager(array: queuedTrack[], callback?: (title: string) => Promise<void>): Promise<PageHolder>;
 export type volumeMode = "percent" | "whole number";
 export declare function parseVolumeString(volume: string): number;
@@ -80,8 +71,8 @@ declare const _default: {
     Pager: typeof Pager;
     queuedTrackPager: typeof queuedTrackPager;
     trackPager: typeof trackPager;
-    getHighestResUrl: typeof getHighestResUrl;
     pageTrack: typeof pageTrack;
+    getHighestResUrl: typeof getHighestResUrl;
     parseVolumeString: typeof parseVolumeString;
 };
 export default _default;

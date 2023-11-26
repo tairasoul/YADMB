@@ -1,17 +1,7 @@
 import voice from "@discordjs/voice";
-import { ResolverInformation } from "./client.js";
+import { queuedTrack, loopType } from "./client.js";
 import { infoData } from "./addonLoader.js";
-type track = {
-    name: string;
-    url: string;
-};
-type loopType = "none" | "queue" | "song" | "playlist";
-type queuedTrack = {
-    type: "playlist" | "song";
-    tracks: track[];
-    trackNumber: number;
-    name: string;
-};
+import ResolverUtils from "./resolverUtils.js";
 export default class QueueHandler {
     tracks: queuedTrack[];
     private internalLoop;
@@ -29,10 +19,9 @@ export default class QueueHandler {
     setVolume(volumeString: string): void;
     get loopType(): loopType;
     get volume(): string;
-    nextTrack(): track | null | undefined;
-    skip(): Promise<track | null | undefined>;
+    nextTrack(): import("./client.js").track | null | undefined;
+    skip(): Promise<import("./client.js").track | null | undefined>;
     pause(): boolean;
     resume(): boolean;
-    play(resolvers: ResolverInformation): Promise<void>;
+    play(resolvers: ResolverUtils): Promise<void>;
 }
-export {};

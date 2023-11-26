@@ -330,7 +330,7 @@ export default {
     Pager,
     queuedTrackPager,
     trackPager,
-    getHighestResUrl,
     pageTrack,
+    getHighestResUrl,
     parseVolumeString
 };

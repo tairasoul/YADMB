@@ -8,6 +8,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
 import utils from "../utils.js";
+import ResolverUtils from "../resolverUtils.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
@@ -42,9 +43,11 @@ export default {
             description: "Name of the playlist."
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => {
         await interaction.defer(1 << 6);
         const name = interaction.data.options.getString("playlist-name", true);
+        const playlist_embed = new builders.EmbedBuilder();
+        playlist_embed.setTitle(name);
         const data: queuedTrack = {
             type: "playlist",
             name: name,
@@ -241,11 +244,11 @@ export default {
             if (int.data.customID !== modalId) return;
             if (!int.acknowledged) await int.defer(1 << 6);
             const video = int.data.components[0].components[0].value as string;
-            const provider = await resolvers.songResolvers.find(async (resolver) => await resolver.resolve(video))?.resolve(video);
+            const provider = resolvers.findNameResolver(video);
             if (provider == undefined) {
                 return int.editOriginal({embeds: [embedMessage("Invalid song link.")], flags: 1 << 6});
             }
-            const dataResolver = resolvers.songDataResolvers.find((resolver) => resolver.regexMatches.find((resolver) => resolver.test(video)));
+            const dataResolver = resolvers.findSongResolver(video);
             if (dataResolver) {
                 const vdata = await dataResolver.resolve(video);
                 if (typeof vdata != "string") {

@@ -6,6 +6,7 @@ import * as voice from "@discordjs/voice";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
+import ResolverUtils from "../resolverUtils.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
@@ -25,7 +26,7 @@ export default {
             required: true
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild) => {
         await interaction.defer()
         const queue = guild.queue;
         const encoded = interaction.data.options.getAttachment("encoded", true);

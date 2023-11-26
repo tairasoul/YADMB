@@ -1,11 +1,11 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import { Guild, ResolverInformation } from "../client";
+import { Guild } from "../client";
 
 export default {
     name: "pause",
     description: "Pause current track.",
-    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: any, guild: Guild) => {
         const queue = guild.queue;
         if (queue.currentInfo) {
             queue.pause();

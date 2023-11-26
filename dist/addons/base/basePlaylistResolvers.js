@@ -31,7 +31,8 @@ const addon = {
                 const prov = getProvider(url);
                 const returnVal = {
                     title: "temp",
-                    items: []
+                    items: [],
+                    url: url
                 };
                 switch (prov) {
                     case "deezer":

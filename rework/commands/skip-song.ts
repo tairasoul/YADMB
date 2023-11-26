@@ -1,11 +1,12 @@
 import { Guild, ResolverInformation } from "../client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
+import ResolverUtils from "../resolverUtils.js";
 
 export default {
     name: "skip-song",
     description: "Skip the current song.",
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild) => {
         const queue = guild.queue;
         const embed = new builders.EmbedBuilder();
         if (queue.currentInfo) {

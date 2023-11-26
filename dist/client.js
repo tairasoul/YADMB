@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import ResolverUtils from "./resolverUtils.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Client, Collection } from "oceanic.js";
@@ -22,7 +23,9 @@ export default class MusicClient extends Client {
         songResolvers: [],
         songDataResolvers: [],
         playlistResolvers: [],
-        audioResourceResolvers: []
+        audioResourceResolvers: [],
+        songThumbnailResolvers: [],
+        playlistThumbnailResolvers: []
     };
     addonCommands = [];
     rawCommands;
@@ -60,6 +63,12 @@ export default class MusicClient extends Client {
             else if (addon.type == "audioResourceResolver")
                 for (const audioResolver of addon.resourceResolvers)
                     this.resolvers.audioResourceResolvers.push(audioResolver);
+            else if (addon.type == "songThumbnailResolver")
+                for (const thumbnailResolver of addon.thumbnailResolvers)
+                    this.resolvers.songThumbnailResolvers.push(thumbnailResolver);
+            else if (addon.type == "playlistThumbnailResolver")
+                for (const thumbnailResolver of addon.thumbnailResolvers)
+                    this.resolvers.playlistThumbnailResolvers.push(thumbnailResolver);
         }
     }
     registerAddonCommands() {
@@ -124,7 +133,7 @@ export default class MusicClient extends Client {
         if (event == "m_interactionCreate") {
             super.on("interactionCreate", (interaction) => 
             // @ts-ignore
-            listener(interaction, this.resolvers, this.m_guilds[interaction.guildID], this));
+            listener(interaction, new ResolverUtils(this.resolvers), this.m_guilds[interaction.guildID], this));
         }
         else {
             // @ts-ignore
@@ -136,7 +145,7 @@ export default class MusicClient extends Client {
         if (event == "m_interactionCreate") {
             super.off("interactionCreate", (interaction) => 
             // @ts-ignore
-            listener(interaction, this.resolvers, this.m_guilds[interaction.guildID], this));
+            listener(interaction, new ResolverUtils(this.resolvers), this.m_guilds[interaction.guildID], this));
         }
         else {
             // @ts-ignore
@@ -167,7 +176,7 @@ export default class MusicClient extends Client {
                 if (cg.queue.nextTrack() != null) {
                     debugLog(util.inspect(cg.queue.tracks, false, 3, true));
                     debugLog(cg.queue.internalCurrentIndex);
-                    cg.queue.play(this.resolvers);
+                    cg.queue.play(new ResolverUtils(this.resolvers));
                 }
                 else {
                     cg.queue.currentInfo = null;

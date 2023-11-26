@@ -2,11 +2,12 @@ import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import MusicClient, { Guild, ResolverInformation } from "../client.js";
 import * as voice from "@discordjs/voice";
+import ResolverUtils from "../resolverUtils.js";
 
 export default {
     name: "join",
     description: "Join a VC and start playing tracks if available.",
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => {
         await interaction.defer();
         if (interaction.member?.voiceState?.channelID) {
             if (guild.connection) {

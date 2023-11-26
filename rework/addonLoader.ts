@@ -54,6 +54,10 @@ export type playlistData = {
      * Items in playlist.
      */
     items: songData[];
+    /**
+     * Url of playlist. Used for resolving thumbnails.
+     */
+    url: string;
 }
 
 export type dataResolver = {
@@ -86,6 +90,17 @@ export type playlistResolver = {
     resolve: (url: string) => Promise<playlistData | string>;
 }
 
+export type thumbnailResolver = {
+    /**
+     * Name of the resolver.
+     */
+    name: string;
+    /**
+     * Function that resolves the URL into a thumnbail URL or undefined (if it can't resolve the url)
+     */
+    resolve: (url: string) => Promise<string | undefined>;
+}
+
 export type command = {
     /**
      * Name of command.
@@ -115,7 +130,7 @@ export type AddonInfo = {
      */
     description: string;
     /**
-     * Addon version.
+     * Addon version. Formatted as v{version}
      */
     version: string;
     /**
@@ -149,7 +164,7 @@ export type AddonInfo = {
      */
     description: string;
     /**
-     * Addon version.
+     * Addon version. Formatted as v{version}
      */
     version: string;
     /**
@@ -183,7 +198,7 @@ export type AddonInfo = {
      */
     description: string;
     /**
-     * Addon version.
+     * Addon version. Formatted as v{version}
      */
     version: string;
     /**
@@ -217,7 +232,7 @@ export type AddonInfo = {
      */
     description: string;
     /**
-     * Addon version.
+     * Addon version. Formatted as v{version}
      */
     version: string;
     /**
@@ -251,7 +266,7 @@ export type AddonInfo = {
      */
     description: string;
     /**
-     * Addon version.
+     * Addon version. Formatted as v{version}
      */
     version: string;
     /**
@@ -275,6 +290,74 @@ export type AddonInfo = {
      * An addon that resolves a song URL into an Audio Resource
      */
     type: "audioResourceResolver";
+} | {
+    /**
+     * The name of your addon.
+     */
+    name: string;
+    /**
+     * Description of your addon.
+     */
+    description: string;
+    /**
+     * Addon version. Formatted as v{version}
+     */
+    version: string;
+    /**
+     * Where can other people find the source of this addon?
+     */
+    sources?: string[];
+    /**
+     * Credits for this addon.
+     */
+    credits: string;
+    /**
+     * List of thumbnail resolvers.
+     */
+    thumbnailResolvers: thumbnailResolver[];
+    /**
+     * Is this addon private?
+     * Addons will not be shown when the user checks addons through /view-addons if it is.
+     */
+    private?: boolean;
+    /**
+     * An addon that resolves a song URL into a thumbnail URL.
+     */
+    type: "songThumbnailResolver";
+} | {
+    /**
+     * The name of your addon.
+     */
+    name: string;
+    /**
+     * Description of your addon.
+     */
+    description: string;
+    /**
+     * Addon version. Formatted as v{version}
+     */
+    version: string;
+    /**
+     * Where can other people find the source of this addon?
+     */
+    sources?: string[];
+    /**
+     * Credits for this addon.
+     */
+    credits: string;
+    /**
+     * List of thumbnail resolvers.
+     */
+    thumbnailResolvers: thumbnailResolver[];
+    /**
+     * Is this addon private?
+     * Addons will not be shown when the user checks addons through /view-addons if it is.
+     */
+    private?: boolean;
+    /**
+     * An addon that resolves a song URL into a thumbnail URL.
+     */
+    type: "playlistThumbnailResolver";
 }
 
 export type infoData = {

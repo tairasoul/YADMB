@@ -86,7 +86,7 @@ export default class QueueHandler {
         debugLog(util.inspect(this.tracks, false, 5, true));
         const track = currentInternal.tracks[currentInternal.trackNumber];
         const currentURL = track.url;
-        const resolver = resolvers.audioResourceResolvers.find((resolver) => resolver.regexMatches.find((reg) => reg.test(currentURL)));
+        const resolver = resolvers.findAudioResolver(currentURL);
         if (resolver) {
             const audioResource = await resolver.resolve(currentURL);
             if (audioResource) {

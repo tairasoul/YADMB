@@ -1,5 +1,6 @@
 import * as oceanic from "oceanic.js";
 import fs from "node:fs"
+import ResolverUtils from "./resolverUtils.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Client, Collection, ClientOptions } from "oceanic.js";
@@ -7,7 +8,7 @@ import QueueHandler from "./queueSystem.js";
 import voice, { NoSubscriberBehavior, createAudioPlayer } from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
 import util from "node:util"
-import { AddonInfo, AudioResolver, command, dataResolver, playlistResolver, resolver } from "./addonLoader.js";
+import { AddonInfo, AudioResolver, command, dataResolver, playlistResolver, resolver, thumbnailResolver } from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
@@ -44,15 +45,17 @@ export type ResolverInformation = {
     songDataResolvers: dataResolver[];
     playlistResolvers: playlistResolver[];
     audioResourceResolvers: AudioResolver[];
+    songThumbnailResolvers: thumbnailResolver[];
+    playlistThumbnailResolvers: thumbnailResolver[];
 }
 
 export type Command = {
     data: builders.ApplicationCommandBuilder, 
-    execute: ((interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => Promise<any>)
+    execute: ((interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => Promise<any>)
 }
 
 interface MusicEvents extends oceanic.ClientEvents {
-    "m_interactionCreate": [interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient];
+    "m_interactionCreate": [interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient];
 }
 
 export default class MusicClient extends Client {
@@ -65,7 +68,9 @@ export default class MusicClient extends Client {
         songResolvers: [],
         songDataResolvers: [],
         playlistResolvers: [],
-        audioResourceResolvers: []
+        audioResourceResolvers: [],
+        songThumbnailResolvers: [],
+        playlistThumbnailResolvers: []
     }
     private addonCommands: command[] = [];
     private rawCommands: Command[];
@@ -100,6 +105,10 @@ export default class MusicClient extends Client {
                 for (const playlistResolver of addon.playlistResolvers) this.resolvers.playlistResolvers.push(playlistResolver);
             else if (addon.type == "audioResourceResolver")
                 for (const audioResolver of addon.resourceResolvers) this.resolvers.audioResourceResolvers.push(audioResolver);
+            else if (addon.type == "songThumbnailResolver")
+                for (const thumbnailResolver of addon.thumbnailResolvers) this.resolvers.songThumbnailResolvers.push(thumbnailResolver);
+            else if (addon.type == "playlistThumbnailResolver")
+                for (const thumbnailResolver of addon.thumbnailResolvers) this.resolvers.playlistThumbnailResolvers.push(thumbnailResolver);
         }
     }
 
@@ -117,13 +126,13 @@ export default class MusicClient extends Client {
                 name: string;
                 description: string;
                 options: oceanic.ApplicationCommandOptions[];
-                callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => any;
+                callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => any;
             } = await import(`file://${__dirname}/commands/${command}`).then(m => m.default);
             this.addCommand(cmd.name, cmd.description, cmd.options, cmd.callback);
         }
     }
 
-    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[] = [], callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => any) {
+    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[] = [], callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => any) {
         const command = new builders.ApplicationCommandBuilder(1, name);
         for (const option of options) command.addOption(option);
         command.setDescription(description);
@@ -175,7 +184,7 @@ export default class MusicClient extends Client {
         if (event == "m_interactionCreate") {
             super.on("interactionCreate", (interaction) => 
                 // @ts-ignore
-                listener(interaction as oceanic.CommandInteraction, this.resolvers, this.m_guilds[interaction.guildID as string], this)
+                listener(interaction as oceanic.CommandInteraction, new ResolverUtils(this.resolvers), this.m_guilds[interaction.guildID as string], this)
             )
         }
         else {
@@ -189,7 +198,7 @@ export default class MusicClient extends Client {
         if (event == "m_interactionCreate") {
             super.off("interactionCreate", (interaction) => 
             // @ts-ignore
-                listener(interaction as oceanic.CommandInteraction, this.resolvers, this.m_guilds[interaction.guildID as string], this)
+                listener(interaction as oceanic.CommandInteraction, new ResolverUtils(this.resolvers), this.m_guilds[interaction.guildID as string], this)
             )
         }
         else {
@@ -225,7 +234,7 @@ export default class MusicClient extends Client {
                 if (cg.queue.nextTrack() != null) {
                     debugLog(util.inspect(cg.queue.tracks, false, 3, true))
                     debugLog(cg.queue.internalCurrentIndex)
-                    cg.queue.play(this.resolvers);
+                    cg.queue.play(new ResolverUtils(this.resolvers));
                 }
                 else {
                     cg.queue.currentInfo = null;

@@ -240,11 +240,11 @@ export default {
             if (!int.acknowledged)
                 await int.defer(1 << 6);
             const video = int.data.components[0].components[0].value;
-            const provider = await resolvers.songResolvers.find(async (resolver) => await resolver.resolve(video))?.resolve(video);
+            const provider = resolvers.findNameResolver(video);
             if (provider == undefined) {
                 return int.editOriginal({ embeds: [embedMessage("Invalid song link.")], flags: 1 << 6 });
             }
-            const dataResolver = resolvers.songDataResolvers.find((resolver) => resolver.regexMatches.find((resolver) => resolver.test(video)));
+            const dataResolver = resolvers.findSongResolver(video);
             if (dataResolver) {
                 const vdata = await dataResolver.resolve(video);
                 if (typeof vdata != "string") {
