@@ -1,7 +1,5 @@
-import { AddonInfo } from "../../addonLoader.js";
+import { AddonInfo } from "../../../dist/addonLoader.js";
 import playdl from "play-dl";
-import { createAudioResource } from "@discordjs/voice";
-import utils from "../../utils.js";
 import ytdl from "@distube/ytdl-core";
 
 function getProvider(url: string) {

@@ -403,7 +403,8 @@ export default class addonLoader {
     private _client;
     private addons;
     constructor(client: MusicClient);
-    readAddons(addonPath: string): Promise<void>;
+    readAddons(): Promise<void>;
+    private readAddonFolder;
     loadAddons(): void;
     registerAddons(): void;
 }

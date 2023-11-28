@@ -1,4 +1,4 @@
-import { AddonInfo, playlistData } from "../../addonLoader.js";
+import { AddonInfo, playlistData } from "../../../dist/addonLoader.js";
 import playdl, { DeezerAlbum, DeezerPlaylist, SoundCloudPlaylist } from "play-dl";
 
 function getProvider(url: string) {

@@ -1,9 +1,7 @@
-import { AddonInfo } from "../../addonLoader.js";
-import playdl, { SoundCloudStream, SoundCloudTrack } from "play-dl";
+import playdl from "play-dl";
 import { createAudioResource } from "@discordjs/voice";
-import utils from "../../utils.js";
-
-const addon: AddonInfo = {
+import utils from "../../../dist/utils.js";
+const addon = {
     name: "Base Audio Resolvers",
     description: "The base audio resolvers for YADMB.",
     credits: "tairasoul",
@@ -17,12 +15,12 @@ const addon: AddonInfo = {
             name: "youtube-resolver",
             priority: 0,
             async available(url) {
-                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=./,/https:\/\/youtu\.be\/watch\?v=./].find((reg) => reg.test(url)) != undefined;
+                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=./, /https:\/\/youtu\.be\/watch\?v=./].find((reg) => reg.test(url)) != undefined;
             },
             async resolve(url) {
                 const info = await playdl.video_info(url);
                 const stream = await playdl.stream_from_info(info);
-                const resource = createAudioResource<any>(stream.stream, {
+                const resource = createAudioResource(stream.stream, {
                     inlineVolume: true,
                     inputType: stream.type
                 });
@@ -35,19 +33,19 @@ const addon: AddonInfo = {
                         views: info.video_details.views.toString(),
                         highestResUrl: utils.getHighestResUrl(info)
                     }
-                }
+                };
             }
         },
         {
             name: "soundcloud-resolver",
             async available(url) {
-                return [/https:\/\/soundcloud\.com\/./,/https:\/\/on\.soundcloud\.com\/./].find((reg) => reg.test(url)) != undefined;
+                return [/https:\/\/soundcloud\.com\/./, /https:\/\/on\.soundcloud\.com\/./].find((reg) => reg.test(url)) != undefined;
             },
             priority: 0,
             async resolve(url) {
-                const so = await playdl.soundcloud(url) as SoundCloudTrack;
-                const stream = await playdl.stream(url) as SoundCloudStream;
-                const resource = createAudioResource<any>(stream.stream, {
+                const so = await playdl.soundcloud(url);
+                const stream = await playdl.stream(url);
+                const resource = createAudioResource(stream.stream, {
                     inlineVolume: true,
                     inputType: stream.type
                 });
@@ -60,10 +58,9 @@ const addon: AddonInfo = {
                         views: "Views are not available for SoundCloud.",
                         highestResUrl: so.thumbnail
                     }
-                }
+                };
             }
         }
     ]
-}
-
+};
 export default addon;
