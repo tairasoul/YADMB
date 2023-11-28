@@ -1,13 +1,12 @@
 # Changelog for YADMB
 
-Addons can now declare two extra resolver-specific fields/methods.
+A few changes here.
 
-They can now declare an async available() function, taking in a URL as an argument and returning a boolean.
+First, I have moved all addons into the addons folder, making it easier to access.
 
-If this is true, it can be used for said URL.
+Second, defs for the important parts are now in dist/ aswell.
 
-They can also declare a priority field.
+Third, exclusions now work with sub-folders. This means adding src/* will actually exclude the entire src folder and not fail to exclude it.
+This means you can also exclude specific files within a folder, say dist/dontInclude.js
 
-The higher it is, the earlier on it'll be tried.
-
-The lower, the later.
+There shouldn't be much you have to change about an install.

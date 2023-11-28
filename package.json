@@ -20,6 +20,6 @@
     "@types/randomstring": "^1.1.8"
   },
   "scripts": {
-    "build": "rm -r dist && rm -r defs && tsc"
+    "build": "rm -r dist && tsc && cd addons/base && tsc && cd ../../dist/commands && rm *.d.ts"
   }
 }

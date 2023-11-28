@@ -13,7 +13,7 @@ go check it out!
 
 # installing addons
 
-installing addons is as simple as putting their provided file or folder into dist/addons, and making sure the bot runs correctly!
+installing addons is as simple as putting their provided file or folder into the addons folder, and making sure the bot runs correctly!
 
 # addon docs
 

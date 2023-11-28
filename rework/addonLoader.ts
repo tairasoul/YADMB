@@ -1,8 +1,10 @@
 import fs from "fs";
 import * as oceanic from "oceanic.js";
+import { fileURLToPath } from 'url';
 import { Guild, default as MusicClient, ResolverInformation } from "./client.js";
 import path from "path";
 import { AudioResource } from "@discordjs/voice";
+const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 
 export type resolver = {
     /**
@@ -409,6 +411,19 @@ export type infoData = {
     durationInMs: number;
 }
 
+function isExcluded(filePath: string, exclusionList: string[]) {
+    return exclusionList.some(exclusion => {
+      if (exclusion.endsWith("*")) {
+        const prefix = exclusion.slice(0, -1); // Remove the trailing *
+        return filePath.startsWith(prefix);
+      } else if (exclusion.startsWith("*")) {
+        const suffix = exclusion.slice(1); // Remove the leading *
+        return filePath.endsWith(suffix);
+      }
+      return filePath === exclusion; // Exact match
+    });
+  }
+
 export default class addonLoader {
     private _client: MusicClient;
     private addons: AddonInfo[] = [];
@@ -416,24 +431,17 @@ export default class addonLoader {
         this._client = client;
     }
 
-    async readAddons(addonPath: string) {
-        const exclusions: string[] = ["exclusions.json", "node_modules", "package.json", "package-lock.json"];
-        if (fs.existsSync(`${addonPath}/exclusions.json`)) {
-            const newExclusions = JSON.parse(fs.readFileSync(`${addonPath}/exclusions.json`, 'utf8'));
-            for (const exclusion of newExclusions) exclusions.push(exclusion);
-        }
-        console.log(`exclusions found for ${path.basename(addonPath)}: ${exclusions.join(", ")}`)
-        for (const addon of fs.readdirSync(addonPath)) {
-            if (exclusions.includes(addon)) continue;
+    async readAddons() {
+        for (const addon of fs.readdirSync(path.join(`${__dirname}`, "..", "addons"))) {
             console.log(`reading addon ${addon}`);
             // if addon is dir, re-call readAddons for addonPath/addon
-            if (fs.statSync(`${addonPath}/${addon}`).isDirectory()) {
+            if (fs.statSync(`${path.join(`${__dirname}`, "..", "addons")}/${addon}`).isDirectory()) {
                 console.log(`addon ${addon} is dir, reading from all files in ${addon}`)
-                await this.readAddons(`${addonPath}/${addon}`);
+                await this.readAddonFolder(`${path.join(`${__dirname}`, "..", "addons")}/${addon}`);
             }
             // else, continue as normal with importing addon.
             else {
-                const addonInfo: AddonInfo | AddonInfo[] = await import(`file://${addonPath}/${addon}`).then(m => m.default);
+                const addonInfo: AddonInfo | AddonInfo[] = await import(`file://${path.join(`${__dirname}`, "..", "addons")}/${addon}`).then(m => m.default);
                 if (addonInfo instanceof Array) {
                     console.log(`addon ${addon} has multiple addons, iterating.`)
                     addonInfo.forEach((saddon) => {
@@ -444,6 +452,31 @@ export default class addonLoader {
                 else this.addons.push(addonInfo);
             }
             console.log(`addon ${addon} has been read`);
+        }
+    }
+
+    private async readAddonFolder(addonPath: string) {
+        const exclusions: string[] = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json"];
+        if (fs.existsSync(`${addonPath}/exclusions.json`)) {
+            const newExclusions = JSON.parse(fs.readFileSync(`${addonPath}/exclusions.json`, 'utf8'));
+            for (const exclusion of newExclusions) exclusions.push(exclusion.replace(/\//g, "\\"));
+        }
+        console.log(`exclusions for ${addonPath}: ${exclusions.join(" ")}`)
+        // for some reason node's types don't include the recursive option??
+        // @ts-ignore
+        for (const pathname of fs.readdirSync(addonPath, {recursive: true})) {
+            if (!isExcluded(pathname, exclusions) && fs.statSync(`${addonPath}/${pathname}`).isFile()) {
+                const addonInfo: AddonInfo | AddonInfo[] = await import(`file://${addonPath}/${pathname}`).then(m => m.default);
+                if (addonInfo instanceof Array) {
+                    console.log(`addon ${path.basename(`${addonPath}/${pathname}`)} has multiple addons, iterating.`)
+                    addonInfo.forEach((saddon) => {
+                        console.log(`reading addon ${saddon.name} from ${pathname}`);
+                        this.addons.push(saddon);
+                    })
+                }
+                else this.addons.push(addonInfo);
+            }
+            if (isExcluded(pathname, exclusions)) console.log(`${pathname} is excluded, skipping.`)
         }
     }
 

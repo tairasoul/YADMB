@@ -6,7 +6,7 @@ These types are used for autocomplete.
 
 ## Project setup
 
-The only files you actually need will be a .ts file, however if you plan to use custom libs within your addon, make an exclusions.json in the root and add the name of the lib folders or files in as an array.
+The only files you actually need will be a .ts file, however if you plan to use custom libs within your addon, make an exclusions.json in the root and add the path of the files.
 
 An addon looks something like [this base addon](https://github.com/tairasoul/YADMB/blob/main/rework/addons/base/baseNameResolvers.ts) used for resolving providers.
 
