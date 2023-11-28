@@ -1,5 +1,13 @@
 # Changelog for YADMB
 
-Since addons now can add commands, the bot will now go through all commands registered by it and if it doesn't recognize it (aka the command isn't in the rawCommands array) it will delete it.
+Addons can now declare two extra resolver-specific fields/methods.
 
-Remove unnecessary imports for multiple files.
+They can now declare an async available() function, taking in a URL as an argument and returning a boolean.
+
+If this is true, it can be used for said URL.
+
+They can also declare a priority field.
+
+The higher it is, the earlier on it'll be tried.
+
+The lower, the later.
