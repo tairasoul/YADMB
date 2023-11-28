@@ -86,19 +86,27 @@ export default class QueueHandler {
         debugLog(util.inspect(this.tracks, false, 5, true));
         const track = currentInternal.tracks[currentInternal.trackNumber];
         const currentURL = track.url;
-        const resolver = resolvers.findAudioResolver(currentURL);
-        if (resolver) {
-            const audioResource = await resolver.resolve(currentURL);
-            if (audioResource) {
-                audioResource.resource.volume?.setVolume(utils.parseVolumeString(this.volumeString));
-                this.audioPlayer.play(audioResource.resource);
-                this.currentInfo = {
-                    name: track.name,
-                    resource: audioResource.resource,
-                    songStart: audioResource.info.durationInMs,
-                    info: audioResource.info
-                };
+        const audioResolvers = await resolvers.getAudioResolvers(currentURL);
+        let audioResource;
+        for (const resolver of audioResolvers) {
+            const output = await resolver.resolve(currentURL);
+            if (output) {
+                audioResource = output;
+                break;
             }
+        }
+        if (audioResource) {
+            audioResource.resource.volume?.setVolume(utils.parseVolumeString(this.volumeString));
+            this.audioPlayer.play(audioResource.resource);
+            this.currentInfo = {
+                name: track.name,
+                resource: audioResource.resource,
+                songStart: audioResource.info.durationInMs,
+                info: audioResource.info
+            };
+        }
+        else {
+            throw new Error("No audio resolver could resolve url " + currentURL);
         }
     }
 }

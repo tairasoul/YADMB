@@ -20,13 +20,10 @@ const addon = {
     playlistResolvers: [
         {
             name: "base",
-            regexMatches: [
-                /https:\/\/(?:music|www)\.youtube\.com\/watch\?v=./,
-                /https:\/\/youtu\.be\/watch\?v=./,
-                /https:\/\/soundcloud\.com\/./,
-                /https:\/\/on\.soundcloud\.com\/./,
-                /https:\/\/deezer\.(?:com|page\.link)\/./
-            ],
+            async available(url) {
+                return [/https:\/\/(?:music|www)\.youtube\.com\/(?:watch\?v|playlist?list)=./, /https:\/\/youtu\.be\/(?:watch\?v|playlist?list)v=./, /https:\/\/soundcloud\.com\/./, /https:\/\/on\.soundcloud\.com\/./, /https:\/\/deezer\.(?:com|page\.link)\/./].find((reg) => reg.test(url)) != undefined;
+            },
+            priority: 0,
             async resolve(url) {
                 const prov = getProvider(url);
                 const returnVal = {

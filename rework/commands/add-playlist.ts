@@ -30,20 +30,25 @@ export default {
         const playlist = interaction.data.options.getString("playlist", true);
         const shuffle = interaction.data.options.getBoolean("shuffle");
         let videos: playlistData | undefined = undefined;
-        const resolver = resolvers.findPlaylistResolver(playlist);
-        if (resolver == undefined) {
+        const p_resolvers = await (await resolvers.getPlaylistResolvers(playlist));
+        if (p_resolvers.length == 0) {
             const embed = new builders.EmbedBuilder();
             embed.setDescription("Invalid playlist link.");
             await interaction.editOriginal({embeds: [embed.toJSON()]});
         }
         else {
-            const resolved = await resolver.resolve(playlist);
-            if (typeof resolved == "string") {
-                const embed = new builders.EmbedBuilder();
-                embed.setDescription(resolved);
-                return await interaction.editOriginal({embeds: [embed.toJSON()]});
+            for (const resolver of p_resolvers) {
+                const resolved = await resolver.resolve(playlist);
+                if (typeof resolved == "string") {
+                    const embed = new builders.EmbedBuilder();
+                    embed.setDescription(resolved);
+                    return await interaction.editOriginal({embeds: [embed.toJSON()]});
+                }
+                else {
+                    videos = resolved;
+                    break;
+                }
             }
-            videos = resolved;
         }
         if (videos == undefined) {
             const embed = new builders.EmbedBuilder();

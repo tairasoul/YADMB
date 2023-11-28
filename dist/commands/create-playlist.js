@@ -245,32 +245,41 @@ export default {
             if (!int.acknowledged)
                 await int.defer(1 << 6);
             const video = int.data.components[0].components[0].value;
-            const provider = resolvers.findNameResolver(video);
+            const nameProviders = await resolvers.getNameResolvers(video);
+            let provider;
+            for (const prov of nameProviders) {
+                if (await prov.resolve(video)) {
+                    provider = await prov.resolve(video);
+                    break;
+                }
+            }
             if (provider == undefined) {
                 return int.editOriginal({ embeds: [embedMessage("Invalid song link.")], flags: 1 << 6 });
             }
-            const dataResolver = resolvers.findSongResolver(video);
+            const dataResolvers = await resolvers.getSongResolvers(video);
+            let dataResolver;
+            for (const resolver of dataResolvers) {
+                const output = await resolver.resolve(video);
+                if (output && typeof output != "string") {
+                    dataResolver = output;
+                    break;
+                }
+            }
             if (dataResolver) {
-                const vdata = await dataResolver.resolve(video);
-                if (typeof vdata != "string") {
-                    const add = {
-                        name: vdata.title,
-                        url: vdata.url
-                    };
-                    data.tracks.push(add);
-                    // @ts-ignore
-                    const pagedd = await utils.pageTrack(add);
-                    pagedd.index = paged.length;
-                    pagedd.embed.addField("index", pagedd.index.toString(), true);
-                    paged.push(pagedd);
-                    const embed = new builders.EmbedBuilder();
-                    embed.setDescription(`Added **${vdata.title}** to custom playlist.`);
-                    await int.editOriginal({ embeds: [embed.toJSON()], flags: 1 << 6 });
-                    resolve();
-                }
-                else {
-                    await int.editOriginal({ embeds: [embedMessage(vdata)] });
-                }
+                const add = {
+                    name: dataResolver.title,
+                    url: dataResolver.url
+                };
+                data.tracks.push(add);
+                // @ts-ignore
+                const pagedd = await utils.pageTrack(add);
+                pagedd.index = paged.length;
+                pagedd.embed.addField("index", pagedd.index.toString(), true);
+                paged.push(pagedd);
+                const embed = new builders.EmbedBuilder();
+                embed.setDescription(`Added **${dataResolver.title}** to custom playlist.`);
+                await int.editOriginal({ embeds: [embed.toJSON()], flags: 1 << 6 });
+                resolve();
             }
             else {
                 await int.editOriginal({ embeds: [embedMessage(`No resolver found for provider ${provider}.`)] });

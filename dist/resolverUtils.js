@@ -3,29 +3,37 @@ export default class ResolverUtils {
     constructor(resolverInfo) {
         this.resolvers = resolverInfo;
     }
-    findAudioResolver(url) {
+    async getAudioResolvers(url) {
+        const resolvers = [];
         for (const resolver of this.resolvers.audioResourceResolvers) {
-            if (resolver.regexMatches.find((reg) => reg.test(url)))
-                return resolver;
+            if (await resolver.available(url))
+                resolvers.push(resolver);
         }
+        return resolvers.sort((a, b) => b.priority - a.priority);
     }
-    findPlaylistResolver(url) {
+    async getPlaylistResolvers(url) {
+        const resolvers = [];
         for (const resolver of this.resolvers.playlistResolvers) {
-            if (resolver.regexMatches.find((reg) => reg.test(url)))
-                return resolver;
+            if (await resolver.available(url))
+                resolvers.push(resolver);
         }
+        return resolvers.sort((a, b) => b.priority - a.priority);
     }
-    findNameResolver(url) {
+    async getNameResolvers(url) {
+        const resolvers = [];
         for (const resolver of this.resolvers.songResolvers) {
-            if (resolver.regexMatches.find((reg) => reg.test(url)))
-                return resolver;
+            if (await resolver.available(url))
+                resolvers.push(resolver);
         }
+        return resolvers.sort((a, b) => b.priority - a.priority);
     }
-    findSongResolver(url) {
+    async getSongResolvers(url) {
+        const resolvers = [];
         for (const resolver of this.resolvers.songDataResolvers) {
-            if (resolver.regexMatches.find((reg) => reg.test(url)))
-                return resolver;
+            if (await resolver.available(url))
+                resolvers.push(resolver);
         }
+        return resolvers.sort((a, b) => b.priority - a.priority);
     }
     async getSongThumbnail(url) {
         for (const resolver of this.resolvers.songThumbnailResolvers) {
@@ -34,7 +42,7 @@ export default class ResolverUtils {
                 return resolved;
             }
         }
-        return undefined;
+        return;
     }
     async getPlaylistThumbnail(url) {
         for (const resolver of this.resolvers.playlistThumbnailResolvers) {
@@ -43,6 +51,6 @@ export default class ResolverUtils {
                 return resolved;
             }
         }
-        return undefined;
+        return;
     }
 }

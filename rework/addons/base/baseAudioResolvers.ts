@@ -15,10 +15,10 @@ const addon: AddonInfo = {
     resourceResolvers: [
         {
             name: "youtube-resolver",
-            regexMatches: [
-                /https:\/\/(?:music|www)\.youtube\.com\/watch\?v=./,
-                /https:\/\/youtu\.be\/watch\?v=./
-            ],
+            priority: 0,
+            async available(url) {
+                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=./,/https:\/\/youtu\.be\/watch\?v=./].find((reg) => reg.test(url)) != undefined;
+            },
             async resolve(url) {
                 const info = await playdl.video_info(url);
                 const stream = await playdl.stream_from_info(info);
@@ -40,10 +40,10 @@ const addon: AddonInfo = {
         },
         {
             name: "soundcloud-resolver",
-            regexMatches: [
-                /https:\/\/soundcloud\.com\/./,
-                /https:\/\/on\.soundcloud\.com\/./
-            ],
+            async available(url) {
+                return [/https:\/\/soundcloud\.com\/./,/https:\/\/on\.soundcloud\.com\/./].find((reg) => reg.test(url)) != undefined;
+            },
+            priority: 0,
             async resolve(url) {
                 const so = await playdl.soundcloud(url) as SoundCloudTrack;
                 const stream = await playdl.stream(url) as SoundCloudStream;
