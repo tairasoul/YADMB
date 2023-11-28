@@ -1,34 +1,43 @@
+import { AudioResource } from "@discordjs/voice";
 import { AudioResolver, dataResolver, playlistResolver, resolver } from "./addonLoader";
 import { ResolverInformation } from "./client.js";
 
 export default class ResolverUtils {
-    private resolvers: ResolverInformation;
+    public resolvers: ResolverInformation;
     constructor(resolverInfo: ResolverInformation) {
         this.resolvers = resolverInfo;
     }
 
-    findAudioResolver(url: string): AudioResolver | undefined {
+    async getAudioResolvers(url: string): Promise<AudioResolver[]> {
+        const resolvers: AudioResolver[] = [];
         for (const resolver of this.resolvers.audioResourceResolvers) {
-            if (resolver.regexMatches.find((reg) => reg.test(url))) return resolver;
+            if (await resolver.available(url)) resolvers.push(resolver);
         }
+        return resolvers.sort((a, b) => b.priority - a.priority);
     }
 
-    findPlaylistResolver(url: string): playlistResolver | undefined {
+    async getPlaylistResolvers(url: string): Promise<playlistResolver[]> {
+        const resolvers: playlistResolver[] = [];
         for (const resolver of this.resolvers.playlistResolvers) {
-            if (resolver.regexMatches.find((reg) => reg.test(url))) return resolver;
+            if (await resolver.available(url)) resolvers.push(resolver);
         }
+        return resolvers.sort((a, b) => b.priority - a.priority);
     }
 
-    findNameResolver(url: string): resolver | undefined {
+    async getNameResolvers(url: string): Promise<resolver[]> {
+        const resolvers: resolver[] = [];
         for (const resolver of this.resolvers.songResolvers) {
-            if (resolver.regexMatches.find((reg) => reg.test(url))) return resolver;
+            if (await resolver.available(url)) resolvers.push(resolver);
         }
+        return resolvers.sort((a, b) => b.priority - a.priority);
     }
 
-    findSongResolver(url: string): dataResolver | undefined {
+    async getSongResolvers(url: string): Promise<dataResolver[]> {
+        const resolvers: dataResolver[] = [];
         for (const resolver of this.resolvers.songDataResolvers) {
-            if (resolver.regexMatches.find((reg) => reg.test(url))) return resolver;
+            if (await resolver.available(url)) resolvers.push(resolver);
         }
+        return resolvers.sort((a, b) => b.priority - a.priority);
     }
 
     async getSongThumbnail(url: string): Promise<string | undefined> {
@@ -38,7 +47,7 @@ export default class ResolverUtils {
                 return resolved;
             }
         }
-        return undefined;
+        return;
     }
 
     async getPlaylistThumbnail(url: string): Promise<string | undefined> {
@@ -48,6 +57,6 @@ export default class ResolverUtils {
                 return resolved;
             }
         }
-        return undefined;
+        return;
     }
 }

@@ -41,6 +41,12 @@
 
 # finished + comments
 
+- resolver priority + more effective way of checking if it can be used on a url
+  - resolvers now expose an available() function that returns true or false. if true, it can be used.
+  - they also expose a priority variable, which means that:
+    - if it is higher, it will be tried earlier.
+    - if it is lower, it will be tried later.
+
 - addons
   - i had an idea very suddenly and it seems interesting so im working on it
   - basically, a way to create custom addons, ~~alongside patching some of my own methods~~ and adding commands.

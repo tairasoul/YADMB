@@ -45,7 +45,14 @@ export default {
         await interaction.defer();
         const video = interaction.data.options.getString("link", true);
         const next = interaction.data.options.getBoolean("next");
-        const provider = resolvers.findNameResolver(video);
+        const nameResolvers = await resolvers.getNameResolvers(video);
+        let provider;
+        for (const resolver of nameResolvers) {
+            if (await resolver.resolve(video)) {
+                provider = await resolver.resolve(video);
+                break;
+            }
+        }
         if (provider === undefined) {
             const embed = new builders.EmbedBuilder();
             embed.setDescription(`Could not get video/music provider for the link you provided.`)
@@ -56,46 +63,51 @@ export default {
             const ct = queue.internalCurrentIndex;
             const nowPlaying = queue.tracks[ct];
             const qt = queue.tracks;
-            const resolver = resolvers.findSongResolver(video)
-            if (resolver) {
-                const song_data = await resolver.resolve(video);
-                if (typeof song_data != "string") {
-                    const song_add: queuedTrack = {
-                        type: "song",
-                        trackNumber: 0,
-                        tracks: [
+            const s_resolvers = await resolvers.getSongResolvers(video);
+            let resolver;
+            for (const s_res of s_resolvers) {
+                const output = await s_res.resolve(video);
+                if (output && typeof output != "string") {
+                    resolver = output;
+                    break;
+                }
+            }
+        if (resolver) {
+                const song_add: queuedTrack = {
+                    type: "song",
+                    trackNumber: 0,
+                    tracks: [
+                        {
+                            name: resolver.title,
+                            url: resolver.url
+                        }
+                    ],
+                    name: resolver.title
+                }
+                if (next) {
+                    if (nowPlaying.type === "playlist") {
+                        nowPlaying.tracks.push(
                             {
-                                name: song_data.title,
-                                url: song_data.url
+                                name: resolver.title,
+                                url: resolver.url
                             }
-                        ],
-                        name: song_data.title
-                    }
-                    if (next) {
-                        if (nowPlaying.type === "playlist") {
-                            nowPlaying.tracks.push(
-                                {
-                                    name: song_data.title,
-                                    url: song_data.url
-                                }
-                            )
-                        }
-                        else {
-                            qt.splice(ct + 1, 0, song_add)
-                        }
+                        )
                     }
                     else {
-                        queue.tracks.push(song_add);
+                        qt.splice(ct + 1, 0, song_add)
                     }
-                    const embed = new builders.EmbedBuilder();
-                    embed.setDescription(`Added **${song_data.title}** to queue.`);
-                    await interaction.editOriginal({embeds: [embed.toJSON()]})
                 }
                 else {
-                    const embed = new builders.EmbedBuilder();
-                    embed.setDescription(song_data);
-                    await interaction.editOriginal({embeds: [embed.toJSON()]})
+                    queue.tracks.push(song_add);
                 }
+                const embed = new builders.EmbedBuilder();
+                embed.setDescription(`Added **${resolver.title}** to queue.`);
+                await interaction.editOriginal({embeds: [embed.toJSON()]})
+            }
+            else {
+                const embed = new builders.EmbedBuilder();
+                embed.setDescription(`Could nt resolve provided song.`);
+                await interaction.editOriginal({embeds: [embed.toJSON()]})
             }
             const ctn = queue.internalCurrentIndex;
             const t = queue.tracks[ctn];

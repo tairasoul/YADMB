@@ -1,12 +1,12 @@
 import { AudioResolver, dataResolver, playlistResolver, resolver } from "./addonLoader";
 import { ResolverInformation } from "./client.js";
 export default class ResolverUtils {
-    private resolvers;
+    resolvers: ResolverInformation;
     constructor(resolverInfo: ResolverInformation);
-    findAudioResolver(url: string): AudioResolver | undefined;
-    findPlaylistResolver(url: string): playlistResolver | undefined;
-    findNameResolver(url: string): resolver | undefined;
-    findSongResolver(url: string): dataResolver | undefined;
+    getAudioResolvers(url: string): Promise<AudioResolver[]>;
+    getPlaylistResolvers(url: string): Promise<playlistResolver[]>;
+    getNameResolvers(url: string): Promise<resolver[]>;
+    getSongResolvers(url: string): Promise<dataResolver[]>;
     getSongThumbnail(url: string): Promise<string | undefined>;
     getPlaylistThumbnail(url: string): Promise<string | undefined>;
 }

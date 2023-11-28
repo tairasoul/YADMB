@@ -12,33 +12,31 @@ const addon: AddonInfo = {
     resolvers: [
         {
             name: "youtube",
-            regexMatches: [
-                /https:\/\/(?:music|www)\.youtube\.com\/./,
-                /https:\/\/youtu\.be\/./
-            ],
+            async available(url) {
+                return [/https:\/\/(?:music|www)\.youtube\.com\/./,/https:\/\/youtu\.be\/./].find((reg) => reg.test(url)) != undefined
+            },
+            priority: 0,
             async resolve(url)  {
-                if (this.regexMatches.find((reg) => reg.test(url)))
                 return "youtube";
             }
         },
         {
             name: "soundcloud",
-            regexMatches: [
-                /https:\/\/soundcloud.\com\/./,
-                /https:\/\/on\.soundcloud\.com\/./
-            ],
+            async available(url) {
+                return [/https:\/\/soundcloud.\com\/./,/https:\/\/on\.soundcloud\.com\/./].find((reg) => reg.test(url)) != undefined
+            },
+            priority: 0,
             async resolve(url) {
-                if (this.regexMatches.find((reg) => reg.test(url)))
                 return "soundcloud";
             }
         },
         {
             name: "deezer",
-            regexMatches: [
-                /https:\/\/deezer\.(?:com|page\.link)\/./
-            ],
+            async available(url) {
+                return [/https:\/\/deezer\.(?:com|page\.link)\/./].find((reg) => reg.test(url)) != undefined
+            },
+            priority: 0,
             async resolve(url) {
-                if (this.regexMatches.find((reg) => reg.test(url)))
                 return "deezer"
             }
         }

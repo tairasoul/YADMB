@@ -7,9 +7,14 @@ export type resolver = {
      */
     name: string;
     /**
-     * RegEx patterns that can be used internally or to identify if this resolver should be used.
+     * Resolver priority. The lower the number, the lower the priority. If your resolver has the highest priority, it will be attempted first.
+     * Please do not set the priority to an absurdly high number, and make it easily configurable by the bot host.
      */
-    regexMatches: RegExp[];
+    priority: number;
+    /**
+     * Can this resolver be used for this link?
+     */
+    available: (url: string) => Promise<boolean>;
     /**
      * Function that resolves the URL into something like "youtube" or something more specific if necessary.
      */
@@ -21,16 +26,21 @@ export type AudioResolver = {
      */
     name: string;
     /**
-     * RegEx patterns that can be used internally or to identify if this resolver should be used.
+     * Resolver priority. The lower the number, the lower the priority. If your resolver has the highest priority, it will be attempted first.
+     * Please do not set the priority to an absurdly high number, and make it easily configurable by the bot host.
      */
-    regexMatches: RegExp[];
+    priority: number;
     /**
-     * Function that turns a song URL into an audio resource from discordjs/voice and into infoData
+     * Can this resolver be used for this link?
+     */
+    available: (url: string) => Promise<boolean>;
+    /**
+     * Function that turns a song URL into an audio resource from discordjs/voice and into infoData. Returns undefined if it can't.
      */
     resolve: (url: string) => Promise<{
         resource: AudioResource<any>;
         info: infoData;
-    }>;
+    } | undefined>;
 };
 export type songData = {
     /**
@@ -62,13 +72,18 @@ export type dataResolver = {
      */
     name: string;
     /**
-     * RegEx patterns that can be used internally or to identify if this resolver should be used.
+     * Resolver priority. The lower the number, the lower the priority. If your resolver has the highest priority, it will be attempted first.
+     * Please do not set the priority to an absurdly high number, and make it easily configurable by the bot host.
      */
-    regexMatches: RegExp[];
+    priority: number;
     /**
-     * Function that resolves the URL into song data.
+     * Can this resolver be used for this link?
      */
-    resolve: (url: string) => Promise<songData | string>;
+    available: (url: string) => Promise<boolean>;
+    /**
+     * Function that resolves the URL into song data. Returns undefined if it can't resolve the URL into data.
+     */
+    resolve: (url: string) => Promise<songData | string | undefined>;
 };
 export type playlistResolver = {
     /**
@@ -76,19 +91,28 @@ export type playlistResolver = {
      */
     name: string;
     /**
-     * RegEx patterns that can be used internally or to identify if this resolver should be used.
+     * Resolver priority. The lower the number, the lower the priority. If your resolver has the highest priority, it will be attempted first.
+     * Please do not set the priority to an absurdly high number, and make it easily configurable by the bot host.
      */
-    regexMatches: RegExp[];
+    priority: number;
     /**
-     * Function that resolves the URL into playlist data.
+     * Can this resolver be used for this link?
      */
-    resolve: (url: string) => Promise<playlistData | string>;
+    available: (url: string) => Promise<boolean>;
+    /**
+     * Function that resolves the URL into playlist data. Returns undefined if it can't resolve the URL into playlist data.
+     */
+    resolve: (url: string) => Promise<playlistData | string | undefined>;
 };
 export type thumbnailResolver = {
     /**
      * Name of the resolver.
      */
     name: string;
+    /**
+     * Can this resolver be used for this link?
+     */
+    available: (url: string) => Promise<boolean>;
     /**
      * Function that resolves the URL into a thumnbail URL or undefined (if it can't resolve the url)
      */
@@ -122,7 +146,7 @@ export type AddonInfo = {
      */
     description: string;
     /**
-     * Addon version. Formatted as v{version}
+     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
      */
     version: string;
     /**
@@ -156,7 +180,7 @@ export type AddonInfo = {
      */
     description: string;
     /**
-     * Addon version. Formatted as v{version}
+     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
      */
     version: string;
     /**
@@ -190,7 +214,7 @@ export type AddonInfo = {
      */
     description: string;
     /**
-     * Addon version. Formatted as v{version}
+     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
      */
     version: string;
     /**
@@ -224,7 +248,7 @@ export type AddonInfo = {
      */
     description: string;
     /**
-     * Addon version. Formatted as v{version}
+     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
      */
     version: string;
     /**
@@ -258,7 +282,7 @@ export type AddonInfo = {
      */
     description: string;
     /**
-     * Addon version. Formatted as v{version}
+     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
      */
     version: string;
     /**
@@ -292,7 +316,7 @@ export type AddonInfo = {
      */
     description: string;
     /**
-     * Addon version. Formatted as v{version}
+     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
      */
     version: string;
     /**
@@ -326,7 +350,7 @@ export type AddonInfo = {
      */
     description: string;
     /**
-     * Addon version. Formatted as v{version}
+     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
      */
     version: string;
     /**
