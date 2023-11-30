@@ -5,6 +5,7 @@ import { Guild, default as MusicClient, ResolverInformation } from "./client.js"
 import path from "path";
 import { AudioResource } from "@discordjs/voice";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
+import { debugLog } from "./bot.js";
 
 export type resolver = {
     /**
@@ -413,16 +414,16 @@ export type infoData = {
 
 function isExcluded(filePath: string, exclusionList: string[]) {
     return exclusionList.some(exclusion => {
-      if (exclusion.endsWith("*")) {
-        const prefix = exclusion.slice(0, -1); // Remove the trailing *
-        return filePath.startsWith(prefix);
-      } else if (exclusion.startsWith("*")) {
-        const suffix = exclusion.slice(1); // Remove the leading *
-        return filePath.endsWith(suffix);
-      }
+        if (exclusion.endsWith("*")) {
+            const prefix = exclusion.slice(0, -1); // Remove the trailing *
+            return filePath.startsWith(prefix);
+        } else if (exclusion.startsWith("*")) {
+            const suffix = exclusion.slice(1); // Remove the leading *
+            return filePath.endsWith(suffix);
+        }
       return filePath === exclusion; // Exact match
     });
-  }
+}
 
 export default class addonLoader {
     private _client: MusicClient;
@@ -449,7 +450,9 @@ export default class addonLoader {
                         this.addons.push(saddon);
                     })
                 }
-                else this.addons.push(addonInfo);
+                else {
+                    this.addons.push(addonInfo);
+                }
             }
             console.log(`addon ${addon} has been read`);
         }
@@ -459,9 +462,11 @@ export default class addonLoader {
         const exclusions: string[] = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json"];
         if (fs.existsSync(`${addonPath}/exclusions.json`)) {
             const newExclusions = JSON.parse(fs.readFileSync(`${addonPath}/exclusions.json`, 'utf8'));
-            for (const exclusion of newExclusions) exclusions.push(exclusion.replace(/\//g, "\\"));
+            for (const exclusion of newExclusions) {
+                exclusions.push(exclusion.replace(/\//g, "\\"));
+            }
         }
-        console.log(`exclusions for ${addonPath}: ${exclusions.join(" ")}`)
+        debugLog(`exclusions for ${addonPath}: ${exclusions.join(" ")}`)
         // for some reason node's types don't include the recursive option??
         // @ts-ignore
         for (const pathname of fs.readdirSync(addonPath, {recursive: true})) {
@@ -474,9 +479,13 @@ export default class addonLoader {
                         this.addons.push(saddon);
                     })
                 }
-                else this.addons.push(addonInfo);
+                else {
+                    this.addons.push(addonInfo);
+                }
             }
-            if (isExcluded(pathname, exclusions)) console.log(`${pathname} is excluded, skipping.`)
+            if (isExcluded(pathname, exclusions)) {
+                debugLog(`${pathname} is excluded, skipping.`)
+            }
         }
     }
 

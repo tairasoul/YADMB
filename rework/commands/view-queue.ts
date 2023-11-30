@@ -6,17 +6,8 @@ import utils, { PageHolder } from "../utils.js";
 // @ts-ignore
 import {default as lzw} from "lzwcompress";
 import { Base64 as base64} from "js-base64";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from 'url';
 import ResolverUtils from "../resolverUtils.js";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-let debug = false;
-if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
-
-function debugLog(text: any) {
-    if (debug) console.log(text)
-}
+import { debugLog } from "../bot.js";
 
 function embedMessage(text: string) {
     const embed = new builders.EmbedBuilder();

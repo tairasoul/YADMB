@@ -20,7 +20,7 @@ export default class QueueHandler {
     get loopType(): loopType;
     get volume(): string;
     nextTrack(): import("./client.js").track | null | undefined;
-    skip(): Promise<import("./client.js").track | null | undefined>;
+    skip(): Promise<void>;
     pause(): boolean;
     resume(): boolean;
     play(resolvers: ResolverUtils): Promise<void>;

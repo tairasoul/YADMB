@@ -7,7 +7,7 @@ const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)
 let debug = false;
 if (fs.existsSync(`${__dirname}/enableDebugging`))
     debug = true;
-function debugLog(text) {
+export function debugLog(text) {
     if (debug)
         console.log(text);
 }
@@ -87,8 +87,9 @@ client.on("guildCreate", (guild) => client.addGuild(guild));
 client.on("guildDelete", (guild) => client.removeGuild(guild));
 client.on("m_interactionCreate", async (interaction, resolvers, guild, m_client) => {
     const command = client.commands.get(interaction.data.name);
-    if (!command)
+    if (!command) {
         return;
+    }
     try {
         await command.execute(interaction, resolvers, guild, m_client);
     }
@@ -98,8 +99,9 @@ client.on("m_interactionCreate", async (interaction, resolvers, guild, m_client)
         if (!interaction.acknowledged) {
             await interaction.createMessage({ content: `There was an error while executing this command, error is ${error}` });
         }
-        else
+        else {
             await interaction.editOriginal({ content: `There was an error while executing this command, error is ${error}` });
+        }
     }
 });
 await client.connect();

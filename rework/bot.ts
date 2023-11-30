@@ -9,7 +9,7 @@ import * as voice from "@discordjs/voice";
 let debug = false;
 if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
 
-function debugLog(text: any) {
+export function debugLog(text: any) {
     if (debug) console.log(text)
 }
 
@@ -96,7 +96,9 @@ client.on("guildDelete", (guild) => client.removeGuild(guild as oceanic.Guild))
 
 client.on("m_interactionCreate", async (interaction, resolvers, guild, m_client) => {
     const command = client.commands.get(interaction.data.name);
-    if (!command) return;
+    if (!command) {
+        return;
+    }
     try {
         await command.execute(interaction, resolvers, guild, m_client);
     } catch (error) {
@@ -105,7 +107,9 @@ client.on("m_interactionCreate", async (interaction, resolvers, guild, m_client)
         if (!interaction.acknowledged) {
             await interaction.createMessage({content: `There was an error while executing this command, error is ${error}`});
         }
-        else await interaction.editOriginal({content: `There was an error while executing this command, error is ${error}`});
+        else {
+            await interaction.editOriginal({content: `There was an error while executing this command, error is ${error}`});
+        }
     }
 })
 

@@ -8,13 +8,7 @@ import { NoSubscriberBehavior, createAudioPlayer } from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
 import util from "node:util";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-let debug = false;
-if (fs.existsSync(`${__dirname}/enableDebugging`))
-    debug = true;
-function debugLog(text) {
-    if (debug)
-        console.log(text);
-}
+import { debugLog } from "./bot.js";
 export default class MusicClient extends Client {
     m_guilds;
     commands;

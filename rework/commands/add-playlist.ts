@@ -5,8 +5,6 @@ import utils from "../utils.js";
 import * as voice from "@discordjs/voice";
 import { playlistData } from "../addonLoader.js";
 import ResolverUtils from "../resolverUtils.js";
-import humanizeDuration from "humanize-duration";
-import playdl from "play-dl";
 
 export default {
     name: "add-playlist",

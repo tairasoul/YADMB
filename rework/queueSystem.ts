@@ -1,21 +1,10 @@
 import voice from "@discordjs/voice";
-import fs from "node:fs"
-import path from 'path';
-import { fileURLToPath } from 'url';
 import util from "node:util";
 import utils from "./utils.js"
 import { queuedTrack, loopType } from "./client.js";
 import { infoData } from "./addonLoader.js";
 import ResolverUtils from "./resolverUtils.js";
-
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-let debug = false;
-if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
-
-function debugLog(text: any) {
-    if (debug) console.log(text)
-}
-
+import { debugLog } from "./bot.js";
 export default class QueueHandler {
     public tracks: queuedTrack[] = [];
     private internalLoop: loopType = "none";
@@ -85,8 +74,7 @@ export default class QueueHandler {
         if (this.tracks[this.internalCurrentIndex].type == "song") this.tracks.splice(this.internalCurrentIndex, 1);
         else this.tracks[this.internalCurrentIndex].tracks.splice(this.tracks[this.internalCurrentIndex].trackNumber, 1)
         this.audioPlayer.stop(true);
-        const track = this.nextTrack();
-        return track;
+        this.nextTrack();
     }
 
     pause() {

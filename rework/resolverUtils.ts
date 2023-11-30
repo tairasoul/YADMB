@@ -1,4 +1,3 @@
-import { AudioResource } from "@discordjs/voice";
 import { AudioResolver, dataResolver, playlistResolver, resolver } from "./addonLoader";
 import { ResolverInformation } from "./client.js";
 

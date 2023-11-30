@@ -1,20 +1,11 @@
 import * as oceanic from "oceanic.js";
-import { Guild, ResolverInformation, queuedTrack } from "../client.js";
+import { Guild, queuedTrack } from "../client.js";
 import * as builders from "@oceanicjs/builders"
 import playdl from "play-dl";
 import util from "util";
 import * as voice from "@discordjs/voice";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from 'url';
 import ResolverUtils from "../resolverUtils.js";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-let debug = false;
-if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
-
-function debugLog(text: any) {
-    if (debug) console.log(text)
-}
+import { debugLog } from "../bot.js";
 
 playdl.getFreeClientID().then((val) => 
     playdl.setToken({

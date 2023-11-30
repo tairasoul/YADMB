@@ -4,32 +4,14 @@ import * as builders from "@oceanicjs/builders";
 import { Base64 as base64 } from "js-base64";
 import rstring from "randomstring";
 import { PageData } from "../utils.js";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from 'url';
 import utils from "../utils.js";
 import ResolverUtils from "../resolverUtils.js";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-let debug = false;
-if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
-
-function debugLog(text: any) {
-    if (debug) console.log(text)
-}
+import { debugLog } from "../bot.js";
 
 function embedMessage(text: string) {
     const embed = new builders.EmbedBuilder();
     embed.setDescription(text);
     return embed.toJSON()
-}
-
-// util functions
-
-function startsWith(str: string, strings: string[]) {
-    for (const string of strings) {
-        if (str.startsWith(string)) return true;
-    }
-    return false
 }
 
 export default {
