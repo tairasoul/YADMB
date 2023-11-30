@@ -39,7 +39,7 @@ export default class QueueHandler {
     }
 
     nextTrack() {
-        const cur = this.tracks[this.internalCurrentIndex]
+        const cur = this.tracks[this.internalCurrentIndex];
         if (this.internalLoop == "song") {
             return;
         }
@@ -62,10 +62,15 @@ export default class QueueHandler {
             else {
                 this.tracks.splice(0, 1);
             }
-            if (this.internalCurrentIndex >= this.tracks.length) {
-                this.internalCurrentIndex = 0;
-            }
         }
+        if (this.internalCurrentIndex >= this.tracks.length) {
+            this.internalCurrentIndex = 0;
+        }
+        const newCurrent = this.tracks[this.internalCurrentIndex];
+        if (newCurrent == undefined) {
+            return null;
+        }
+        return newCurrent.tracks[newCurrent.trackNumber];
     }
 
     async skip() {
