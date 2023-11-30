@@ -25,17 +25,21 @@
     - paging may be done easier if it's mapped internally instead of within just the command.
 
 - rewrite the commands that use pages, so the PageHolder class is ACTUALLY used
-  - currently bot.ts handles the paging instead of just.. using the functions
+  - currently ~~bot.ts~~ the command handles the paging instead of just.. using the functions
 
 - instead of paging at command execute time, page when a song is added and add some embeds for each song if playlist
   - ~~this means live-updating view-queue will be easier~~ it's just a snapshot now so
-  - and it wont take as much time to do view-queue
+  - it wont take as much time to do view-queue
 
 - update utils.ts
   - what to update:
     - pager functions
     - they all assume that the track is a youtube track.
     - this means that it will error sometimes if it isn't a youtube track
+  - potential solution:
+    - pager addons.
+    - they expose 2 resolvers.
+    - one for a track in a playlist, one for a queued item. (aka replacing utils.trackPager and utils.queuedTrackPager)
 
 # in progress
 
