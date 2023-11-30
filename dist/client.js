@@ -94,8 +94,9 @@ export default class MusicClient extends Client {
     }
     addCommand(name, description, options = [], callback) {
         const command = new builders.ApplicationCommandBuilder(1, name);
-        for (const option of options)
+        for (const option of options) {
             command.addOption(option);
+        }
         command.setDescription(description);
         command.setDMPermission(false);
         const toPush = {
@@ -105,7 +106,6 @@ export default class MusicClient extends Client {
         this.rawCommands.push(toPush);
     }
     async registerCommands() {
-        // go through commands
         for (const command of this.rawCommands) {
             console.log(`creating global command ${command.data.name}`);
             this.commands.set(command.data.name, command);
@@ -125,9 +125,6 @@ export default class MusicClient extends Client {
         }
         this.editStatus("online", [{ name: (this.guilds.size).toString() + ' servers', type: 3 }]);
     }
-    /**
-     * Remove commands registered on this application that are unknown to MusicClient.
-     */
     async removeUnknownCommands() {
         for (const globalCommand of await this.application.getGlobalCommands()) {
             if (!this.rawCommands.find((cmd) => cmd.data.name == globalCommand.name)) {
