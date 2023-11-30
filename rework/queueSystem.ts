@@ -66,11 +66,6 @@ export default class QueueHandler {
                 this.internalCurrentIndex = 0;
             }
         }
-        const newCurrent = this.tracks[this.internalCurrentIndex];
-        if (newCurrent == undefined) {
-            return null;
-        }
-        return newCurrent.tracks[newCurrent.trackNumber];
     }
 
     async skip() {
