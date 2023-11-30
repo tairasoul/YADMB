@@ -97,7 +97,7 @@ export default {
             }
             else {
                 const embed = new builders.EmbedBuilder();
-                embed.setDescription(`Could nt resolve provided song.`);
+                embed.setDescription(`Could not resolve provided song.`);
                 await interaction.editOriginal({embeds: [embed.toJSON()]})
             }
             const ctn = queue.internalCurrentIndex;
