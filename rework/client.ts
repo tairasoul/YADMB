@@ -90,20 +90,41 @@ export default class MusicClient extends Client {
     registerAddons() {
         for (const addon of this.addons) {
             console.log(`registering addon ${addon.name}`);
-            if (addon.type == "songResolver") 
-                for (const resolver of addon.resolvers) this.resolvers.songResolvers.push(resolver);
-            else if (addon.type == "command") 
-                for (const command of addon.commands) this.addonCommands.push(command);
-            else if (addon.type == "songDataResolver")
-                for (const songResolver of addon.dataResolvers) this.resolvers.songDataResolvers.push(songResolver);
-            else if (addon.type == "playlistDataResolver")
-                for (const playlistResolver of addon.playlistResolvers) this.resolvers.playlistResolvers.push(playlistResolver);
-            else if (addon.type == "audioResourceResolver")
-                for (const audioResolver of addon.resourceResolvers) this.resolvers.audioResourceResolvers.push(audioResolver);
-            else if (addon.type == "songThumbnailResolver")
-                for (const thumbnailResolver of addon.thumbnailResolvers) this.resolvers.songThumbnailResolvers.push(thumbnailResolver);
-            else if (addon.type == "playlistThumbnailResolver")
-                for (const thumbnailResolver of addon.thumbnailResolvers) this.resolvers.playlistThumbnailResolvers.push(thumbnailResolver);
+            if (addon.type == "songResolver") {
+                for (const resolver of addon.resolvers) {
+                    this.resolvers.songResolvers.push(resolver);
+                }
+            }
+            else if (addon.type == "command") {
+                for (const command of addon.commands) {
+                    this.addonCommands.push(command);
+                }
+            }
+            else if (addon.type == "songDataResolver") {
+                for (const songResolver of addon.dataResolvers) {
+                    this.resolvers.songDataResolvers.push(songResolver);
+                }
+            }
+            else if (addon.type == "playlistDataResolver") {
+                for (const playlistResolver of addon.playlistResolvers) {
+                    this.resolvers.playlistResolvers.push(playlistResolver);
+                }
+            }
+            else if (addon.type == "audioResourceResolver") {
+                for (const audioResolver of addon.resourceResolvers) {
+                    this.resolvers.audioResourceResolvers.push(audioResolver);
+                }
+            }
+            else if (addon.type == "songThumbnailResolver") {
+                for (const thumbnailResolver of addon.thumbnailResolvers) {
+                    this.resolvers.songThumbnailResolvers.push(thumbnailResolver);
+                }
+            }
+            else if (addon.type == "playlistThumbnailResolver") {
+                for (const thumbnailResolver of addon.thumbnailResolvers) {
+                    this.resolvers.playlistThumbnailResolvers.push(thumbnailResolver);
+                }
+            }
         }
     }
 
