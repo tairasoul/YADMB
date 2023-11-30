@@ -230,8 +230,6 @@ export default {
             /** @ts-ignore */
             client.off("interactionCreate", onExitInspect);
             /** @ts-ignore */
-            client.off("interactionCreate", onRemoveInspected);
-            /** @ts-ignore */
             client.off("interactionCreate", onExport);
             /** @ts-ignore */
             client.off("interactionCreate", onExit);
