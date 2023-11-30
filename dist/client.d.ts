@@ -56,9 +56,6 @@ export default class MusicClient extends Client {
     loadCommands(): Promise<void>;
     addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[] | undefined, callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => any): void;
     registerCommands(): Promise<void>;
-    /**
-     * Remove commands registered on this application that are unknown to MusicClient.
-     */
     removeUnknownCommands(): Promise<void>;
     on<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this;
     off<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this;
