@@ -10,12 +10,7 @@ import * as builders from "@oceanicjs/builders";
 import util from "node:util"
 import { AddonInfo, AudioResolver, command, dataResolver, playlistResolver, resolver, thumbnailResolver } from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-let debug = false;
-if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
-
-function debugLog(text: any) {
-    if (debug) console.log(text)
-}
+import { debugLog } from "./bot.js";
 
 export type track = {
     name: string;

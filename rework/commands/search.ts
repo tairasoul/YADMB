@@ -5,18 +5,9 @@ import * as builders from "@oceanicjs/builders";
 import humanize from "humanize-duration";
 import utils from "../utils.js";
 import * as voice from "@discordjs/voice";
-import fs from "fs";
 import util from "util";
-import path from "path";
-import { fileURLToPath } from 'url';
 import ResolverUtils from "../resolverUtils.js";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-let debug = false;
-if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
-
-function debugLog(text: any) {
-    if (debug) console.log(text)
-}
+import { debugLog } from "../bot.js";
 
 export default {
     name: "search",

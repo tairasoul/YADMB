@@ -2,18 +2,11 @@ import fs from 'fs';
 import * as oceanic from 'oceanic.js';
 import { Client } from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { Base64 as base64 } from "js-base64";
 import playdl, { InfoData } from "play-dl";
 import humanizeDuration from 'humanize-duration';
 import { queuedTrack, track } from './client.js';
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-let debug = false;
-if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
-function debugLog(text: any) {
-    if (debug) console.log(text)
-}
+import { debugLog } from './bot.js';
 
 export function getHighestResUrl(data: InfoData) {
     const thumbnails = data.video_details.thumbnails;

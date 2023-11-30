@@ -1,16 +1,6 @@
-import fs from "node:fs";
-import path from 'path';
-import { fileURLToPath } from 'url';
 import util from "node:util";
 import utils from "./utils.js";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-let debug = false;
-if (fs.existsSync(`${__dirname}/enableDebugging`))
-    debug = true;
-function debugLog(text) {
-    if (debug)
-        console.log(text);
-}
+import { debugLog } from "./bot.js";
 export default class QueueHandler {
     tracks = [];
     internalLoop = "none";
@@ -70,8 +60,7 @@ export default class QueueHandler {
         else
             this.tracks[this.internalCurrentIndex].tracks.splice(this.tracks[this.internalCurrentIndex].trackNumber, 1);
         this.audioPlayer.stop(true);
-        const track = this.nextTrack();
-        return track;
+        this.nextTrack();
     }
     pause() {
         return this.audioPlayer.pause(true);

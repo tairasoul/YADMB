@@ -2,6 +2,7 @@ import fs from "fs";
 import { fileURLToPath } from 'url';
 import path from "path";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
+import { debugLog } from "./bot.js";
 function isExcluded(filePath, exclusionList) {
     return exclusionList.some(exclusion => {
         if (exclusion.endsWith("*")) {
@@ -39,8 +40,9 @@ export default class addonLoader {
                         this.addons.push(saddon);
                     });
                 }
-                else
+                else {
                     this.addons.push(addonInfo);
+                }
             }
             console.log(`addon ${addon} has been read`);
         }
@@ -49,10 +51,11 @@ export default class addonLoader {
         const exclusions = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json"];
         if (fs.existsSync(`${addonPath}/exclusions.json`)) {
             const newExclusions = JSON.parse(fs.readFileSync(`${addonPath}/exclusions.json`, 'utf8'));
-            for (const exclusion of newExclusions)
+            for (const exclusion of newExclusions) {
                 exclusions.push(exclusion.replace(/\//g, "\\"));
+            }
         }
-        console.log(`exclusions for ${addonPath}: ${exclusions.join(" ")}`);
+        debugLog(`exclusions for ${addonPath}: ${exclusions.join(" ")}`);
         // for some reason node's types don't include the recursive option??
         // @ts-ignore
         for (const pathname of fs.readdirSync(addonPath, { recursive: true })) {
@@ -65,11 +68,13 @@ export default class addonLoader {
                         this.addons.push(saddon);
                     });
                 }
-                else
+                else {
                     this.addons.push(addonInfo);
+                }
             }
-            if (isExcluded(pathname, exclusions))
-                console.log(`${pathname} is excluded, skipping.`);
+            if (isExcluded(pathname, exclusions)) {
+                debugLog(`${pathname} is excluded, skipping.`);
+            }
         }
     }
     loadAddons() {

@@ -1,6 +1,6 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import MusicClient, { Guild, ResolverInformation } from "../client.js";
+import MusicClient, { Guild } from "../client.js";
 import * as voice from "@discordjs/voice";
 import ResolverUtils from "../resolverUtils.js";
 

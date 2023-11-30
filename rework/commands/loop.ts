@@ -1,6 +1,6 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import { Guild, ResolverInformation, loopType } from "../client.js";
+import { Guild, loopType } from "../client.js";
 import ResolverUtils from "../resolverUtils.js";
 
 const loopTypeStrs = {

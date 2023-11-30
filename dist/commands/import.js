@@ -2,17 +2,7 @@ import * as oceanic from "oceanic.js";
 import utils from "../utils.js";
 import * as builders from "@oceanicjs/builders";
 import * as voice from "@discordjs/voice";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from 'url';
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-let debug = false;
-if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`))
-    debug = true;
-function debugLog(text) {
-    if (debug)
-        console.log(text);
-}
+import { debugLog } from "../bot.js";
 export default {
     name: "import",
     description: "Import a exported queue/playlist.",

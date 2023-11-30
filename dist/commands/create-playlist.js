@@ -2,30 +2,12 @@ import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import { Base64 as base64 } from "js-base64";
 import rstring from "randomstring";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from 'url';
 import utils from "../utils.js";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-let debug = false;
-if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`))
-    debug = true;
-function debugLog(text) {
-    if (debug)
-        console.log(text);
-}
+import { debugLog } from "../bot.js";
 function embedMessage(text) {
     const embed = new builders.EmbedBuilder();
     embed.setDescription(text);
     return embed.toJSON();
-}
-// util functions
-function startsWith(str, strings) {
-    for (const string of strings) {
-        if (str.startsWith(string))
-            return true;
-    }
-    return false;
 }
 export default {
     name: "create-playlist",

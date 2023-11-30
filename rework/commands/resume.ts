@@ -1,6 +1,6 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import { Guild, ResolverInformation } from "../client.js";
+import { Guild } from "../client.js";
 import ResolverUtils from "../resolverUtils.js";
 
 export default {
