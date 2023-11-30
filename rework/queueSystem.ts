@@ -62,6 +62,9 @@ export default class QueueHandler {
             else {
                 this.tracks.splice(0, 1);
             }
+            if (this.internalCurrentIndex >= this.tracks.length) {
+                this.internalCurrentIndex = 0;
+            }
         }
         const newCurrent = this.tracks[this.internalCurrentIndex];
         if (newCurrent == undefined) {
