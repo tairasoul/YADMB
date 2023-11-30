@@ -19,7 +19,7 @@ export default class QueueHandler {
     setVolume(volumeString: string): void;
     get loopType(): loopType;
     get volume(): string;
-    nextTrack(): import("./client.js").track | null | undefined;
+    nextTrack(): void;
     skip(): Promise<void>;
     pause(): boolean;
     resume(): boolean;
