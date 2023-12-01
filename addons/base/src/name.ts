@@ -1,4 +1,4 @@
-import { AddonInfo } from "../../../dist/addonLoader.js";
+import { AddonInfo } from "../../../dist/addonTypes.js";
 
 const addon: AddonInfo = {
     name: "Base Name Resolvers",

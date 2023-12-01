@@ -3,12 +3,11 @@ import * as oceanic from 'oceanic.js';
 import { Client } from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 import { Base64 as base64 } from "js-base64";
-import playdl, { InfoData } from "play-dl";
-import humanizeDuration from 'humanize-duration';
+import { InfoData } from "play-dl";
 import { queuedTrack, track } from './client.js';
 import { debugLog } from './bot.js';
 import ResolverUtils from './resolverUtils.js';
-import { PageData } from './addonLoader.js';
+import { PageData } from './addonTypes.js';
 
 export function getHighestResUrl(data: InfoData) {
     const thumbnails = data.video_details.thumbnails;

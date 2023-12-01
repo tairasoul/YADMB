@@ -1,6 +1,6 @@
 import voice from "@discordjs/voice";
 import { queuedTrack, loopType } from "./client.js";
-import { infoData } from "./addonLoader.js";
+import { infoData } from "./addonTypes.js";
 import ResolverUtils from "./resolverUtils.js";
 export default class QueueHandler {
     tracks: queuedTrack[];

@@ -1,6 +1,6 @@
 # Addon documentation.
 
-First, start by installing yadmb-types from npmjs.
+First, start by installing [yadmb-types](https://www.npmjs.com/package/yadmb-types?activeTab=readme) from npmjs.
 
 These types are used for autocomplete.
 

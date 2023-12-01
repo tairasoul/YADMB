@@ -57,21 +57,23 @@ export default class addonLoader {
         }
         debugLog(`exclusions for ${addonPath}: ${exclusions.join(" ")}`);
         for (const pathname of fs.readdirSync(addonPath, { recursive: true, encoding: "utf8" })) {
-            if (!isExcluded(pathname, exclusions) && fs.statSync(`${addonPath}/${pathname}`).isFile()) {
-                const addonInfo = await import(`file://${addonPath}/${pathname}`).then(m => m.default);
-                if (addonInfo instanceof Array) {
-                    console.log(`addon ${path.basename(`${addonPath}/${pathname}`)} has multiple addons, iterating.`);
-                    addonInfo.forEach((saddon) => {
-                        console.log(`reading addon ${saddon.name} from ${pathname}`);
-                        this.addons.push(saddon);
-                    });
+            if (fs.statSync(`${addonPath}/${pathname}`).isFile()) {
+                if (!isExcluded(pathname, exclusions)) {
+                    const addonInfo = await import(`file://${addonPath}/${pathname}`).then(m => m.default);
+                    if (addonInfo instanceof Array) {
+                        console.log(`addon ${path.basename(`${addonPath}/${pathname}`)} has multiple addons, iterating.`);
+                        addonInfo.forEach((saddon) => {
+                            console.log(`reading addon ${saddon.name} from ${pathname}`);
+                            this.addons.push(saddon);
+                        });
+                    }
+                    else {
+                        this.addons.push(addonInfo);
+                    }
                 }
                 else {
-                    this.addons.push(addonInfo);
+                    debugLog(`${pathname} is excluded, skipping.`);
                 }
-            }
-            if (isExcluded(pathname, exclusions)) {
-                debugLog(`${pathname} is excluded, skipping.`);
             }
         }
     }

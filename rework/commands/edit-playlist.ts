@@ -7,7 +7,7 @@ import utils from "../utils.js";
 import util from "util";
 import ResolverUtils from "../resolverUtils.js";
 import { debugLog } from "../bot.js";
-import { PageData } from "../addonLoader.js";
+import { PageData } from "../addonTypes.js";
 
 function embedMessage(text: string) {
     const embed = new builders.EmbedBuilder();

@@ -5,7 +5,7 @@ import { Client, Collection, ClientOptions } from "oceanic.js";
 import QueueHandler from "./queueSystem.js";
 import voice from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
-import { AddonInfo, AudioResolver, PagerResolver, dataResolver, playlistResolver, resolver, thumbnailResolver } from "./addonLoader.js";
+import { AddonInfo, AudioResolver, PagerResolver, dataResolver, playlistResolver, resolver, thumbnailResolver } from "./addonTypes.js";
 export type track = {
     name: string;
     url: string;
