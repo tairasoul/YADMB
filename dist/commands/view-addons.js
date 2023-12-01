@@ -6,10 +6,9 @@ export default {
         await interaction.defer();
         let fileData = "";
         for (const addon of client.addons) {
-            if (addon.private == true)
+            if (addon.private)
                 continue;
-            const string = `${addon.name} v${addon.version}\n${addon.description}\nCredits: ${addon.credits}${addon.sources ? "\nSources:\n" + addon.sources.join("\n") : ""}\n\n`;
-            fileData += string;
+            fileData += `${addon.name} v${addon.version}\n${addon.description}\nCredits: ${addon.credits}${addon.sources ? "\nSources:\n" + addon.sources.join("\n") : ""}\n\n`;
         }
         await interaction.editOriginal({ files: [
                 {
