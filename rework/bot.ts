@@ -13,6 +13,8 @@ export function debugLog(text: any) {
     if (debug) console.log(text)
 }
 
+let setup = false;
+
 const { token } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 
 const client = new MusicClient({
@@ -74,6 +76,7 @@ client.on('error', (error) => {
 })
 
 client.on("ready", async () => {
+    if (setup) return;
     await loader.readAddons();
     loader.loadAddons();
     await client.loadCommands();

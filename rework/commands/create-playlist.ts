@@ -1,12 +1,11 @@
-import MusicClient, { Guild, queuedTrack, ResolverInformation, track } from "../client.js";
+import MusicClient, { Guild, queuedTrack, track } from "../client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import { Base64 as base64 } from "js-base64";
 import rstring from "randomstring";
-import { PageData } from "../utils.js";
-import utils from "../utils.js";
 import ResolverUtils from "../resolverUtils.js";
 import { debugLog } from "../bot.js";
+import { PageData } from "../addonLoader.js";
 
 function embedMessage(text: string) {
     const embed = new builders.EmbedBuilder();
@@ -252,15 +251,23 @@ export default {
                     url: dataResolver.url
                 }
                 data.tracks.push(add);
-                // @ts-ignore
-                const pagedd: PageData = await utils.pageTrack(add);
-                pagedd.index = paged.length;
-                pagedd.embed.addField("index", pagedd.index.toString(), true);
-                paged.push(pagedd);
-                const embed = new builders.EmbedBuilder();
-                embed.setDescription(`Added **${dataResolver.title}** to custom playlist.`);
-                await int.editOriginal({embeds: [embed.toJSON()], flags: 1 << 6});
-                resolve();
+                const pagers = await resolvers.getPagers(add.url);
+                if (pagers) {
+                    let pager;
+                    for (const page of pagers) {
+                        const output = await page.trackPager(add, paged.length);
+                        if (output) {
+                            pager = output;
+                            break;
+                        }
+                    }
+                    if (pager == undefined) throw new Error(`Pager for url ${add.url} failed.`)
+                    paged.push(pager);
+                    const embed = new builders.EmbedBuilder();
+                    embed.setDescription(`Added **${dataResolver.title}** to custom playlist.`);
+                    await int.editOriginal({embeds: [embed.toJSON()], flags: 1 << 6});
+                    resolve();
+                }
             }
             else {
                 await int.editOriginal({embeds: [embedMessage(`No resolver found for provider ${provider}.`)]});

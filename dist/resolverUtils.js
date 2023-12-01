@@ -3,6 +3,14 @@ export default class ResolverUtils {
     constructor(resolverInfo) {
         this.resolvers = resolverInfo;
     }
+    async getPagers(url) {
+        const resolvers = [];
+        for (const resolver of this.resolvers.pagers) {
+            if (await resolver.available(url))
+                resolvers.push(resolver);
+        }
+        return resolvers.sort((a, b) => b.priority - a.priority);
+    }
     async getAudioResolvers(url) {
         const resolvers = [];
         for (const resolver of this.resolvers.audioResourceResolvers) {
