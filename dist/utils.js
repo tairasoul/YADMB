@@ -2,8 +2,6 @@ import fs from 'fs';
 import * as oceanic from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 import { Base64 as base64 } from "js-base64";
-import playdl from "play-dl";
-import humanizeDuration from 'humanize-duration';
 import { debugLog } from './bot.js';
 export function getHighestResUrl(data) {
     const thumbnails = data.video_details.thumbnails;
@@ -140,53 +138,21 @@ export function Pager(pages) {
     }
     return new PageHolder(PageClasses);
 }
-export async function queuedTrackPager(array, callback = () => { return new Promise((resolve) => resolve()); }) {
+export async function queuedTrackPager(array, callback = () => { return new Promise((resolve) => resolve()); }, resolvers) {
     const pages = [];
     for (let i = 0; i < array.length; i++) {
-        try {
-            const queued = array[i];
-            await callback(queued.name);
-            debugLog(`paging ${queued.name}`);
-            debugLog(queued);
-            const embed = new builders.EmbedBuilder();
-            embed.setTitle(queued.name);
-            embed.addField("index", i.toString(), true);
-            embed.addField("type", queued.type, true);
-            embed.addField("songs", queued.tracks.length.toString(), true);
-            debugLog(queued.tracks[0].url);
-            const info = await playdl.video_basic_info(queued.tracks[0].url);
-            embed.setImage(getHighestResUrl(info));
-            pages.push({
-                embed: embed,
-                id: queued.name,
-                index: i,
-                type: queued.type
-            });
+        await callback(`paging ${array[i].name}`);
+        const pagers = await resolvers.getPagers(array[i].tracks[0].url);
+        let output;
+        for (const pager of pagers) {
+            output = await pager.queuedPager(array[i], i);
+            if (output) {
+                pages.push(output);
+                break;
+            }
         }
-        catch {
-            await new Promise((resolve) => {
-                setTimeout(async () => {
-                    const queued = array[i];
-                    await callback(queued.name);
-                    debugLog(`paging ${queued.name}`);
-                    debugLog(queued);
-                    const embed = new builders.EmbedBuilder();
-                    embed.setTitle(queued.name);
-                    embed.addField("index", i.toString(), true);
-                    embed.addField("type", queued.type, true);
-                    embed.addField("songs", queued.tracks.length.toString(), true);
-                    debugLog(queued.tracks[0].url);
-                    const info = await playdl.video_basic_info(queued.tracks[0].url);
-                    embed.setImage(getHighestResUrl(info));
-                    pages.push({
-                        embed: embed,
-                        id: queued.name,
-                        index: i,
-                        type: queued.type
-                    });
-                    resolve();
-                }, 5000);
-            });
+        if (output == undefined) {
+            throw new Error(`Could not get pager for ${array[i].name}`);
         }
     }
     return Pager({ pages: pages });
@@ -205,110 +171,24 @@ export function parseVolumeString(volume) {
     }
     return result;
 }
-export async function trackPager(array, callback = () => { return new Promise((resolve) => resolve()); }) {
+export async function trackPager(array, callback = () => { return new Promise((resolve) => resolve()); }, resolvers) {
     const pages = [];
     for (let i = 0; i < array.length; i++) {
-        try {
-            const queued = array[i];
-            await callback(queued.name);
-            debugLog(`paging ${queued.name}`);
-            debugLog(queued);
-            const embed = new builders.EmbedBuilder();
-            embed.setTitle(queued.name);
-            embed.addField("index", i.toString(), true);
-            const info = await playdl.video_basic_info(queued.url);
-            debugLog(info.video_details.thumbnails);
-            embed.setImage(getHighestResUrl(info));
-            // @ts-ignore
-            embed.addField("Author", info.video_details.channel.name);
-            embed.addField("Likes", info.video_details.likes.toString());
-            embed.addField("Views", info.video_details.views.toString());
-            embed.addField("Duration", humanizeDuration(info.video_details.durationInSec * 1000));
-            embed.addField("Uploaded", new Date(info.video_details.uploadedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
-            pages.push({
-                embed: embed,
-                id: queued.name,
-                index: i,
-                type: "inspectedSong"
-            });
+        await callback(`paging ${array[i].name}`);
+        const pagers = await resolvers.getPagers(array[i].url);
+        let output;
+        for (const pager of pagers) {
+            output = await pager.trackPager(array[i], i);
+            if (output) {
+                pages.push(output);
+                break;
+            }
         }
-        catch {
-            await new Promise((resolve) => {
-                setTimeout(async () => {
-                    const queued = array[i];
-                    await callback(queued.name);
-                    debugLog(`paging ${queued.name}`);
-                    debugLog(queued);
-                    const embed = new builders.EmbedBuilder();
-                    embed.setTitle(queued.name);
-                    embed.addField("index", i.toString(), true);
-                    const info = await playdl.video_basic_info(queued.url);
-                    debugLog(info.video_details.thumbnails);
-                    embed.setImage(getHighestResUrl(info));
-                    // @ts-ignore
-                    embed.addField("Author", info.video_details.channel.name);
-                    embed.addField("Likes", info.video_details.likes.toString());
-                    embed.addField("Views", info.video_details.views.toString());
-                    embed.addField("Duration", humanizeDuration(info.video_details.durationInSec * 1000));
-                    embed.addField("Uploaded", new Date(info.video_details.uploadedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
-                    pages.push({
-                        embed: embed,
-                        id: queued.name,
-                        index: i,
-                        type: "inspectedSong"
-                    });
-                    resolve();
-                }, 5000);
-            });
+        if (output == undefined) {
+            throw new Error(`Could not get pager for ${array[i].name}`);
         }
     }
     return Pager({ pages: pages });
-}
-export async function pageTrack(track) {
-    try {
-        debugLog(`paging ${track.name}`);
-        debugLog(track);
-        const embed = new builders.EmbedBuilder();
-        embed.setTitle(track.name);
-        const info = await playdl.video_basic_info(track.url);
-        debugLog(info.video_details.thumbnails);
-        embed.setImage(getHighestResUrl(info));
-        // @ts-ignore
-        embed.addField("Author", info.video_details.channel.name);
-        embed.addField("Likes", info.video_details.likes.toString());
-        embed.addField("Views", info.video_details.views.toString());
-        embed.addField("Duration", humanizeDuration(info.video_details.durationInSec * 1000));
-        embed.addField("Uploaded", new Date(info.video_details.uploadedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
-        return {
-            embed: embed,
-            id: track.name,
-            type: "inspectedSong"
-        };
-    }
-    catch {
-        return new Promise((resolve) => {
-            setTimeout(async () => {
-                debugLog(`paging ${track.name}`);
-                debugLog(track);
-                const embed = new builders.EmbedBuilder();
-                embed.setTitle(track.name);
-                const info = await playdl.video_basic_info(track.url);
-                debugLog(info.video_details.thumbnails);
-                embed.setImage(getHighestResUrl(info));
-                // @ts-ignore
-                embed.addField("Author", info.video_details.channel.name);
-                embed.addField("Likes", info.video_details.likes.toString());
-                embed.addField("Views", info.video_details.views.toString());
-                embed.addField("Duration", humanizeDuration(info.video_details.durationInSec * 1000));
-                embed.addField("Uploaded", new Date(info.video_details.uploadedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
-                resolve({
-                    embed: embed,
-                    id: track.name,
-                    type: "inspectedSong"
-                });
-            }, 5000);
-        });
-    }
 }
 export default {
     SelectMenu,
@@ -321,7 +201,6 @@ export default {
     Pager,
     queuedTrackPager,
     trackPager,
-    pageTrack,
     getHighestResUrl,
     parseVolumeString
 };
