@@ -10,6 +10,8 @@ The only files you actually need will be a .ts file, however if you plan to use 
 
 An addon looks something like [this base addon](https://github.com/tairasoul/YADMB/blob/main/addons/base/src/name.ts) used for resolving providers.
 
+You can use [this template](https://github.com/tairasoul/yadmb-addon-template) as a base.
+
 ## Addon types
 
 You have 6 types of addons:
