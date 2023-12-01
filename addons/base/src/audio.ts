@@ -17,7 +17,7 @@ const addon: AddonInfo = {
             name: "youtube-resolver",
             priority: 0,
             async available(url) {
-                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=./,/https:\/\/youtu\.be\/watch\?v=./].find((reg) => reg.test(url)) != undefined;
+                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/,/https:\/\/youtu\.be\/watch\?v=.*/].find((reg) => reg.test(url)) != undefined;
             },
             async resolve(url) {
                 const info = await playdl.video_info(url);
@@ -41,7 +41,7 @@ const addon: AddonInfo = {
         {
             name: "soundcloud-resolver",
             async available(url) {
-                return [/https:\/\/soundcloud\.com\/./,/https:\/\/on\.soundcloud\.com\/./].find((reg) => reg.test(url)) != undefined;
+                return [/https:\/\/soundcloud\.com\/.*/,/https:\/\/on\.soundcloud\.com\/.*/].find((reg) => reg.test(url)) != undefined;
             },
             priority: 0,
             async resolve(url) {

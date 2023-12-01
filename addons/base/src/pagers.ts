@@ -18,7 +18,7 @@ const addon: AddonInfo = {
             name: "youtube",
             priority: 0,
             async available(url) {
-                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=./,/https:\/\/youtu\.be\/watch\?v=./].find((reg) => reg.test(url)) != undefined;
+                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/,/https:\/\/youtu\.be\/watch\?v=.*/].find((reg) => reg.test(url)) != undefined;
             },
             async queuedPager(track, index) {
                 const embed = new builders.EmbedBuilder();
@@ -59,7 +59,7 @@ const addon: AddonInfo = {
             name: "soundcloud",
             priority: 0,
             async available(url) {
-                return [/https:\/\/soundcloud\.com\/./,/https:\/\/on\.soundcloud\.com\/./].find((reg) => reg.test(url)) != undefined;
+                return [/https:\/\/soundcloud\.com\/*./,/https:\/\/on\.soundcloud\.com\/.*/].find((reg) => reg.test(url)) != undefined;
             },
             async queuedPager(track, index) {
                 const embed = new builders.EmbedBuilder();
@@ -68,12 +68,10 @@ const addon: AddonInfo = {
                 embed.setImage(info.thumbnail);
                 // @ts-ignore
                 embed.addField("Author", info.publisher?.artist);
-                embed.addField("Likes", "Unavailable for SoundCloud.");
-                embed.addField("Views", "Unavailable for SoundCloud.");
                 embed.addField("Duration", humanizeDuration(info.durationInSec * 1000));
                 return {
                     id: track.name,
-                    type: "playlist",
+                    type: track.type,
                     index,
                     embed
                 } as PageData
@@ -85,8 +83,6 @@ const addon: AddonInfo = {
                 embed.setImage(info.thumbnail);
                 // @ts-ignore
                 embed.addField("Author", info.publisher?.artist);
-                embed.addField("Likes", "Unavailable for SoundCloud.");
-                embed.addField("Views", "Unavailable for SoundCloud.");
                 embed.addField("Duration", humanizeDuration(info.durationInSec * 1000));
                 return {
                     id: track.name,

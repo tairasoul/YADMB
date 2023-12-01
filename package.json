@@ -20,6 +20,12 @@
     "@types/randomstring": "^1.1.8"
   },
   "scripts": {
-    "build": "rm -r dist && tsc && cd addons/base && tsc && cd ../../dist/commands && rm *.d.ts"
+    "build": "npm run build_bot && npm run build_base_addons",
+    "build_bot": "rm -r dist && tsc && cd dist/commands  && rm *.d.ts",
+    "build_base_addons": "cd addons/base && tsc",
+    "e_debug": "mv config.json template.json && mv debug.json config.json",
+    "e_default": "mv config.json template.json && mv default.json config.json",
+    "d_debug": "mv config.json debug.json && mv template.json config.json",
+    "d_default": "mv config.json default.json && mv template.json config.json"
   }
 }
