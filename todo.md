@@ -31,6 +31,14 @@
   - ~~this means live-updating view-queue will be easier~~ it's just a snapshot now so
   - it wont take as much time to do view-queue
 
+# finished + comments
+
+- resolver priority + more effective way of checking if it can be used on a url
+  - resolvers now expose an available() function that returns true or false. if true, it can be used.
+  - they also expose a priority variable, which means that:
+    - if it is higher, it will be tried earlier.
+    - if it is lower, it will be tried later.
+
 - update utils.ts
   - what to update:
     - pager functions
@@ -40,14 +48,6 @@
     - pager addons.
     - they expose 2 resolvers.
     - one for a track in a playlist, one for a queued item. (aka replacing utils.trackPager and utils.queuedTrackPager)
-
-# finished + comments
-
-- resolver priority + more effective way of checking if it can be used on a url
-  - resolvers now expose an available() function that returns true or false. if true, it can be used.
-  - they also expose a priority variable, which means that:
-    - if it is higher, it will be tried earlier.
-    - if it is lower, it will be tried later.
 
 - addons
   - i had an idea very suddenly and it seems interesting so im working on it

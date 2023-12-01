@@ -12,7 +12,7 @@ An addon looks something like [this base addon](https://github.com/tairasoul/YAD
 
 ## Addon types
 
-You have 5 types of addons:
+You have 6 types of addons:
 
 - Custom commands
 
@@ -21,6 +21,8 @@ You have 5 types of addons:
 - Provider resolvers
 
 - Song data resolvers
+
+- Pagers
 
 and finally,
 
@@ -47,6 +49,12 @@ If you do not add these in, all other resolvers won't work.
 Song data resolvers simply resolve a URL of a song into a table, containing the URL and the title of the song.
 
 The URL should be playable through one of the audio resolvers, otherwise an error will get thrown when the queue system tries to play the song.
+
+### Pagers
+
+Pagers resolve a URL and an index into usable data for view-queue, and any other potential addon commands.
+
+Check out [the base pagers](https://github.com/tairasoul/YADMB/blob/main/addons/base/pagers.ts) to see how they look.
 
 ### Playlist data resolvers
 
