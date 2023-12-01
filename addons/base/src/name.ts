@@ -13,7 +13,7 @@ const addon: AddonInfo = {
         {
             name: "youtube",
             async available(url) {
-                return [/https:\/\/(?:music|www)\.youtube\.com\/./,/https:\/\/youtu\.be\/./].find((reg) => reg.test(url)) != undefined
+                return [/https:\/\/(?:music|www)\.youtube\.com\/.*/,/https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined
             },
             priority: 0,
             async resolve(url)  {
@@ -23,7 +23,7 @@ const addon: AddonInfo = {
         {
             name: "soundcloud",
             async available(url) {
-                return [/https:\/\/soundcloud.\com\/./,/https:\/\/on\.soundcloud\.com\/./].find((reg) => reg.test(url)) != undefined
+                return [/https:\/\/soundcloud\.com\/.*/,/https:\/\/on\.soundcloud\.com\/.*/].find((reg) => reg.test(url)) != undefined
             },
             priority: 0,
             async resolve(url) {
@@ -33,7 +33,7 @@ const addon: AddonInfo = {
         {
             name: "deezer",
             async available(url) {
-                return [/https:\/\/deezer\.(?:com|page\.link)\/./].find((reg) => reg.test(url)) != undefined
+                return [/https:\/\/deezer\.(?:com|page\.link)\/.*/].find((reg) => reg.test(url)) != undefined
             },
             priority: 0,
             async resolve(url) {

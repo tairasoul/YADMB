@@ -140,18 +140,20 @@ export function Pager(pages) {
 }
 export async function queuedTrackPager(array, callback = () => { return new Promise((resolve) => resolve()); }, resolvers) {
     const pages = [];
-    for (let i = 0; ++i < array.length;) {
+    for (let i = 0; i < array.length; i++) {
         await callback(`paging ${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].tracks[0].url);
         let output;
         for (const pager of pagers) {
             output = await pager.queuedPager(array[i], i);
             if (output) {
+                pages.push(output);
                 break;
             }
         }
-        if (output)
-            pages.push(output);
+        if (output == undefined) {
+            throw new Error(`Could not get pager for ${array[i].name}`);
+        }
     }
     return Pager({ pages: pages });
 }
@@ -171,18 +173,20 @@ export function parseVolumeString(volume) {
 }
 export async function trackPager(array, callback = () => { return new Promise((resolve) => resolve()); }, resolvers) {
     const pages = [];
-    for (let i = 0; ++i < array.length;) {
+    for (let i = 0; i < array.length; i++) {
         await callback(`paging ${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].url);
         let output;
         for (const pager of pagers) {
             output = await pager.trackPager(array[i], i);
             if (output) {
+                pages.push(output);
                 break;
             }
         }
-        if (output)
-            pages.push(output);
+        if (output == undefined) {
+            throw new Error(`Could not get pager for ${array[i].name}`);
+        }
     }
     return Pager({ pages: pages });
 }

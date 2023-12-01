@@ -33,8 +33,8 @@ export default {
         const nameResolvers = await resolvers.getNameResolvers(video);
         let provider;
         for (const resolver of nameResolvers) {
-            if (await resolver.resolve(video)) {
-                provider = await resolver.resolve(video);
+            provider = await resolver.resolve(video);
+            if (provider != undefined) {
                 break;
             }
         }

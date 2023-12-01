@@ -186,9 +186,8 @@ export default {
             await i.defer()
             const queueIndex = data.queued.pages[currentPage].index;
             const queued = guild.queue.tracks;
-            const removed = queued.splice(queueIndex, 1);
-            queued.splice(guild.queue.internalCurrentIndex, 0, removed[0]);
-            await i.createMessage({embeds: [embedMessage("Playing " + removed[0].name + " next.")], flags: 1 << 6});
+            queued.splice(guild.queue.internalCurrentIndex, 0, queued[queueIndex]);
+            await i.createMessage({embeds: [embedMessage("Playing " + queued[queueIndex].name + " next.")], flags: 1 << 6});
         }
 
         const onExitInspect = async (i: oceanic.ComponentInteraction) => {
