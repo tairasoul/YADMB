@@ -534,9 +534,7 @@ export default class addonLoader {
             }
         }
         debugLog(`exclusions for ${addonPath}: ${exclusions.join(" ")}`)
-        // for some reason node's types don't include the recursive option??
-        // @ts-ignore
-        for (const pathname of fs.readdirSync(addonPath, {recursive: true})) {
+        for (const pathname of fs.readdirSync(addonPath, {recursive: true, encoding: "utf8"})) {
             if (!isExcluded(pathname, exclusions) && fs.statSync(`${addonPath}/${pathname}`).isFile()) {
                 const addonInfo: AddonInfo | AddonInfo[] = await import(`file://${addonPath}/${pathname}`).then(m => m.default);
                 if (addonInfo instanceof Array) {
