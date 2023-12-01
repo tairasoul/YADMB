@@ -1,6 +1,7 @@
 import * as oceanic from "oceanic.js";
-import { Guild, default as MusicClient, ResolverInformation } from "./client.js";
+import { Guild, default as MusicClient, ResolverInformation, queuedTrack, track } from "./client.js";
 import { AudioResource } from "@discordjs/voice";
+import { EmbedBuilder } from "@oceanicjs/builders";
 export type resolver = {
     /**
      * Name of the resolver.
@@ -19,6 +20,35 @@ export type resolver = {
      * Function that resolves the URL into something like "youtube" or something more specific if necessary.
      */
     resolve: (url: string) => Promise<string | undefined>;
+};
+export type PageData = {
+    embed: EmbedBuilder;
+    id: string;
+    index: number;
+    type: "playlist" | "song";
+};
+export type PagerResolver = {
+    /**
+     * Name of the resolver.
+     */
+    name: string;
+    /**
+     * Resolver priority. The lower the number, the lower the priority. If your resolver has the highest priority, it will be attempted first.
+     * Please do not set the priority to an absurdly high number, and make it easily configurable by the bot host.
+     */
+    priority: number;
+    /**
+     * Can this resolver be used for this link?
+     */
+    available: (url: string) => Promise<boolean>;
+    /**
+     * Pager for a queued item.
+     */
+    queuedPager: (track: queuedTrack, index: number) => Promise<PageData>;
+    /**
+     * Pager for a track within a playlist.
+     */
+    trackPager: (track: track, index: number) => Promise<PageData>;
 };
 export type AudioResolver = {
     /**
@@ -374,6 +404,40 @@ export type AddonInfo = {
      * An addon that resolves a song URL into a thumbnail URL.
      */
     type: "playlistThumbnailResolver";
+} | {
+    /**
+     * The name of your addon.
+     */
+    name: string;
+    /**
+     * Description of your addon.
+     */
+    description: string;
+    /**
+     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
+     */
+    version: string;
+    /**
+     * Where can other people find the source of this addon?
+     */
+    sources?: string[];
+    /**
+     * Credits for this addon.
+     */
+    credits: string;
+    /**
+     * List of thumbnail resolvers.
+     */
+    pagers: PagerResolver[];
+    /**
+     * Is this addon private?
+     * Addons will not be shown when the user checks addons through /view-addons if it is.
+     */
+    private?: boolean;
+    /**
+     * An addon that resolves a URL into page data.
+     */
+    type: "pagerAddon";
 };
 export type infoData = {
     /**

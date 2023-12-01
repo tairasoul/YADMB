@@ -8,7 +8,7 @@ import QueueHandler from "./queueSystem.js";
 import voice, { NoSubscriberBehavior, createAudioPlayer } from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
 import util from "node:util"
-import { AddonInfo, AudioResolver, command, dataResolver, playlistResolver, resolver, thumbnailResolver } from "./addonLoader.js";
+import { AddonInfo, AudioResolver, PagerResolver, command, dataResolver, playlistResolver, resolver, thumbnailResolver } from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 import { debugLog } from "./bot.js";
 
@@ -42,6 +42,7 @@ export type ResolverInformation = {
     audioResourceResolvers: AudioResolver[];
     songThumbnailResolvers: thumbnailResolver[];
     playlistThumbnailResolvers: thumbnailResolver[];
+    pagers: PagerResolver[];
 }
 
 export type Command = {
@@ -65,7 +66,8 @@ export default class MusicClient extends Client {
         playlistResolvers: [],
         audioResourceResolvers: [],
         songThumbnailResolvers: [],
-        playlistThumbnailResolvers: []
+        playlistThumbnailResolvers: [],
+        pagers: []
     }
     private addonCommands: command[] = [];
     private rawCommands: Command[];
@@ -90,41 +92,49 @@ export default class MusicClient extends Client {
     registerAddons() {
         for (const addon of this.addons) {
             console.log(`registering addon ${addon.name}`);
-            if (addon.type == "songResolver") {
-                for (const resolver of addon.resolvers) {
-                    this.resolvers.songResolvers.push(resolver);
-                }
+            switch(addon.type) {
+                case "songResolver":
+                    for (const resolver of addon.resolvers) {
+                        this.resolvers.songResolvers.push(resolver);
+                    }
+                    break;
+                case "command":
+                    for (const command of addon.commands) {
+                        this.addonCommands.push(command);
+                    }
+                    break;
+                case "songDataResolver":
+                    for (const songResolver of addon.dataResolvers) {
+                        this.resolvers.songDataResolvers.push(songResolver);
+                    }
+                    break;
+                case "playlistDataResolver":
+                    for (const playlistResolver of addon.playlistResolvers) {
+                        this.resolvers.playlistResolvers.push(playlistResolver);
+                    }
+                    break;
+                case "audioResourceResolver":
+                    for (const audioResolver of addon.resourceResolvers) {
+                        this.resolvers.audioResourceResolvers.push(audioResolver);
+                    }
+                    break;
+                case "songThumbnailResolver":
+                    for (const thumbnailResolver of addon.thumbnailResolvers) {
+                        this.resolvers.songThumbnailResolvers.push(thumbnailResolver);
+                    }
+                    break;
+                case "playlistThumbnailResolver":
+                    for (const thumbnailResolver of addon.thumbnailResolvers) {
+                        this.resolvers.playlistThumbnailResolvers.push(thumbnailResolver);
+                    }
+                    break;
+                case "pagerAddon":
+                    for (const pager of addon.pagers) {
+                        this.resolvers.pagers.push(pager);
+                    }
+                    break;
             }
-            else if (addon.type == "command") {
-                for (const command of addon.commands) {
-                    this.addonCommands.push(command);
-                }
-            }
-            else if (addon.type == "songDataResolver") {
-                for (const songResolver of addon.dataResolvers) {
-                    this.resolvers.songDataResolvers.push(songResolver);
-                }
-            }
-            else if (addon.type == "playlistDataResolver") {
-                for (const playlistResolver of addon.playlistResolvers) {
-                    this.resolvers.playlistResolvers.push(playlistResolver);
-                }
-            }
-            else if (addon.type == "audioResourceResolver") {
-                for (const audioResolver of addon.resourceResolvers) {
-                    this.resolvers.audioResourceResolvers.push(audioResolver);
-                }
-            }
-            else if (addon.type == "songThumbnailResolver") {
-                for (const thumbnailResolver of addon.thumbnailResolvers) {
-                    this.resolvers.songThumbnailResolvers.push(thumbnailResolver);
-                }
-            }
-            else if (addon.type == "playlistThumbnailResolver") {
-                for (const thumbnailResolver of addon.thumbnailResolvers) {
-                    this.resolvers.playlistThumbnailResolvers.push(thumbnailResolver);
-                }
-            }
+            
         }
     }
 
