@@ -4,7 +4,7 @@ const addon = {
     credits: "tairasoul",
     version: "1.0.0",
     sources: [
-        "https://github.com/tairasoul/YADMB/blob/main/addons/base/name.ts"
+        "https://github.com/tairasoul/YADMB/blob/main/addons/base/src/name.ts"
     ],
     type: "songResolver",
     resolvers: [
