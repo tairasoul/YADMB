@@ -41,8 +41,6 @@
     - they expose 2 resolvers.
     - one for a track in a playlist, one for a queued item. (aka replacing utils.trackPager and utils.queuedTrackPager)
 
-# in progress
-
 # finished + comments
 
 - resolver priority + more effective way of checking if it can be used on a url
