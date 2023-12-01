@@ -1,10 +1,18 @@
-import { AudioResolver, dataResolver, playlistResolver, resolver } from "./addonLoader";
+import { AudioResolver, PagerResolver, dataResolver, playlistResolver, resolver } from "./addonLoader";
 import { ResolverInformation } from "./client.js";
 
 export default class ResolverUtils {
     public resolvers: ResolverInformation;
     constructor(resolverInfo: ResolverInformation) {
         this.resolvers = resolverInfo;
+    }
+
+    async getPagers(url: string): Promise<PagerResolver[]> {
+        const resolvers: PagerResolver[] = [];
+        for (const resolver of this.resolvers.pagers) {
+            if (await resolver.available(url)) resolvers.push(resolver);
+        }
+        return resolvers.sort((a, b) => b.priority - a.priority);
     }
 
     async getAudioResolvers(url: string): Promise<AudioResolver[]> {

@@ -14,13 +14,13 @@ function embedMessage(text) {
 export default {
     name: "view-queue",
     description: "View a snapshot of the queue.",
-    callback: async (interaction, _resolvers, guild, client) => {
+    callback: async (interaction, resolvers, guild, client) => {
         await interaction.defer(1 << 6);
         await interaction.editOriginal({ embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")], flags: 1 << 6 });
         const data = {
             queued: await utils.queuedTrackPager(guild.queue.tracks, async (title) => {
                 await interaction.editOriginal({ embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6 });
-            }),
+            }, resolvers),
             tracks: null
         };
         let isInspecting = false;
@@ -136,7 +136,7 @@ export default {
             await i.createMessage({ embeds: [embedMessage("Paging tracks for playlist.")], flags: 1 << 6 });
             data.tracks = await utils.trackPager(guild.queue.tracks[currentPage].tracks, async (title) => {
                 await i.editOriginal({ embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6 });
-            });
+            }, resolvers);
             isInspecting = true;
             /** @ts-ignore */
             await interaction.editOriginal({ content: "", embeds: data.tracks.pages[0].embed.toJSON(true), components: actionRows.inspected, flags: 1 << 6 });
@@ -185,9 +185,8 @@ export default {
             await i.defer();
             const queueIndex = data.queued.pages[currentPage].index;
             const queued = guild.queue.tracks;
-            const removed = queued.splice(queueIndex, 1);
-            queued.splice(guild.queue.internalCurrentIndex, 0, removed[0]);
-            await i.createMessage({ embeds: [embedMessage("Playing " + removed[0].name + " next.")], flags: 1 << 6 });
+            queued.splice(guild.queue.internalCurrentIndex, 0, queued[queueIndex]);
+            await i.createMessage({ embeds: [embedMessage("Playing " + queued[queueIndex].name + " next.")], flags: 1 << 6 });
         };
         const onExitInspect = async (i) => {
             if (i.data.customID !== exitInspectId)

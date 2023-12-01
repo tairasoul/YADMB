@@ -5,6 +5,8 @@ import { Client } from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 import { InfoData } from "play-dl";
 import { queuedTrack, track } from './client.js';
+import ResolverUtils from './resolverUtils.js';
+import { PageData } from './addonLoader.js';
 export declare function getHighestResUrl(data: InfoData): string;
 export declare function SelectMenu(options: Array<{
     name: string;
@@ -37,29 +39,14 @@ export declare class PageHolder {
     get currentPageNum(): number;
     get currentPage(): Page;
 }
-export interface PageData {
-    embed: builders.EmbedBuilder;
-    id: string;
-    index: number;
-    type: "playlist" | "song" | "inspectedSong";
-}
 export interface PageHolderData {
     pages: PageData[];
 }
 export declare function Pager(pages: PageHolderData): PageHolder;
-export declare function queuedTrackPager(array: queuedTrack[], callback?: (title: string) => Promise<void>): Promise<PageHolder>;
+export declare function queuedTrackPager(array: queuedTrack[], callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils): Promise<PageHolder>;
 export type volumeMode = "percent" | "whole number";
 export declare function parseVolumeString(volume: string): number;
-export declare function trackPager(array: track[], callback?: (title: string) => Promise<void>): Promise<PageHolder>;
-export declare function pageTrack(track: track): Promise<{
-    embed: builders.EmbedBuilder;
-    id: String;
-    type: "inspectedSong";
-} | {
-    embed: builders.EmbedBuilder;
-    id: string;
-    type: string;
-}>;
+export declare function trackPager(array: track[], callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils): Promise<PageHolder>;
 declare const _default: {
     SelectMenu: typeof SelectMenu;
     mkdsf: typeof mkdsf;
@@ -71,7 +58,6 @@ declare const _default: {
     Pager: typeof Pager;
     queuedTrackPager: typeof queuedTrackPager;
     trackPager: typeof trackPager;
-    pageTrack: typeof pageTrack;
     getHighestResUrl: typeof getHighestResUrl;
     parseVolumeString: typeof parseVolumeString;
 };
