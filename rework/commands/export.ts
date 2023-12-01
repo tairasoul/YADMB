@@ -47,7 +47,7 @@ export default {
                 await interaction.editOriginal({content: "Exported playlist. Save this as a file:", files: [
                     {
                         name: `${(interaction.member as oceanic.Member).id}.${interaction.guildID as string}.${interaction.createdAt.getTime()}.export.txt`,
-                        contents: new Buffer(encoded)
+                        contents: Buffer.from(encoded)
                     }
                 ]});
             case "queue":
@@ -63,7 +63,7 @@ export default {
                 await interaction.editOriginal({content: "Exported queue. Save this as a file:", files: [
                     {
                         name: `${(interaction.member as oceanic.Member).id}.${interaction.guildID as string}.${interaction.createdAt.getTime()}.export.txt`,
-                        contents: new Buffer(q_enc)
+                        contents: Buffer.from(q_enc)
                     }
                 ]});
         }
