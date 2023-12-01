@@ -1,4 +1,4 @@
-import { AddonInfo, PageData } from "../../../dist/addonLoader";
+import { AddonInfo, PageData } from "../../../dist/addonTypes";
 import * as builders from "@oceanicjs/builders"
 import playdl, { SoundCloudTrack } from "play-dl";
 import { getHighestResUrl } from "../../../dist/utils.js";

@@ -5,7 +5,7 @@ import { Base64 as base64 } from "js-base64";
 import rstring from "randomstring";
 import ResolverUtils from "../resolverUtils.js";
 import { debugLog } from "../bot.js";
-import { PageData } from "../addonLoader.js";
+import { PageData } from "../addonTypes.js";
 
 function embedMessage(text: string) {
     const embed = new builders.EmbedBuilder();

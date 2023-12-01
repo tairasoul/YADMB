@@ -1,4 +1,4 @@
-import MusicClient, { Guild, ResolverInformation, queuedTrack } from "../client.js";
+import MusicClient, { Guild, queuedTrack } from "../client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import rstring from "randomstring";

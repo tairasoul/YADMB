@@ -6,7 +6,7 @@ import * as builders from "@oceanicjs/builders";
 import { InfoData } from "play-dl";
 import { queuedTrack, track } from './client.js';
 import ResolverUtils from './resolverUtils.js';
-import { PageData } from './addonLoader.js';
+import { PageData } from './addonTypes.js';
 export declare function getHighestResUrl(data: InfoData): string;
 export declare function SelectMenu(options: Array<{
     name: string;

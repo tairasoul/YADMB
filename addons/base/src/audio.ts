@@ -1,4 +1,4 @@
-import { AddonInfo } from "../../../dist/addonLoader";
+import { AddonInfo } from "../../../dist/addonTypes";
 import playdl, { SoundCloudStream, SoundCloudTrack } from "play-dl";
 import { createAudioResource } from "@discordjs/voice";
 import utils from "../../../dist/utils.js";

@@ -1,4 +1,4 @@
-import { AddonInfo } from "../../../dist/addonLoader.js";
+import { AddonInfo } from "../../../dist/addonTypes.js";
 import playdl from "play-dl";
 import ytdl from "@distube/ytdl-core";
 

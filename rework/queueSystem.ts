@@ -2,7 +2,7 @@ import voice from "@discordjs/voice";
 import util from "node:util";
 import utils from "./utils.js"
 import { queuedTrack, loopType } from "./client.js";
-import { infoData } from "./addonLoader.js";
+import { infoData } from "./addonTypes.js";
 import ResolverUtils from "./resolverUtils.js";
 import { debugLog } from "./bot.js";
 export default class QueueHandler {

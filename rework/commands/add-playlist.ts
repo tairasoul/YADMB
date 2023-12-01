@@ -3,7 +3,7 @@ import * as builders from "@oceanicjs/builders";
 import { Guild, queuedTrack, track } from "../client.js";
 import utils from "../utils.js";
 import * as voice from "@discordjs/voice";
-import { playlistData } from "../addonLoader.js";
+import { playlistData } from "../addonTypes.js";
 import ResolverUtils from "../resolverUtils.js";
 
 export default {
