@@ -3,6 +3,7 @@
     "@discordjs/voice": "^0.16.0",
     "@distube/ytdl-core": "^4.13.2",
     "@oceanicjs/builders": "^1.1.7",
+    "@types/node": "^20.10.1",
     "humanize-duration": "^3.28.0",
     "js-base64": "^3.7.5",
     "libsodium-wrappers": "^0.7.11",
