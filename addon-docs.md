@@ -8,7 +8,7 @@ These types are used for autocomplete.
 
 The only files you actually need will be a .ts file, however if you plan to use custom libs within your addon, make an exclusions.json in the root and add the path of the files.
 
-An addon looks something like [this base addon](https://github.com/tairasoul/YADMB/blob/main/rework/addons/base/baseNameResolvers.ts) used for resolving providers.
+An addon looks something like [this base addon](https://github.com/tairasoul/YADMB/blob/main/addons/base/src/name.ts) used for resolving providers.
 
 ## Addon types
 
@@ -54,7 +54,7 @@ The URL should be playable through one of the audio resolvers, otherwise an erro
 
 Pagers resolve a URL and an index into usable data for view-queue, and any other potential addon commands.
 
-Check out [the base pagers](https://github.com/tairasoul/YADMB/blob/main/addons/base/pagers.ts) to see how they look.
+Check out [the base pagers](https://github.com/tairasoul/YADMB/blob/main/addons/base/src/pagers.ts) to see how they look.
 
 ### Playlist data resolvers
 
