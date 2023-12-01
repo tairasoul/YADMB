@@ -8,7 +8,7 @@ const addon = {
     version: "1.0.0",
     type: "audioResourceResolver",
     sources: [
-        "https://github.com/tairasoul/YADMB/blob/main/addons/base/audio.ts"
+        "https://github.com/tairasoul/YADMB/blob/main/addons/base/src/audio.ts"
     ],
     resourceResolvers: [
         {
