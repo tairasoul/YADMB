@@ -15,7 +15,7 @@ const addon: AddonInfo = {
     version: "1.0.0",
     type: "playlistDataResolver",
     sources: [
-        "https://github.com/tairasoul/YADMB/blob/main/rework/addons/base/basePlaylistResolvers.ts"
+        "https://github.com/tairasoul/YADMB/blob/main/addons/base/playlist.ts"
     ],
     playlistResolvers: [
         {

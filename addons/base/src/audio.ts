@@ -10,7 +10,7 @@ const addon: AddonInfo = {
     version: "1.0.0",
     type: "audioResourceResolver",
     sources: [
-        "https://github.com/tairasoul/YADMB/blob/main/rework/addons/base/baseAudioResolvers.ts"
+        "https://github.com/tairasoul/YADMB/blob/main/addons/base/audio.ts"
     ],
     resourceResolvers: [
         {

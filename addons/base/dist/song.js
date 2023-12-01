@@ -16,7 +16,7 @@ const addon = {
     version: "1.0.0",
     type: "songDataResolver",
     sources: [
-        "https://github.com/tairasoul/YADMB/blob/main/rework/addons/base/baseSongResolvers.ts"
+        "https://github.com/tairasoul/YADMB/blob/main/addons/base/song.ts"
     ],
     dataResolvers: [
         {

@@ -6,7 +6,7 @@ const addon: AddonInfo = {
     credits: "tairasoul",
     version: "1.0.0",
     sources: [
-        "https://github.com/tairasoul/YADMB/blob/main/rework/addons/base/baseNameResolvers.ts"
+        "https://github.com/tairasoul/YADMB/blob/main/addons/base/name.ts"
     ],
     type: "songResolver",
     resolvers: [

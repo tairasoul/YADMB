@@ -11,7 +11,7 @@ const addon: AddonInfo = {
     version: "1.0.0",
     type: "pagerAddon",
     sources: [
-        "https://github.com/tairasoul/YADMB/blob/main/rework/addons/base/baseAudioResolvers.ts"
+        "https://github.com/tairasoul/YADMB/blob/main/addons/base/pagers.ts"
     ],
     pagers: [
         {
