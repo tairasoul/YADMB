@@ -7,7 +7,7 @@ import addonLoader from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 import * as voice from "@discordjs/voice";
 let debug = false;
-if (fs.existsSync(`${__dirname}/enableDebugging`)) debug = true;
+if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
 
 export function debugLog(text: any) {
     if (debug) console.log(text)

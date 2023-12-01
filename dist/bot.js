@@ -5,7 +5,7 @@ import MusicClient from './client.js';
 import addonLoader from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
-if (fs.existsSync(`${__dirname}/enableDebugging`))
+if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`))
     debug = true;
 export function debugLog(text) {
     if (debug)
