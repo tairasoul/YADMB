@@ -1,6 +1,10 @@
 # Yet Another Discord Music Bot
 a music bot because i got bored and made one
 
+the concept is a decentralized music bot.
+
+no instance of this stores any of your data in the filesystem, everything that is stored on filesystem will be stored on the user's filesystem and not the host machine
+
 started in december 2022, this is one of the projects i've been working on the longest.
 
 if you encounter any problems or have any suggestions, open an issue.
