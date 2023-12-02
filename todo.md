@@ -31,6 +31,13 @@
   - ~~this means live-updating view-queue will be easier~~ it's just a snapshot now so
   - it wont take as much time to do view-queue
 
+- online playlist editor/viewer
+  - just an idea.
+  - runs off the same addons as the default bot (mostly the resolvers)
+  - allows you to create, view and edit custom playlists online
+  - bot host can choose to run it alongside the bot
+  - up to them to forward it though
+
 # finished + comments
 
 - resolver priority + more effective way of checking if it can be used on a url
