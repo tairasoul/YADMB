@@ -226,7 +226,7 @@
             <div class="modal-content">
                 <textarea class="song-text-area" placeholder="Enter song URL"></textarea>
                 <br>
-                <button class="song-url-confirm" onclick="closeModal();addSong(document.querySelector('.song-text-area').value.trim());document.querySelector('.song-text-area').value=null">Add</button>
+                <button class="song-url-confirm" onclick="closeModal();addSong(document.querySelector('.song-text-area').value.trim());document.querySelector('.song-text-area').value=null;document.addEventListener('click', handleClickOutside);">Add</button>
             </div>
         </div>
 
@@ -246,6 +246,19 @@
         <script>
             let dragItem = null;
             let placeholder = null;
+
+            const modal = document.querySelector('.song-add-popup');
+            const background = document.body;
+
+            // Function to handle click events on the background
+            function handleClickOutside(event) {
+                if (!modal.contains(event.target)) {
+                    // Click is outside the modal, close the modal
+                    modal.style.display = 'none';
+                    document.removeEventListener('click', handleClickOutside); // Remove the click outside listener
+                }
+            }
+
 
             function handleDragStart(event) {
                 if (event.target.parentElement.classList.contains('player-container')) {
