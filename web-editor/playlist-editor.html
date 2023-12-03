@@ -264,9 +264,7 @@
     
             function handleDrop() {
                 if (dragItem) {
-                    dragItem.style.position = ''; // Reset position
-                    dragItem.style.top = ''; // Reset top position
-                    dragItem.style.opacity = ''; // Reset opacity
+                    dragItem.removeAttribute("style");
                     const parent = placeholder.parentNode;
                     parent.insertBefore(dragItem, placeholder);
                     parent.removeChild(placeholder);
@@ -277,7 +275,7 @@
     
             function handleDragEnd() {
                 if (dragItem) {
-                    dragItem.style.opacity = ''; // Reset opacity
+                    dragItem.removeAttribute("style");
                     const parent = dragItem.parentNode;
                     parent.removeChild(placeholder);
                     dragItem = null;
