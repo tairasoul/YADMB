@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Playlist Editor</title>
+        <style>
+            /* Styles for the mockup */
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #181818; /* Dark background color */
+                color: #fff; /* Light text color */
+            }
+            header {
+                background-color: #282828; /* Darker header background color */
+                color: #ffffff;
+                padding: 10px;
+                text-align: center;
+            }
+            .player-container {
+                max-width: 800px;
+                margin: 20px auto;
+                padding: 20px;
+                border: 1px solid #444; /* Darker border color */
+                background-color: #1e1e1e; /* Darker container background color */
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                text-align: left;
+                display: flex;
+                align-items: center;
+                cursor: grab; /* Change cursor on drag */
+                transition: background-color 0.3s ease;
+            }
+            .thumbnail {
+                flex: 0 0 80px;
+                margin-right: 20px;
+            }
+            .thumbnail img {
+                width: 100%;
+                height: auto;
+            }
+            .song-info {
+                flex: 1;
+            }
+            .song-title {
+                font-size: 24px;
+                font-weight: bold;
+                margin: 0;
+            }
+            .artist {
+                font-style: italic;
+                color: #ccc; /* Lighter text color for artist */
+            }
+            .add-song {
+                font-style: normal;
+                color: #ccc;
+            }
+            .controls {
+                padding-top: 20px;
+            }
+            .control-button {
+                background-color: #ff0000;
+                color: #ffffff;
+                border: none;
+                padding: 10px 20px;
+                margin-right: 10px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            .drag-over {
+                background-color: #333; /* Darker color when dragging over */
+            }
+            .placeholder {
+                border: 1px dashed #777; /* Placeholder border */
+                height: 100px; /* Adjust placeholder height */
+                margin: 10px 0;
+            }
+            .add-song {
+                position: absolute;
+                top: 0;
+                right: 20px;
+                margin-top: 20px;
+            }
+            .add-song-button {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius:  10px;
+            }
+            /* Modal styles */
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            }
+            .modal-content {
+                width: 80%; /* Adjust the width as needed */
+                max-width: 600px; /* Set a max-width if desired */
+                background-color: #1e1e1e;
+                padding: 20px;
+                border-radius: 5px;
+                text-align: center;
+            }
+            .song-text-area {
+                width: calc(100% - 22px); /* Adjust width considering padding and borders */
+                padding: 10px;
+                margin-bottom: 10px;
+                background-color: #333;
+                border: 1px solid #444;
+                color: #fff;
+                border-radius: 5px;
+            }
+            .song-url-confirm {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+            }
+            .remove {
+                position: relative;
+                width: 20px;
+                height: 20px;
+                background: none;
+                border: none;
+            }
+            .remove-button {
+                background-color: transparent;
+                color: #ffffff;
+                border: none;
+                padding: 5px;
+                cursor: pointer;
+                position: absolute;
+                top: 10px;
+                right: 10px;
+            }
+            .remove-button::before,
+            .remove-button::after {
+                content: '';
+                position: absolute;
+                width: 20px;
+                height: 2px;
+                background-color: #ffffff;
+                transform-origin: center;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            .remove-button::before {
+                transform: translate(-50%, -50%) rotate(45deg);
+            }
+            .remove-button::after {
+                transform: translate(-50%, -50%) rotate(-45deg);
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Playlist Editor</h1>
+        </header>
+
+        <div class="add-song">
+            <button class="add-song-button" onclick="openModal()">Add song</button>
+        </div>
+
+        <div class="modal-overlay" id="modal">
+            <div class="modal-content">
+                <textarea class="song-text-area" placeholder="Enter song URL"></textarea>
+                <br>
+                <button class="song-url-confirm" onclick="closeModal();addSong(document.querySelector('.song-text-area'))">Add</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="error-modal">
+            <div class="modal-content">
+                <label>Error while trying to add the song.</label>
+            </div>
+        </div>
+        
+        <div id="playlist">
+            <div class="player-container">
+                <div class="thumbnail">
+                    <!-- Placeholder for the video thumbnail -->
+                    <img src="https://via.placeholder.com/80x80.png" alt="Video Thumbnail">
+                </div>
+                <div class="song-info" draggable="true">
+                    <p class="song-title">Song Title 1</p>
+                    <p class="artist">Artist Name 1</p>
+                    <!-- Add other information like album, duration, etc., as needed -->
+                </div>
+                <div class="remove">
+                    <button class="remove-button" onclick="removeElement(this)"></button>
+                </div>
+            </div>
+    
+            <div class="player-container">
+                <div class="thumbnail">
+                    <!-- Placeholder for the video thumbnail -->
+                    <img src="https://via.placeholder.com/80x80.png" alt="Video Thumbnail">
+                </div>
+                <div class="song-info" draggable="true">
+                    <p class="song-title">Song Title 2</p>
+                    <p class="artist">Artist Name 2</p>
+                    <!-- Add other information like album, duration, etc., as needed -->
+                </div>
+                <div class="remove">
+                    <button class="remove-button" onclick="removeElement(this)"></button>
+                </div>
+            </div>
+    
+            <div class="player-container">
+                <div class="thumbnail">
+                    <!-- Placeholder for the video thumbnail -->
+                    <img src="https://via.placeholder.com/80x80.png" alt="Video Thumbnail">
+                </div>
+                <div class="song-info" draggable="true">
+                    <p class="song-title">Song Title 3</p>
+                    <p class="artist">Artist Name 3</p>
+                    <!-- Add other information like album, duration, etc., as needed -->
+                </div>
+                <div class="remove">
+                    <button class="remove-button" onclick="removeElement(this)"></button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function openModal() {
+                const modal = document.getElementById('modal');
+                modal.style.display = 'flex';
+            }
+    
+            function closeModal() {
+                const modal = document.getElementById('modal');
+                modal.style.display = 'none';
+            }
+
+            function showError() {
+                const error = document.getElementById("error-modal");
+                error.style.display = "flex";
+            }
+
+            function hideError() {
+                const error = document.getElementById("error-modal");
+                error.style.display = "none";
+            }
+        </script>
+        
+        <script>
+            let dragItem = null;
+            let placeholder = null;
+    
+            function handleDragStart(event) {
+                if (event.target.parentElement.classList.contains('player-container')) {
+                    dragItem = event.target.parentElement;
+                    placeholder = document.createElement('div');
+                    placeholder.className = 'placeholder';
+                    dragItem.parentNode.insertBefore(placeholder, dragItem.nextSibling);
+                    event.dataTransfer.setDragImage(new Image(), 0, 0); // Hide drag image
+                }
+            }
+    
+            function handleDragOver(event) {
+                event.preventDefault();
+                if (dragItem) {
+                    const bounding = event.currentTarget.getBoundingClientRect();
+                    const offsetY = event.clientY - bounding.top;
+                    const newIndex = Math.floor(offsetY / dragItem.offsetHeight);
+                    const siblings = [...event.currentTarget.children];
+                    const currentIndex = siblings.indexOf(dragItem);
+                    if (newIndex > currentIndex) {
+                        event.currentTarget.insertBefore(placeholder, siblings[newIndex + 1]);
+                    } else {
+                        event.currentTarget.insertBefore(placeholder, siblings[newIndex]);
+                    }
+                }
+            }
+    
+            function handleDrop() {
+                if (dragItem) {
+                    const parent = dragItem.parentNode;
+                    parent.insertBefore(dragItem, placeholder);
+                    parent.removeChild(placeholder);
+                    dragItem = null;
+                    placeholder = null;
+                }
+            }
+    
+            function handleDragEnd() {
+                if (dragItem) {
+                    const parent = dragItem.parentNode;
+                    parent.removeChild(placeholder);
+                    dragItem = null;
+                    placeholder = null;
+                }
+            }
+    
+            const playlist = document.getElementById('playlist');
+            playlist.addEventListener('dragstart', handleDragStart);
+            playlist.addEventListener('dragover', handleDragOver);
+            playlist.addEventListener('drop', handleDrop);
+            playlist.addEventListener('dragend', handleDragEnd);
+        </script>
+    </body>
+</html>

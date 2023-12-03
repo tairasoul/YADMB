@@ -38,6 +38,14 @@ export default class QueueHandler {
             }
             else {
                 cur.trackNumber++;
+                if (cur.trackNumber >= cur.tracks.length) {
+                    if (this.internalLoop == "queue") {
+                        this.internalCurrentIndex++;
+                    }
+                    else {
+                        this.tracks.splice(0, 1);
+                    }
+                }
             }
         }
         else if ((cur.type == "playlist" && cur.trackNumber >= cur.tracks.length) || cur.type == "song") {
@@ -58,12 +66,7 @@ export default class QueueHandler {
         return newCurrent.tracks[newCurrent.trackNumber];
     }
     async skip() {
-        if (this.tracks[this.internalCurrentIndex].type == "song")
-            this.tracks.splice(this.internalCurrentIndex, 1);
-        else
-            this.tracks[this.internalCurrentIndex].tracks.splice(this.tracks[this.internalCurrentIndex].trackNumber, 1);
         this.audioPlayer.stop(true);
-        this.nextTrack();
     }
     pause() {
         return this.audioPlayer.pause(true);
