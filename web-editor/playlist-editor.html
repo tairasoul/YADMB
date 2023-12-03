@@ -32,6 +32,10 @@
                 transition: opacity 0.3s ease-in-out; /* Add transition */
                 pointer-events: all
             }
+            .playlist-editor-text {
+                text-align: center;
+                flex: 1;
+            }
             .player-container.dragging {
                 opacity: 0.5; /* Change opacity when dragging */
             }
@@ -81,10 +85,21 @@
             }
             .add-song {
                 position: sticky;
-                top: 0;
+                margin-top: -80px;
+                z-index: 200;
                 right: 20px;
-                margin-top: 20px;
                 pointer-events: all;
+                float: right;
+            }
+            .sticky-header {
+                position: sticky;
+                top: 0;
+                padding: 10px;
+                z-index: 100; /* Ensure it appears above other content if necessary */
+                display: flex;
+                text-align: center;
+                justify-content: space-between; /* Align items to the start and end */
+                align-items: center; /* Align items vertically */
             }
             .add-song-button {
                 background-color: #4CAF50;
@@ -97,6 +112,60 @@
                 font-size: 16px;
                 cursor: pointer;
                 border-radius:  10px;
+            }
+            .export {
+                position: sticky;
+                margin-top: -80px;
+                z-index: 200;
+                left: 20px;
+                pointer-events: all;
+                float: left;
+            }
+            .export-button {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius:  10px;
+            }
+            .export-text-area {
+                width: calc(100% - 22px); /* Adjust width considering padding and borders */
+                padding: 10px;
+                margin-bottom: 10px;
+                background-color: #333;
+                border: 1px solid #444;
+                color: #fff;
+                border-radius: 5px;
+                pointer-events: all;
+            }
+            .export-confirm {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                pointer-events: all;
+            }
+            .export-cancel {
+                background-color: rgb(209, 44, 11);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                pointer-events: all;
             }
             /* Modal styles */
             .modal-overlay {
@@ -169,6 +238,7 @@
                 position: absolute;
                 top: 10px;
                 right: 10px;
+                pointer-events: all;
             }
             .remove-button::before,
             .remove-button::after {
@@ -203,8 +273,8 @@
         </style>
     </head>
     <body>
-        <header>
-            <h1>Playlist Editor</h1>
+        <header class="sticky-header">
+            <h1 class="playlist-editor-text"">Playlist Editor</h1>
         </header>
 
         
@@ -216,6 +286,16 @@
     
             function closeModal() {
                 const modal = document.getElementById('modal');
+                modal.style.display = 'none';
+            }
+
+            function openExportModal() {
+                const modal = document.getElementById('export-modal');
+                modal.style.display = 'flex';
+            }
+    
+            function closeExportModal() {
+                const modal = document.getElementById('export-modal');
                 modal.style.display = 'none';
             }
 
@@ -232,6 +312,21 @@
 
         <div class="add-song">
             <button class="add-song-button" onclick="openModal()">Add song</button>
+        </div>
+
+        <div class="export">
+            <button class="export-button" onclick="openExportModal()">Export playlist</button>
+        </div>
+
+        <div class="modal-overlay" id="export-modal">
+            <div class="modal-content">
+                <textarea class="export-text-area" placeholder="Enter playlist name"></textarea>
+                <br>
+                <button class="export-confirm" onclick="closeExportModal();exportQueue(document.querySelector('.export-text-area').value);document.querySelector('.song-text-area').value=null">Export playlist</button>
+                <br>
+                <br>
+                <button class="export-cancel" onclick="closeExportModal();document.querySelector('.song-text-area').value=null">Close</button>
+            </div>
         </div>
 
         <div class="modal-overlay" id="modal">
