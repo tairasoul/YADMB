@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Playlist Editor</title>
+        <style>
+            /* Styles for the mockup */
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #181818; /* Dark background color */
+                color: #fff; /* Light text color */
+            }
+            header {
+                background-color: #282828; /* Darker header background color */
+                color: #ffffff;
+                padding: 10px;
+                text-align: center;
+            }
+            .player-container {
+                max-width: 800px;
+                margin: 20px auto;
+                padding: 20px;
+                border: 1px solid #444; /* Darker border color */
+                background-color: #1e1e1e; /* Darker container background color */
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                text-align: left;
+                display: flex;
+                align-items: center;
+                cursor: grab; /* Change cursor on drag */
+                transition: opacity 0.3s ease-in-out; /* Add transition */
+                pointer-events: all
+            }
+            .playlist-editor-text {
+                text-align: center;
+                flex: 1;
+            }
+            .player-container.dragging {
+                opacity: 0.5; /* Change opacity when dragging */
+            }
+            .thumbnail {
+                flex: 0 0 80px;
+                margin-right: 20px;
+            }
+            .thumbnail img {
+                width: 100%;
+                height: auto;
+            }
+            .song-info {
+                flex: 1;
+            }
+            .song-title {
+                font-size: 24px;
+                font-weight: bold;
+                margin: 0;
+            }
+            .artist {
+                font-style: italic;
+                color: #ccc; /* Lighter text color for artist */
+            }
+            .add-song {
+                font-style: normal;
+                color: #ccc;
+            }
+            .controls {
+                padding-top: 20px;
+            }
+            .control-button {
+                background-color: #ff0000;
+                color: #ffffff;
+                border: none;
+                padding: 10px 20px;
+                margin-right: 10px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            .drag-over {
+                background-color: #333; /* Darker color when dragging over */
+            }
+            .placeholder {
+                border: 1px dashed #777; /* Placeholder border */
+                height: 100px; /* Adjust placeholder height */
+                margin: 10px 0;
+            }
+            .add-song {
+                position: sticky;
+                margin-top: -80px;
+                z-index: 200;
+                right: 20px;
+                pointer-events: all;
+                float: right;
+            }
+            .sticky-header {
+                position: sticky;
+                top: 0;
+                padding: 10px;
+                z-index: 100; /* Ensure it appears above other content if necessary */
+                display: flex;
+                text-align: center;
+                justify-content: space-between; /* Align items to the start and end */
+                align-items: center; /* Align items vertically */
+            }
+            .add-song-button {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius:  10px;
+            }
+            .drop-area {
+                width: 300px;
+                height: 200px;
+                border: 2px dashed #ccc;
+                text-align: center;
+                padding: 20px;
+                margin: 20px;
+                background-color: #1e1e1e; /* Match the background color */
+                color: #fff; /* Match the text color */
+                border-radius: 5px; /* Apply border radius */
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .drop-area p {
+                margin: 10px 0;
+            }
+            
+            .drop-area.highlight {
+                border-color: #ff0000; /* Highlight color when dragging over */
+            }
+            
+            .file-label {
+                background-color: #4CAF50;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius: 10px;
+                border: none;
+                pointer-events: all;
+            }
+
+            .file-label:empty {
+                padding: 50px 20px; /* Adjust padding when label is empty */
+                /* Additional styles */
+            }
+
+            /* Initially hide the Process File button */
+            #processButton {
+                display: none;
+            }
+            
+            .file-input {
+                display: none; /* Hide the file input */
+            }
+            .import {
+                position: sticky;
+                margin-top: -80px;
+                z-index: 200;
+                left: 200px;
+                pointer-events: all;
+                float: left;
+            }
+            .import-button {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius:  10px;
+                pointer-events: all;
+            }
+            .processButton {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius:  10px;
+                pointer-events: all;
+            }
+            .import-cancel {
+                background-color: rgb(209, 44, 11);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                pointer-events: all;
+            }
+            .export {
+                position: sticky;
+                margin-top: -80px;
+                z-index: 200;
+                left: 20px;
+                pointer-events: all;
+                float: left;
+            }
+            .export-button {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius:  10px;
+            }
+            .export-text-area {
+                width: calc(100% - 22px); /* Adjust width considering padding and borders */
+                padding: 10px;
+                margin-bottom: 10px;
+                background-color: #333;
+                border: 1px solid #444;
+                color: #fff;
+                border-radius: 5px;
+                pointer-events: all;
+            }
+            .export-confirm {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                pointer-events: all;
+            }
+            .export-cancel {
+                background-color: rgb(209, 44, 11);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                pointer-events: all;
+            }
+            /* Modal styles */
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            }
+            .modal-content {
+                width: 400px; /* Set the width */
+                max-width: 600px; /* Set a max-width if desired */
+                background-color: #1e1e1e;
+                padding: 20px;
+                border-radius: 5px;
+                text-align: center;
+            }
+            .song-text-area {
+                width: calc(100% - 22px); /* Adjust width considering padding and borders */
+                padding: 10px;
+                margin-bottom: 10px;
+                background-color: #333;
+                border: 1px solid #444;
+                color: #fff;
+                border-radius: 5px;
+                pointer-events: all;
+            }
+            .song-url-confirm {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                pointer-events: all;
+            }
+            .song-url-cancel {
+                background-color: rgb(209, 44, 11);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                pointer-events: all;
+            }
+            .remove {
+                position: relative;
+                width: 20px;
+                height: 20px;
+                background: none;
+                border: none;
+            }
+            .remove-button {
+                background-color: transparent;
+                color: #ffffff;
+                border: none;
+                padding: 5px;
+                cursor: pointer;
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                pointer-events: all;
+            }
+            .remove-button::before,
+            .remove-button::after {
+                content: '';
+                position: absolute;
+                width: 20px;
+                height: 2px;
+                background-color: #ffffff;
+                transform-origin: center;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            .remove-button::before {
+                transform: translate(-50%, -50%) rotate(45deg);
+            }
+            .remove-button::after {
+                transform: translate(-50%, -50%) rotate(-45deg);
+            }
+            img {
+                pointer-events: none;
+            }
+            textarea {
+                resize: none;
+            }
+            p {
+                pointer-events: none;
+            }
+            div {
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="sticky-header">
+            <h1 class="playlist-editor-text"">Playlist Editor</h1>
+        </header>
+
+        
+        <script>
+            function openModal() {
+                const modal = document.getElementById('modal');
+                modal.style.display = 'flex';
+            }
+    
+            function closeModal() {
+                const modal = document.getElementById('modal');
+                modal.style.display = 'none';
+            }
+
+            function openExportModal() {
+                const modal = document.getElementById('export-modal');
+                modal.style.display = 'flex';
+            }
+    
+            function closeExportModal() {
+                const modal = document.getElementById('export-modal');
+                modal.style.display = 'none';
+            }
+
+            function openImportModal() {
+                const modal = document.getElementById('import-modal');
+                modal.style.display = 'flex';
+            }
+    
+            function closeImportModal() {
+                const modal = document.getElementById('import-modal');
+                modal.style.display = 'none';
+            }
+
+            function showError() {
+                const error = document.getElementById("error-modal");
+                error.style.display = "flex";
+            }
+
+            function hideError() {
+                const error = document.getElementById("error-modal");
+                error.style.display = "none";
+            }
+        </script>
+
+        <div class="add-song">
+            <button class="add-song-button" onclick="openModal()">Add song</button>
+        </div>
+
+        <div class="export">
+            <button class="export-button" onclick="openExportModal()">Export playlist</button>
+        </div>
+
+        <div class="import">
+            <button class="import-button" onclick="openImportModal()">Import playlist file</button>
+        </div>
+
+        <div class="modal-overlay" id="export-modal">
+            <div class="modal-content">
+                <textarea class="export-text-area" placeholder="Enter playlist name"></textarea>
+                <br>
+                <button class="export-confirm" onclick="closeExportModal();exportQueue(document.querySelector('.export-text-area').value);document.querySelector('.song-text-area').value=null">Export playlist</button>
+                <br>
+                <br>
+                <button class="export-cancel" onclick="closeExportModal();document.querySelector('.song-text-area').value=null">Close</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal">
+            <div class="modal-content">
+                <textarea class="song-text-area" placeholder="Enter song URL"></textarea>
+                <br>
+                <button class="song-url-confirm" onclick="addSong(document.querySelector('.song-text-area').value.trim());document.querySelector('.song-text-area').value=null">Add</button>
+                <br>
+                <br>
+                <button class="song-url-cancel" onclick="closeModal();document.querySelector('.song-text-area').value=null">Close</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="error-modal">
+            <div class="modal-content">
+                <label>Error while trying to add the song.</label>
+                <br>
+                <button class="song-url-confirm" onclick="hideError()">Got it.</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="import-modal">
+            <div class="modal-content">
+                <div id="dropArea" class="drop-area">
+                    <input type="file" id="fileInput" class="file-input" />
+                    <div id="fileDetails" class="file-details"></div>
+                    <div id="fileButtons">
+                        <label class="import-button" id="importButton" for="fileInput">Import</label>
+                        <button class="import-button" id="processButton" onclick="processFile()" style="display: none;">Process File</button>
+                        <button class="import-button" id="cancelButton" onclick="cancelFile()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="playlist">
+        </div>
+
+        <script type="module" src="./code/song.verify.js"></script>
+
+        <script>
+            document.getElementById('fileInput').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                const processButton = document.getElementById('processButton');
+                const cancelButton = document.getElementById('cancelButton');
+                const importButton = document.getElementById('importButton');
+            
+                if (file) {
+                    // Show the Process File and Cancel buttons if a file is selected
+                    processButton.style.display = 'inline-block';
+                    cancelButton.style.display = 'inline-block';
+                    importButton.style.display = 'none'; // Hide the Import button
+                } else {
+                    // Hide the Process File and Cancel buttons if no file is selected
+                    processButton.style.display = 'none';
+                    cancelButton.style.display = 'inline-block';
+                    importButton.style.display = 'inline-block'; // Show the Import button
+                }
+            });
+            function cancelFile() {
+                // Reset file input and hide the Process File and Cancel buttons
+                document.getElementById('fileInput').value = ''; // Clear file input value
+                document.getElementById('fileDetails').textContent = ''; // Clear file details
+                document.getElementById('processButton').style.display = 'none';
+                document.getElementById('cancelButton').style.display = 'inline-block';
+                document.getElementById('importButton').style.display = 'inline-block'; // Show the Import button
+                closeImportModal();
+            }
+            document.getElementById('fileInput').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                const processButton = document.getElementById('processButton');
+            
+                if (file) {
+                    // Show the Process File button if a file is selected
+                    processButton.style.display = 'inline-block';
+                } else {
+                    // Hide the Process File button if no file is selected
+                    processButton.style.display = 'none';
+                }
+            });
+            function handleFile(file) {
+                const fileDetails = document.getElementById('fileDetails');
+                const processButton = document.getElementById('processButton');
+            
+                fileDetails.innerHTML = `
+                    <p>File Name: ${file.name}</p>
+                    <p>File Size: ${formatFileSize(file.size)}</p>
+                `;
+                processButton.removeAttribute('disabled');
+            }
+            
+            function processFile() {
+                document.getElementById('importButton').style.display = "inline-block";
+                document.getElementById('processButton').style.display = 'none';
+                document.getElementById('cancelButton').style.display = 'inline-block';
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+                if (file) {
+                    // Process the file here as needed
+                    console.log('File processed:', file.name);
+                    // Reset file details and disable button after processing
+                    document.getElementById('fileDetails').innerHTML = '';
+                    document.getElementById('processButton').setAttribute('disabled', 'true');
+                    // Read file contents
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const fileContent = event.target.result;
+                        console.log('File content:', fileContent);
+
+                        /** @type {string} */
+                        const playlistB64 = event.target.result;
+                        const playlistJSON = atob(playlistB64);
+                        const parsed = JSON.parse(playlistJSON);
+                        closeImportModal();
+                        for (const track of parsed.tracks) {
+                            addSong(track.url);
+                        }
+                        // Process the file content as needed
+                    };
+                    reader.readAsText(file);
+                }
+            }
+            
+            function formatFileSize(size) {
+                if (size === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                const i = Math.floor(Math.log(size) / Math.log(k));
+                return parseFloat((size / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            document.getElementById('fileInput').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    handleFile(file);
+                }
+            });
+        </script>
+        
+        <script>let dragItem = null;
+            let placeholder = null;
+            
+            function handleDragStart(event) {
+                if (event.target.classList.contains('player-container')) {
+                    dragItem = event.target;
+                    placeholder = document.createElement('div');
+                    placeholder.className = 'placeholder';
+                    dragItem.style.opacity = '0.5';
+                    dragItem.parentNode.insertBefore(placeholder, dragItem.nextSibling);
+                    event.dataTransfer.setDragImage(new Image(), 0, 0); // Hide drag image
+                }
+            }
+            
+            function handleDragOver(event) {
+                event.preventDefault();
+                if (dragItem) {
+                    const offsetY = event.clientY - event.currentTarget.getBoundingClientRect().top + 40;
+                    const offsetX = event.clientX - event.currentTarget.getBoundingClientRect().left - 200;
+                    dragItem.style.position = 'fixed';
+                    dragItem.style.top = `${offsetY}px`;
+                    dragItem.style.left = `${offsetX}px`;
+                    const newIndex = Math.floor(offsetY / dragItem.offsetHeight);
+                    const siblings = [...event.currentTarget.querySelectorAll('.player-container')];
+                    const currentIndex = siblings.indexOf(dragItem);
+                    if (newIndex > currentIndex) {
+                        event.currentTarget.insertBefore(placeholder, siblings[newIndex + 1]);
+                    } else {
+                        event.currentTarget.insertBefore(placeholder, siblings[newIndex]);
+                    }
+                }
+            }
+            
+            function handleDrop(event) {
+                if (dragItem) {
+                    dragItem.removeAttribute("style");
+                    const parent = placeholder.parentNode;
+                    parent.insertBefore(dragItem, placeholder);
+                    parent.removeChild(placeholder);
+                    dragItem = null;
+                    placeholder = null;
+                }
+            }
+            
+            function handleDragEnd(event) {
+                if (dragItem) {
+                    dragItem.removeAttribute("style");
+                    const parent = dragItem.parentNode;
+                    parent.removeChild(placeholder);
+                    dragItem = null;
+                    placeholder = null;
+                }
+            }
+            
+            const playlist = document.getElementById('playlist');
+            playlist.addEventListener('dragstart', handleDragStart);
+            playlist.addEventListener('dragover', handleDragOver);
+            playlist.addEventListener('drop', handleDrop);
+            playlist.addEventListener('dragend', handleDragEnd);
+        </script>
+    </body>
+</html>

@@ -6,13 +6,12 @@ import ResolverUtils from "../resolverUtils.js";
 export default {
     name: "skip-song",
     description: "Skip the current song.",
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverUtils, guild: Guild) => {
         const queue = guild.queue;
         const embed = new builders.EmbedBuilder();
         if (queue.currentInfo) {
             embed.setDescription(`Skipped song ${queue.currentInfo.name}.`);
             await queue.skip();
-            await queue.play(resolvers);
         }
         else {
             embed.setDescription(`No song to skip.`);
