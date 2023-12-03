@@ -36,9 +36,9 @@ server.on("connection", (socket) => {
                 await loader.readAddons();
                 for (const addon of loader.addons) {
                     for (const resolver of addon.resolvers) {
-                        const av_hash = createSha256(`${addon.name}.${resolver.name}.available`);
+                        const av_hash = createSha256(`${addon.name}.${addon.version}.${resolver.name}.available`);
                         hashTable[av_hash] = resolver.available;
-                        const wb_hash = createSha256(`${addon.name}.${resolver.name}.webResolver`);
+                        const wb_hash = createSha256(`${addon.name}.${addon.version}.${resolver.name}.webResolver`);
                         hashTable[wb_hash] = resolver.webResolver;
                     }
                 }
