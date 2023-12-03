@@ -1,4 +1,14 @@
 import ytdl from "@distube/ytdl-core";
+import playdl, { SoundCloudPlaylist, SoundCloudTrack } from "play-dl";
+
+playdl.getFreeClientID().then((val) => 
+    playdl.setToken({
+        soundcloud: {
+            client_id: val
+        }
+    })
+)
+
 
 export type WebInfo = {
     /**
@@ -85,6 +95,34 @@ const addon: AddonInfo = {
                     songUrl: url
                 }
             },
+        },
+        {
+            name: "soundcloud",
+            description: "Resolvers soundcloud links.",
+            async available(url) {
+                return [/https:\/\/soundcloud\.com\/.*/,/https:\/\/on\.soundcloud\.com\/.*/].find((reg) => reg.test(url)) != undefined;
+            },
+            async webResolver(url) {
+                const so = await playdl.soundcloud(url);
+                if (so instanceof SoundCloudPlaylist) {
+                    return {
+                        songName: "Soundcloud playlists are not supported. Please remove this element.",
+                        songArtist: "",
+                        songThumbnail: "",
+                        songUrl: ""
+                    }
+                }
+                else {
+                    const sound = so as SoundCloudTrack;
+                    return {
+                        songName: sound.name,
+                        // @ts-ignore
+                        songArtist: sound.publisher.name,
+                        songThumbnail: sound.thumbnail,
+                        songUrl: url
+                    }
+                }
+            }
         }
     ]
 }
