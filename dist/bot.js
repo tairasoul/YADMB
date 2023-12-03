@@ -4,6 +4,8 @@ import { fileURLToPath } from 'url';
 import MusicClient from './client.js';
 import addonLoader from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
+import { startWebFunctions } from "./web.fsapi.js";
+import web from "./web.command.js";
 let debug = false;
 if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`))
     debug = true;
@@ -12,7 +14,7 @@ export function debugLog(text) {
         console.log(text);
 }
 let setup = false;
-const { token } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+const { token, web_features } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 const client = new MusicClient({
     auth: token,
     allowedMentions: {
@@ -32,6 +34,10 @@ const client = new MusicClient({
         connectionTimeout: 900000
     }
 });
+if (web_features) {
+    startWebFunctions();
+    client.addCommand(web.data.name, web.data.description, [], web.execute);
+}
 const loader = new addonLoader(client);
 client.on('voiceStateUpdate', (oldState, newState) => {
     const guild = client.m_guilds[oldState.guildID];
@@ -108,3 +114,4 @@ client.on("m_interactionCreate", async (interaction, resolvers, guild, m_client)
     }
 });
 await client.connect();
+export default client.addons;

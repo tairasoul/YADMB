@@ -98,7 +98,7 @@ const addon: AddonInfo = {
         },
         {
             name: "soundcloud",
-            description: "Resolvers soundcloud links.",
+            description: "Resolves soundcloud links.",
             async available(url) {
                 return [/https:\/\/soundcloud\.com\/.*/,/https:\/\/on\.soundcloud\.com\/.*/].find((reg) => reg.test(url)) != undefined;
             },
