@@ -1,22 +1,17 @@
-/* Apply your stylized homepage layout here */
-body.homepage {
+body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f7f7f7;
+    background-color: #1f1f1f;
+    color: #eee;
 }
 
 header {
     background-color: #333;
-    color: #fff;
+    color: #eee;
     text-align: center;
     padding: 20px 0;
     margin-bottom: 20px;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 28px;
 }
 
 main {
@@ -33,12 +28,17 @@ main {
 }
 
 .homepage-section {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+    width: 300px; /* Adjust the width */
+    height: 300px; /* Adjust the height */
+    border-radius: 10px;
+    background-color: #333;
+    margin: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transition: transform 0.3s ease;
     text-align: center;
-    width: 300px;
 }
 
 .homepage-section h2 {
@@ -47,7 +47,7 @@ main {
 }
 
 .homepage-section p {
-    color: #666;
+    color: #ccc;
     margin-bottom: 20px;
 }
 
@@ -67,7 +67,7 @@ main {
 
 footer {
     background-color: #333;
-    color: #fff;
+    color: #eee;
     text-align: center;
     padding: 10px 0;
     position: fixed;
