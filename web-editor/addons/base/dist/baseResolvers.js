@@ -15,11 +15,12 @@ const addon = {
                 const info = await ytdl.getInfo(url);
                 const author = info.videoDetails.author.name;
                 const title = info.videoDetails.title;
-                const thumbnail = info.videoDetails.thumbnail.thumbnails[0].url;
+                const thumbnail = info.videoDetails.thumbnails[0].url;
                 return {
                     songArtist: author,
                     songName: title,
-                    songThumbnail: thumbnail
+                    songThumbnail: thumbnail,
+                    songUrl: url
                 };
             },
         }

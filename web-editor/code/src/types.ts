@@ -11,6 +11,10 @@ export type WebInfo = {
      * Song thumbnail.
      */
     songThumbnail: string;
+    /**
+     * Song url.
+     */
+    songUrl: string;
 }
 
 export type WebResolver = {

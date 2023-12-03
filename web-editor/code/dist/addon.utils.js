@@ -3,12 +3,12 @@ async function sha256(message) {
     const encoder = new TextEncoder();
     const data = encoder.encode(message);
     // Create a hash using SubtleCrypto
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hash = await crypto.subtle.digest('SHA-256', data);
     // Convert the hash buffer to a string
-    const hashString = Array.from(new Uint8Array(hashBuffer))
-        .map(byte => String.fromCharCode(byte))
+    const hexString = Array.from(new Uint8Array(hash))
+        .map(byte => byte.toString(16).padStart(2, '0'))
         .join('');
-    return hashString;
+    return hexString;
 }
 export default class AddonUtils {
     rawInfo = [];
@@ -17,6 +17,7 @@ export default class AddonUtils {
     constructor(info, socket) {
         this.rawInfo = info.sort((a, b) => b.priority - a.priority);
         this.ws = socket;
+        this.setupHashes();
     }
     async setupHashes() {
         for (const addon of this.rawInfo) {
@@ -24,6 +25,8 @@ export default class AddonUtils {
             for (const resolver of addon.resolvers) {
                 const av_hash = await sha256(`${addon.name}.${addon.version}.${resolver.name}.available`);
                 const wb_hash = await sha256(`${addon.name}.${addon.version}.${resolver.name}.webResolver`);
+                console.log(`${addon.name}.${addon.version}.${resolver.name}.webResolver`);
+                console.log(wb_hash);
                 const newResolver = {
                     name: resolver.name,
                     description: resolver.description,
@@ -32,6 +35,7 @@ export default class AddonUtils {
                             this.ws.send(JSON.stringify({ request: "hashExecute", hash: av_hash, params: [url] }));
                             const callback = (msg) => {
                                 const json = JSON.parse(msg.data);
+                                console.log(json);
                                 if (json.response === `hashExecute${av_hash}`) {
                                     this.ws.removeEventListener("message", callback);
                                     resolve(json.data);
@@ -45,6 +49,7 @@ export default class AddonUtils {
                             this.ws.send(JSON.stringify({ request: "hashExecute", hash: wb_hash, params: [url] }));
                             const callback = (msg) => {
                                 const json = JSON.parse(msg.data);
+                                console.log(json);
                                 if (json.response === `hashExecute${wb_hash}`) {
                                     this.ws.removeEventListener("message", callback);
                                     resolve(json.data);
@@ -71,8 +76,9 @@ export default class AddonUtils {
         const resolvers = [];
         for (const addon of this.fixedInfo) {
             for (const resolver of addon.resolvers) {
-                if (await resolver.available(url))
+                if (await resolver.available(url)) {
                     resolvers.push(resolver);
+                }
             }
         }
         return resolvers;
