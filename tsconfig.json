@@ -15,6 +15,8 @@
   },
   "exclude": [
     "addons/*",
-    "dist/*.d.ts"
+    "dist/*.d.ts",
+    "web-editor/*",
+    "dist/*/*.d.ts"
   ]
 }
