@@ -37,9 +37,9 @@ app.get('/execute-hash/:hash', async (request, response) => {
     console.log(url);
     console.log(`received request to execute hash ${hash} with url ${url}`);
     if (hash in hashTable) {
-        console.log(`executing hash ${hash} from hashTable`);
+        console.log(`executing hash from hashTable`);
         const corresponding = await hashTable[hash](url);
-        console.log(`sending response for hashExecute${hash}`);
+        console.log(`sending response for hashExecute}`);
         response.json({ response: `hashExecute${hash}`, data: corresponding });
     }
 });
