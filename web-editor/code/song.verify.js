@@ -82,3 +82,32 @@ document.addSong = async (/** @type {string} */text) => {
     console.log(output);
     createSong(output.songThumbnail, output.songName, output.songArtist, output.songUrl)
 }
+
+document.exportQueue = async (/** @type {string} */ name) => {
+    const elements = document.querySelectorAll(".player-container");
+    const exported = {
+        name,
+        trackNumber: 0,
+        type: "playlist",
+        tracks: []
+    }
+    for (const element of elements) {
+        const url = element.getAttribute("url")
+        const title = element.getAttribute("title");
+        exported.tracks.push({url, title});
+    }
+    const encoded = JSON.stringify(exported);
+    const b64 = btoa(encoded);
+
+    const blob = new Blob([b64], { type: "application/json" });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `online.playlist.${name}.export.txt`;
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+}
