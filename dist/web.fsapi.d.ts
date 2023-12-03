@@ -1,1 +1,1 @@
-export {};
+export declare function startWebFunctions(): void;

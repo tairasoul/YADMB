@@ -113,6 +113,103 @@
                 cursor: pointer;
                 border-radius:  10px;
             }
+            .drop-area {
+                width: 300px;
+                height: 200px;
+                border: 2px dashed #ccc;
+                text-align: center;
+                padding: 20px;
+                margin: 20px;
+                background-color: #1e1e1e; /* Match the background color */
+                color: #fff; /* Match the text color */
+                border-radius: 5px; /* Apply border radius */
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .drop-area p {
+                margin: 10px 0;
+            }
+            
+            .drop-area.highlight {
+                border-color: #ff0000; /* Highlight color when dragging over */
+            }
+            
+            .file-label {
+                background-color: #4CAF50;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius: 10px;
+                border: none;
+                pointer-events: all;
+            }
+
+            .file-label:empty {
+                padding: 50px 20px; /* Adjust padding when label is empty */
+                /* Additional styles */
+            }
+
+            /* Initially hide the Process File button */
+            #processButton {
+                display: none;
+            }
+            
+            .file-input {
+                display: none; /* Hide the file input */
+            }
+            .import {
+                position: sticky;
+                margin-top: -80px;
+                z-index: 200;
+                left: 200px;
+                pointer-events: all;
+                float: left;
+            }
+            .import-button {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius:  10px;
+                pointer-events: all;
+            }
+            .processButton {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius:  10px;
+                pointer-events: all;
+            }
+            .import-cancel {
+                background-color: rgb(209, 44, 11);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                pointer-events: all;
+            }
             .export {
                 position: sticky;
                 margin-top: -80px;
@@ -181,7 +278,7 @@
                 z-index: 9999;
             }
             .modal-content {
-                width: 80%; /* Adjust the width as needed */
+                width: 400px; /* Set the width */
                 max-width: 600px; /* Set a max-width if desired */
                 background-color: #1e1e1e;
                 padding: 20px;
@@ -299,6 +396,16 @@
                 modal.style.display = 'none';
             }
 
+            function openImportModal() {
+                const modal = document.getElementById('import-modal');
+                modal.style.display = 'flex';
+            }
+    
+            function closeImportModal() {
+                const modal = document.getElementById('import-modal');
+                modal.style.display = 'none';
+            }
+
             function showError() {
                 const error = document.getElementById("error-modal");
                 error.style.display = "flex";
@@ -316,6 +423,10 @@
 
         <div class="export">
             <button class="export-button" onclick="openExportModal()">Export playlist</button>
+        </div>
+
+        <div class="import">
+            <button class="import-button" onclick="openImportModal()">Import playlist file</button>
         </div>
 
         <div class="modal-overlay" id="export-modal">
@@ -347,32 +458,131 @@
                 <button class="song-url-confirm" onclick="hideError()">Got it.</button>
             </div>
         </div>
+
+        <div class="modal-overlay" id="import-modal">
+            <div class="modal-content">
+                <div id="dropArea" class="drop-area">
+                    <input type="file" id="fileInput" class="file-input" />
+                    <div id="fileDetails" class="file-details"></div>
+                    <div id="fileButtons">
+                        <label class="import-button" id="importButton" for="fileInput">Import</label>
+                        <button class="import-button" id="processButton" onclick="processFile()" style="display: none;">Process File</button>
+                        <button class="import-button" id="cancelButton" onclick="cancelFile()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <div id="playlist">
         </div>
 
         <script type="module" src="./code/song.verify.js"></script>
-        
+
         <script>
-            let dragItem = null;
-            let placeholder = null;
+            document.getElementById('fileInput').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                const processButton = document.getElementById('processButton');
+                const cancelButton = document.getElementById('cancelButton');
+                const importButton = document.getElementById('importButton');
+            
+                if (file) {
+                    // Show the Process File and Cancel buttons if a file is selected
+                    processButton.style.display = 'inline-block';
+                    cancelButton.style.display = 'inline-block';
+                    importButton.style.display = 'none'; // Hide the Import button
+                } else {
+                    // Hide the Process File and Cancel buttons if no file is selected
+                    processButton.style.display = 'none';
+                    cancelButton.style.display = 'inline-block';
+                    importButton.style.display = 'inline-block'; // Show the Import button
+                }
+            });
+            function cancelFile() {
+                // Reset file input and hide the Process File and Cancel buttons
+                document.getElementById('fileInput').value = ''; // Clear file input value
+                document.getElementById('fileDetails').textContent = ''; // Clear file details
+                document.getElementById('processButton').style.display = 'none';
+                document.getElementById('cancelButton').style.display = 'inline-block';
+                document.getElementById('importButton').style.display = 'inline-block'; // Show the Import button
+                closeImportModal();
+            }
+            document.getElementById('fileInput').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                const processButton = document.getElementById('processButton');
+            
+                if (file) {
+                    // Show the Process File button if a file is selected
+                    processButton.style.display = 'inline-block';
+                } else {
+                    // Hide the Process File button if no file is selected
+                    processButton.style.display = 'none';
+                }
+            });
+            function handleFile(file) {
+                const fileDetails = document.getElementById('fileDetails');
+                const processButton = document.getElementById('processButton');
+            
+                fileDetails.innerHTML = `
+                    <p>File Name: ${file.name}</p>
+                    <p>File Size: ${formatFileSize(file.size)}</p>
+                `;
+                processButton.removeAttribute('disabled');
+            }
+            
+            function processFile() {
+                document.getElementById('importButton').style.display = "inline-block";
+                document.getElementById('processButton').style.display = 'none';
+                document.getElementById('cancelButton').style.display = 'inline-block';
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+                if (file) {
+                    // Process the file here as needed
+                    console.log('File processed:', file.name);
+                    // Reset file details and disable button after processing
+                    document.getElementById('fileDetails').innerHTML = '';
+                    document.getElementById('processButton').setAttribute('disabled', 'true');
+                    // Read file contents
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const fileContent = event.target.result;
+                        console.log('File content:', fileContent);
 
-            const modal = document.querySelector('.song-add-popup');
-            const background = document.body;
-
-            // Function to handle click events on the background
-            function handleClickOutside(event) {
-                if (!modal.contains(event.target)) {
-                    // Click is outside the modal, close the modal
-                    modal.style.display = 'none';
-                    document.removeEventListener('click', handleClickOutside); // Remove the click outside listener
+                        /** @type {string} */
+                        const playlistB64 = event.target.result;
+                        const playlistJSON = atob(playlistB64);
+                        const parsed = JSON.parse(playlistJSON);
+                        closeImportModal();
+                        for (const track of parsed.tracks) {
+                            addSong(track.url);
+                        }
+                        // Process the file content as needed
+                    };
+                    reader.readAsText(file);
                 }
             }
-
-
+            
+            function formatFileSize(size) {
+                if (size === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                const i = Math.floor(Math.log(size) / Math.log(k));
+                return parseFloat((size / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            document.getElementById('fileInput').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    handleFile(file);
+                }
+            });
+        </script>
+        
+        <script>let dragItem = null;
+            let placeholder = null;
+            
             function handleDragStart(event) {
-                if (event.target.parentElement.classList.contains('player-container')) {
-                    dragItem = event.target.parentElement;
+                if (event.target.classList.contains('player-container')) {
+                    dragItem = event.target;
                     placeholder = document.createElement('div');
                     placeholder.className = 'placeholder';
                     dragItem.style.opacity = '0.5';
@@ -380,18 +590,17 @@
                     event.dataTransfer.setDragImage(new Image(), 0, 0); // Hide drag image
                 }
             }
-    
+            
             function handleDragOver(event) {
                 event.preventDefault();
                 if (dragItem) {
-                    const bounding = event.currentTarget.getBoundingClientRect();
-                    const offsetY = event.clientY - bounding.top + 40;
-                    const offsetX = event.clientX - bounding.left - 200
+                    const offsetY = event.clientY - event.currentTarget.getBoundingClientRect().top + 40;
+                    const offsetX = event.clientX - event.currentTarget.getBoundingClientRect().left - 200;
                     dragItem.style.position = 'fixed';
                     dragItem.style.top = `${offsetY}px`;
                     dragItem.style.left = `${offsetX}px`;
                     const newIndex = Math.floor(offsetY / dragItem.offsetHeight);
-                    const siblings = [...event.currentTarget.children];
+                    const siblings = [...event.currentTarget.querySelectorAll('.player-container')];
                     const currentIndex = siblings.indexOf(dragItem);
                     if (newIndex > currentIndex) {
                         event.currentTarget.insertBefore(placeholder, siblings[newIndex + 1]);
@@ -400,8 +609,8 @@
                     }
                 }
             }
-    
-            function handleDrop() {
+            
+            function handleDrop(event) {
                 if (dragItem) {
                     dragItem.removeAttribute("style");
                     const parent = placeholder.parentNode;
@@ -411,8 +620,8 @@
                     placeholder = null;
                 }
             }
-    
-            function handleDragEnd() {
+            
+            function handleDragEnd(event) {
                 if (dragItem) {
                     dragItem.removeAttribute("style");
                     const parent = dragItem.parentNode;
@@ -421,7 +630,7 @@
                     placeholder = null;
                 }
             }
-    
+            
             const playlist = document.getElementById('playlist');
             playlist.addEventListener('dragstart', handleDragStart);
             playlist.addEventListener('dragover', handleDragOver);

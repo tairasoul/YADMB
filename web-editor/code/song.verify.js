@@ -30,7 +30,6 @@ function createSong(thumbnailUrl, title, artist, url) {
     thumbnail.draggable = false;
     const songInfo = document.createElement('div');
     songInfo.className = "song-info"
-    songInfo.draggable = true;
     const songTitle = document.createElement('p');
     songTitle.className = "song-title"
     const songArtist = document.createElement('p');
@@ -63,7 +62,7 @@ function createSong(thumbnailUrl, title, artist, url) {
     container.parentElement = playlist;*/
 }
 
-document.addSong = async (/** @type {string} */text) => {
+window.addSong = async (/** @type {string} */text) => {
     const resolvers = await utils.getAvailableResolvers(text);
     if (resolvers.length === 0) {
         const error_modal = document.getElementById("error-modal");

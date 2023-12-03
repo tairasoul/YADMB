@@ -28,7 +28,7 @@
     "build_bot": "rm -r dist && tsc && cd dist/commands  && rm *.d.ts",
     "build_base_addons": "cd addons/base && tsc",
     "build_web": "npm run build_web_base && npm run build_web_addons",
-    "build_web_base": "cd web-editor/code && tsc",
+    "build_web_base": "cd web-editor/code && rm -r dist && tsc",
     "build_web_addons": "cd web-editor/addons/base && tsc",
     "e_debug": "mv config.json template.json && mv debug.json config.json",
     "e_default": "mv config.json template.json && mv default.json config.json",
