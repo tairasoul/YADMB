@@ -2,6 +2,10 @@ import addonUtils from "./dist/addon.utils.js";
 
 const connection = new WebSocket(`ws://localhost:2567`);
 
+/**
+ * @type {addonUtils}
+ */
+
 let utils;
 
 connection.addEventListener("open", () => connection.send(JSON.stringify({request: "readAddons"})))
@@ -36,6 +40,7 @@ function createSong(thumbnailUrl, title, artist) {
 
 document.addSong = async (/** @type {string} */text) => {
     const resolvers = await utils.getAvailableResolvers(text);
+    console.log(resolvers);
     if (resolvers.length === 0) {
         const error_modal = document.getElementById("error-modal");
         error_modal.querySelector("label").textContent = `No resolvers found for URL ${text}`;

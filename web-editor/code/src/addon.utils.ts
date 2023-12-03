@@ -16,44 +16,67 @@ async function sha256(message: string) {
     return hashString;
 }
 export default class AddonUtils {
-    info: AddonInfo[] = [];
+    rawInfo: AddonInfo[] = [];
+    fixedInfo: AddonInfo[] = [];
     ws: WebSocket;
     constructor(info: AddonInfo[], socket: WebSocket) {
-        this.info = info.sort((a, b) => b.priority - a.priority);
+        this.rawInfo = info.sort((a, b) => b.priority - a.priority);
         this.ws = socket;
     }
 
     async setupHashes() {
-        for (const addon of this.info) {
+        for (const addon of this.rawInfo) {
+            const resolvers: WebResolver[] = [];
             for (const resolver of addon.resolvers) {
-                const av_hash = await sha256(`${addon.name}.${resolver.name}.available`);
-                resolver.available = (url: string) => {
-                    return new Promise(async (resolve) => {
-                        this.ws.send(JSON.stringify({request: "hashExecute", hash: av_hash, params: [url]}));
-                        const callback = (msg: any) => {
-                            const json = JSON.parse(msg.data);
-                            if (json.response === `hashExecute${av_hash}`) {
-                                this.ws.removeEventListener("message", callback);
-                                resolve(json.data);
+                const av_hash = await sha256(`${addon.name}.${addon.version}.${resolver.name}.available`);
+                const wb_hash = await sha256(`${addon.name}.${addon.version}.${resolver.name}.webResolver`);
+                const newResolver: WebResolver = {
+                    name: resolver.name,
+                    description: resolver.description,
+                    available: (url: string) => {
+                        return new Promise(async (resolve) => {
+                            this.ws.send(JSON.stringify({request: "hashExecute", hash: av_hash, params: [url]}));
+                            const callback = (msg: any) => {
+                                const json = JSON.parse(msg.data);
+                                if (json.response === `hashExecute${av_hash}`) {
+                                    this.ws.removeEventListener("message", callback);
+                                    resolve(json.data);
+                                }
                             }
-                        }
-                        this.ws.addEventListener("message", callback)
-                    })
+                            this.ws.addEventListener("message", callback)
+                        })
+                    },
+                    webResolver: (url: string) => {
+                        return new Promise(async (resolve) => {
+                            this.ws.send(JSON.stringify({request: "hashExecute", hash: wb_hash, params: [url]}));
+                            const callback = (msg: any) => {
+                                const json = JSON.parse(msg.data);
+                                if (json.response === `hashExecute${wb_hash}`) {
+                                    this.ws.removeEventListener("message", callback);
+                                    resolve(json.data);
+                                }
+                            }
+                            this.ws.addEventListener("message", callback);
+                        })
+                    }
                 }
-                const wb_hash = await sha256(`${addon.name}.${resolver.name}.webResolver`)
-                resolver.webResolver = (url: string) => {
-                    return new Promise(async (resolve) => {
-                        this.ws.send(JSON.stringify({request: "hashExecute", hash: wb_hash, params: [url]}));
-
-                    })
-                }
+                resolvers.push(newResolver);
             }
+            const newAddon: AddonInfo = {
+                name: addon.name,
+                description: addon.description,
+                version: addon.version,
+                private: addon.private,
+                priority: addon.priority,
+                resolvers
+            }
+            this.fixedInfo.push(newAddon);
         }
     }
 
     async getAvailableResolvers(url: string): Promise<WebResolver[]> {
         const resolvers: WebResolver[] = [];
-        for (const addon of this.info) {
+        for (const addon of this.fixedInfo) {
             for (const resolver of addon.resolvers) {
                 if (await resolver.available(url)) resolvers.push(resolver);
             }
