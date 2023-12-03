@@ -4,7 +4,7 @@ import crypto from "crypto";
 function createSha256(str) {
     const hash = crypto.createHash("sha256");
     hash.update(str);
-    return hash.digest().toString();
+    return hash.digest("hex");
 }
 const server = new WebSocketServer({
     port: 2567
@@ -25,6 +25,8 @@ server.on("connection", (socket) => {
                         const av_hash = createSha256(`${addon.name}.${addon.version}.${resolver.name}.available`);
                         hashTable[av_hash] = resolver.available;
                         const wb_hash = createSha256(`${addon.name}.${addon.version}.${resolver.name}.webResolver`);
+                        console.log(`${addon.name}.${addon.version}.${resolver.name}.webResolver`);
+                        console.log(wb_hash);
                         hashTable[wb_hash] = resolver.webResolver;
                     }
                 }
@@ -34,7 +36,7 @@ server.on("connection", (socket) => {
             socket.send(JSON.stringify({ response: "readAddons", addons: loader.addons }));
         }
         else if (req.request === "hashExecute") {
-            const corresponding = hashTable[req.hash](...req.params);
+            const corresponding = await hashTable[req.hash](...req.params);
             socket.send(JSON.stringify({ response: `hashExecute${req.hash}`, data: corresponding }));
         }
     });

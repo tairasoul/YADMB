@@ -16,31 +16,52 @@ connection.addEventListener("message", (ev) => {
     }
 })
 
-function createSong(thumbnailUrl, title, artist) {
+function createSong(thumbnailUrl, title, artist, url) {
+    console.log(thumbnailUrl, title, artist)
     const playlist = document.getElementById("playlist");
-    const container = document.createElement('div[class="player-container"]');
-    const thumbnailDiv = document.createElement('div[class="thumbnail]');
-    const thumbnail = document.createElement(`img[src=${thumbnailUrl}]`);
-    const songInfo = document.createElement('div[class="song-info" draggable="true"]');
-    const songTitle = document.createElement('p[class="song-title"]');
-    const songArtist = document.createElement('p[class="artist"]');
-    const removeDiv = document.createElement('div[class="remove"]');
-    const removeButton = document.createElement('button[class="remove-button" onclick="removeElement(this)"]');
+    const container = document.createElement('div');
+    container.className = "player-container"
+    const thumbnailDiv = document.createElement('div');
+    thumbnailDiv.className = "thumbnail"
+    const thumbnail = document.createElement(`img`);
+    thumbnail.src = thumbnailUrl
+    const songInfo = document.createElement('div');
+    songInfo.className = "song-info"
+    songInfo.draggable = true;
+    const songTitle = document.createElement('p');
+    songTitle.className = "song-title"
+    const songArtist = document.createElement('p');
+    songArtist.className = "artist"
+    const removeDiv = document.createElement('div');
+    removeDiv.className = "remove"
+    const removeButton = document.createElement('button');
+    removeButton.className = "remove-button"
+    removeButton.onclick = () => {
+        const closest = removeButton.closest(".player-container");
+        if (closest) closest.remove();
+    }
     songTitle.textContent = title;
     songArtist.textContent = artist;
-    thumbnail.parentElement = thumbnailDiv;
+    thumbnailDiv.appendChild(thumbnail);
+    songInfo.appendChild(songTitle);
+    songInfo.appendChild(songArtist);
+    removeDiv.appendChild(removeButton);
+    container.appendChild(thumbnailDiv);
+    container.appendChild(songInfo);
+    container.appendChild(removeDiv);
+    playlist.appendChild(container);
+    /*thumbnail.parentElement = thumbnailDiv;
     songTitle.parentElement = songInfo;
     songArtist.parentElement = songInfo;
     thumbnailDiv.parentElement = container;
     songInfo.parentElement = container;
     removeButton.parentElement = removeDiv;
     removeDiv.parentElement = container;
-    container.parentElement = playlist;
+    container.parentElement = playlist;*/
 }
 
 document.addSong = async (/** @type {string} */text) => {
     const resolvers = await utils.getAvailableResolvers(text);
-    console.log(resolvers);
     if (resolvers.length === 0) {
         const error_modal = document.getElementById("error-modal");
         error_modal.querySelector("label").textContent = `No resolvers found for URL ${text}`;
@@ -55,5 +76,5 @@ document.addSong = async (/** @type {string} */text) => {
             break;
         }
     }
-    createSong(output.songThumbnail, output.songName, output.songArtist)
+    createSong(output.songThumbnail, output.songName, output.songArtist, output.songUrl)
 }

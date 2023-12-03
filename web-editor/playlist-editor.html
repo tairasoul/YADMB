@@ -29,7 +29,10 @@
                 display: flex;
                 align-items: center;
                 cursor: grab; /* Change cursor on drag */
-                transition: background-color 0.3s ease;
+                transition: opacity 0.3s ease-in-out; /* Add transition */
+            }
+            .player-container.dragging {
+                opacity: 0.5; /* Change opacity when dragging */
             }
             .thumbnail {
                 flex: 0 0 80px;
@@ -207,7 +210,7 @@
             <div class="modal-content">
                 <textarea class="song-text-area" placeholder="Enter song URL"></textarea>
                 <br>
-                <button class="song-url-confirm" onclick="closeModal();addSong(document.querySelector('.song-text-area').textContent)">Add</button>
+                <button class="song-url-confirm" onclick="closeModal();addSong(document.querySelector('.song-text-area').value.trim());document.querySelector('.song-text-area').value=null">Add</button>
             </div>
         </div>
 
@@ -220,50 +223,6 @@
         </div>
         
         <div id="playlist">
-            <div class="player-container">
-                <div class="thumbnail">
-                    <!-- Placeholder for the video thumbnail -->
-                    <img src="https://via.placeholder.com/80x80.png" alt="Video Thumbnail">
-                </div>
-                <div class="song-info" draggable="true">
-                    <p class="song-title">Song Title 1</p>
-                    <p class="artist">Artist Name 1</p>
-                    <!-- Add other information like album, duration, etc., as needed -->
-                </div>
-                <div class="remove">
-                    <button class="remove-button" onclick="removeElement(this)"></button>
-                </div>
-            </div>
-    
-            <div class="player-container">
-                <div class="thumbnail">
-                    <!-- Placeholder for the video thumbnail -->
-                    <img src="https://via.placeholder.com/80x80.png" alt="Video Thumbnail">
-                </div>
-                <div class="song-info" draggable="true">
-                    <p class="song-title">Song Title 2</p>
-                    <p class="artist">Artist Name 2</p>
-                    <!-- Add other information like album, duration, etc., as needed -->
-                </div>
-                <div class="remove">
-                    <button class="remove-button" onclick="removeElement(this)"></button>
-                </div>
-            </div>
-    
-            <div class="player-container">
-                <div class="thumbnail">
-                    <!-- Placeholder for the video thumbnail -->
-                    <img src="https://via.placeholder.com/80x80.png" alt="Video Thumbnail">
-                </div>
-                <div class="song-info" draggable="true">
-                    <p class="song-title">Song Title 3</p>
-                    <p class="artist">Artist Name 3</p>
-                    <!-- Add other information like album, duration, etc., as needed -->
-                </div>
-                <div class="remove">
-                    <button class="remove-button" onclick="removeElement(this)"></button>
-                </div>
-            </div>
         </div>
 
         <script type="module" src="./code/song.verify.js"></script>
@@ -271,12 +230,13 @@
         <script>
             let dragItem = null;
             let placeholder = null;
-    
+
             function handleDragStart(event) {
                 if (event.target.parentElement.classList.contains('player-container')) {
                     dragItem = event.target.parentElement;
                     placeholder = document.createElement('div');
                     placeholder.className = 'placeholder';
+                    dragItem.style.opacity = '0.5';
                     dragItem.parentNode.insertBefore(placeholder, dragItem.nextSibling);
                     event.dataTransfer.setDragImage(new Image(), 0, 0); // Hide drag image
                 }
@@ -286,7 +246,11 @@
                 event.preventDefault();
                 if (dragItem) {
                     const bounding = event.currentTarget.getBoundingClientRect();
-                    const offsetY = event.clientY - bounding.top;
+                    const offsetY = event.clientY - bounding.top + 40;
+                    const offsetX = event.clientX - bounding.left - 200
+                    dragItem.style.position = 'fixed';
+                    dragItem.style.top = `${offsetY}px`;
+                    dragItem.style.left = `${offsetX}px`;
                     const newIndex = Math.floor(offsetY / dragItem.offsetHeight);
                     const siblings = [...event.currentTarget.children];
                     const currentIndex = siblings.indexOf(dragItem);
@@ -300,7 +264,10 @@
     
             function handleDrop() {
                 if (dragItem) {
-                    const parent = dragItem.parentNode;
+                    dragItem.style.position = ''; // Reset position
+                    dragItem.style.top = ''; // Reset top position
+                    dragItem.style.opacity = ''; // Reset opacity
+                    const parent = placeholder.parentNode;
                     parent.insertBefore(dragItem, placeholder);
                     parent.removeChild(placeholder);
                     dragItem = null;
@@ -310,6 +277,7 @@
     
             function handleDragEnd() {
                 if (dragItem) {
+                    dragItem.style.opacity = ''; // Reset opacity
                     const parent = dragItem.parentNode;
                     parent.removeChild(placeholder);
                     dragItem = null;
