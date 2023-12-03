@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { AddonInfo } from "./types";
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 
 function isExcluded(filePath: string, exclusionList: string[]) {
     return exclusionList.some(exclusion => {
@@ -17,13 +19,7 @@ function isExcluded(filePath: string, exclusionList: string[]) {
 
 export default class addonLoader {
     addons: AddonInfo[] = [];
-    private addonsRead: boolean = false;
     constructor() {
-    }
-
-    readAddonsSync() {
-        this.readAddons();
-        while (!this.addonsRead) {};
     }
 
     async readAddons() {
@@ -50,7 +46,6 @@ export default class addonLoader {
             }
             console.log(`addon ${addon} has been read`);
         }
-        this.addonsRead = true;
     }
 
     async readAddonFolder(addonPath: string) {
