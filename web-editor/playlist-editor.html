@@ -30,6 +30,7 @@
                 align-items: center;
                 cursor: grab; /* Change cursor on drag */
                 transition: opacity 0.3s ease-in-out; /* Add transition */
+                pointer-events: all
             }
             .player-container.dragging {
                 opacity: 0.5; /* Change opacity when dragging */
@@ -173,6 +174,15 @@
                 transform: translate(-50%, -50%) rotate(-45deg);
             }
             img {
+                pointer-events: none;
+            }
+            textarea {
+                resize: none;
+            }
+            p {
+                pointer-events: none;
+            }
+            div {
                 pointer-events: none;
             }
         </style>
