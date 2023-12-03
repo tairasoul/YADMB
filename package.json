@@ -18,6 +18,7 @@
   "type": "module",
   "devDependencies": {
     "@types/base-64": "^1.0.0",
+    "@types/express": "^4.17.21",
     "@types/humanize-duration": "^3.27.1",
     "@types/node": "^20.10.1",
     "@types/randomstring": "^1.1.8"

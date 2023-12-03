@@ -1,32 +1,33 @@
 import addonUtils from "./dist/addon.utils.js";
 
-const connection = new WebSocket(`ws://localhost:2567`);
-
 /**
  * @type {addonUtils}
  */
 
 let utils;
 
-connection.addEventListener("open", () => connection.send(JSON.stringify({request: "readAddons"})))
-connection.addEventListener("message", (ev) => {
-    const parsed = JSON.parse(ev.data);
-    if (parsed.response == "readAddons") {
-        utils = new addonUtils(parsed.addons, connection);
+const initialSetup = async () => {
+    if (!utils) {
+        const addons = await (await fetch(`${window.location.protocol}/read-addons`)).json();
+        utils = new addonUtils(addons.addons, `${window.location.protocol}`);
     }
-})
+}
+
+initialSetup();
 
 function createSong(thumbnailUrl, title, artist, url) {
-    console.log(thumbnailUrl, title, artist)
+    console.log(thumbnailUrl, title, artist, url);
     const playlist = document.getElementById("playlist");
     const container = document.createElement('div');
     container.className = "player-container"
     container.setAttribute("url", url);
     container.setAttribute("title", title);
     const thumbnailDiv = document.createElement('div');
+    container.draggable = true;
     thumbnailDiv.className = "thumbnail"
     const thumbnail = document.createElement(`img`);
     thumbnail.src = thumbnailUrl
+    thumbnail.draggable = false;
     const songInfo = document.createElement('div');
     songInfo.className = "song-info"
     songInfo.draggable = true;
@@ -78,5 +79,6 @@ document.addSong = async (/** @type {string} */text) => {
             break;
         }
     }
+    console.log(output);
     createSong(output.songThumbnail, output.songName, output.songArtist, output.songUrl)
 }
