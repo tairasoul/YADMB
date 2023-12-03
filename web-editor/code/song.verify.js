@@ -21,6 +21,8 @@ function createSong(thumbnailUrl, title, artist, url) {
     const playlist = document.getElementById("playlist");
     const container = document.createElement('div');
     container.className = "player-container"
+    container.setAttribute("url", url);
+    container.setAttribute("title", title);
     const thumbnailDiv = document.createElement('div');
     thumbnailDiv.className = "thumbnail"
     const thumbnail = document.createElement(`img`);
