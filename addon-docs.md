@@ -14,7 +14,7 @@ You can use [this template](https://github.com/tairasoul/yadmb-addon-template) a
 
 ## Addon types
 
-You have 6 types of addons:
+You have 7 types of addons:
 
 - Custom commands
 
@@ -23,6 +23,8 @@ You have 6 types of addons:
 - Provider resolvers
 
 - Song data resolvers
+
+- Web data resolvers (for the web-ui)
 
 - Pagers
 
@@ -51,6 +53,10 @@ If you do not add these in, all other resolvers won't work.
 Song data resolvers simply resolve a URL of a song into a table, containing the URL and the title of the song.
 
 The URL should be playable through one of the audio resolvers, otherwise an error will get thrown when the queue system tries to play the song.
+
+### Web data resolvers
+
+Web data resolvers resolve a URL into songArtist, songName, songThumbnail and songUrl. This gets used by the web-ui to create elements the user can rearrange and interact with to create a custom playlist.
 
 ### Pagers
 
