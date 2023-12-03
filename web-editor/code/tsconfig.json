@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
-    "rootDir": "./rework",                               /* Specify the root folder within your source files. */
+    "rootDir": "./src",                               /* Specify the root folder within your source files. */
     "moduleResolution": "node",                          /* Specify how TypeScript looks up a file from a given module specifier. */
     "outDir": "./dist",                                  /* Specify an output folder for all emitted files. */
     "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
@@ -12,11 +12,5 @@
     "target": "ES2022",
     "resolveJsonModule": true,
     "declaration": true
-  },
-  "exclude": [
-    "addons/*",
-    "dist/*.d.ts",
-    "web-editor/*",
-    "dist/*/*.d.ts"
-  ]
+  }
 }
