@@ -199,7 +199,7 @@
         <script>
             function openModal() {
                 const modal = document.getElementById('modal');
-                modal.style.display = 'block';
+                modal.style.display = 'flex';
             }
     
             function closeModal() {
@@ -209,7 +209,7 @@
 
             function showError() {
                 const error = document.getElementById("error-modal");
-                error.style.display = "block";
+                error.style.display = "flex";
             }
 
             function hideError() {
@@ -226,7 +226,9 @@
             <div class="modal-content">
                 <textarea class="song-text-area" placeholder="Enter song URL"></textarea>
                 <br>
-                <button class="song-url-confirm" onclick="closeModal();addSong(document.querySelector('.song-text-area').value.trim());document.querySelector('.song-text-area').value=null;document.addEventListener('click', handleClickOutside);">Add</button>
+                <button class="song-url-confirm" onclick="addSong(document.querySelector('.song-text-area').value.trim());document.querySelector('.song-text-area').value=null">Add</button>
+                <br>
+                <button class="song-url-confirm" onclick="closeModal();document.querySelector('.song-text-area').value=null">Close</button>
             </div>
         </div>
 
