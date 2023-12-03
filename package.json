@@ -12,6 +12,7 @@
     "opusscript": "^0.0.8",
     "play-dl": "^1.9.7",
     "randomstring": "^1.3.0",
+    "ws": "^8.14.2",
     "ytpl": "^2.3.0"
   },
   "type": "module",
@@ -22,9 +23,10 @@
     "@types/randomstring": "^1.1.8"
   },
   "scripts": {
-    "build": "npm run build_bot && npm run build_base_addons",
+    "build": "npm run build_bot && npm run build_base_addons && npm run build_web",
     "build_bot": "rm -r dist && tsc && cd dist/commands  && rm *.d.ts",
     "build_base_addons": "cd addons/base && tsc",
+    "build_web": "cd web-editor/code && tsc",
     "e_debug": "mv config.json template.json && mv debug.json config.json",
     "e_default": "mv config.json template.json && mv default.json config.json",
     "d_debug": "mv config.json debug.json && mv template.json config.json",

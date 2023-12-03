@@ -184,13 +184,14 @@
             <div class="modal-content">
                 <textarea class="song-text-area" placeholder="Enter song URL"></textarea>
                 <br>
-                <button class="song-url-confirm" onclick="closeModal();addSong(document.querySelector('.song-text-area'))">Add</button>
+                <button class="song-url-confirm" onclick="closeModal();addSong(document.querySelector('.song-text-area').textContent)">Add</button>
             </div>
         </div>
 
         <div class="modal-overlay" id="error-modal">
             <div class="modal-content">
                 <label>Error while trying to add the song.</label>
+                <button class="song-url-confirm" onclick="hideError()">Got it.</button>
             </div>
         </div>
         
@@ -240,6 +241,8 @@
                 </div>
             </div>
         </div>
+
+        <script type="module" src="./code/song.verify.js"/>
 
         <script>
             function openModal() {
