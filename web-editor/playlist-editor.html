@@ -141,6 +141,18 @@
                 cursor: pointer;
                 pointer-events: all;
             }
+            .song-url-cancel {
+                background-color: rgb(209, 44, 11);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                cursor: pointer;
+                pointer-events: all;
+            }
             .remove {
                 position: relative;
                 width: 20px;
@@ -227,6 +239,7 @@
                 <textarea class="song-text-area" placeholder="Enter song URL"></textarea>
                 <br>
                 <button class="song-url-confirm" onclick="addSong(document.querySelector('.song-text-area').value.trim());document.querySelector('.song-text-area').value=null">Add</button>
+                <br>
                 <br>
                 <button class="song-url-confirm" onclick="closeModal();document.querySelector('.song-text-area').value=null">Close</button>
             </div>
