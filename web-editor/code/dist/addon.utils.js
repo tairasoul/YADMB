@@ -1,7 +1,9 @@
 export default class AddonUtils {
     info = [];
     constructor(info) {
+        console.log(info);
         this.info = info.sort((a, b) => b.priority - a.priority);
+        console.log(this.info);
     }
     async getAvailableResolvers(url) {
         const resolvers = [];

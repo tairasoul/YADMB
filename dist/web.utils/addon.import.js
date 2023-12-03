@@ -1,5 +1,7 @@
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 function isExcluded(filePath, exclusionList) {
     return exclusionList.some(exclusion => {
         if (exclusion.endsWith("*")) {
@@ -15,13 +17,7 @@ function isExcluded(filePath, exclusionList) {
 }
 export default class addonLoader {
     addons = [];
-    addonsRead = false;
     constructor() {
-    }
-    readAddonsSync() {
-        this.readAddons();
-        while (!this.addonsRead) { }
-        ;
     }
     async readAddons() {
         for (const addon of fs.readdirSync(path.join(`${__dirname}`, "../../web-editor/addons"))) {
@@ -47,7 +43,6 @@ export default class addonLoader {
             }
             console.log(`addon ${addon} has been read`);
         }
-        this.addonsRead = true;
     }
     async readAddonFolder(addonPath) {
         const exclusions = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json"];

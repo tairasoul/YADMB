@@ -1,3 +1,5 @@
+import ytdl from "@distube/ytdl-core";
+
 export type WebInfo = {
     /**
      * Name of the song.
@@ -72,7 +74,15 @@ const addon: AddonInfo = {
                 return [/https:\/\/(?:music|www)\.youtube\.com\/.*/,/https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined
             },
             async webResolver(url) {
-                
+                const info = await ytdl.getInfo(url);
+                const author = info.videoDetails.author.name;
+                const title = info.videoDetails.title
+                const thumbnail = info.videoDetails.thumbnail.thumbnails[0].url
+                return {
+                    songArtist: author,
+                    songName: title,
+                    songThumbnail: thumbnail
+                }
             },
         }
     ]

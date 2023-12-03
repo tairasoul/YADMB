@@ -2,11 +2,13 @@ import addonUtils from "./dist/addon.utils.js";
 
 const connection = new WebSocket(`ws://localhost:2567`);
 
+let utils;
+
 connection.addEventListener("open", () => connection.send(JSON.stringify({request: "readAddons"})))
 connection.addEventListener("message", (ev) => {
     const parsed = JSON.parse(ev.data);
     if (parsed.response == "readAddons") {
-        const utils = new addonUtils(parsed.addons);
+        utils = new addonUtils(parsed.addons, connection);
     }
 })
 

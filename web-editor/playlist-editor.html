@@ -176,6 +176,29 @@
             <h1>Playlist Editor</h1>
         </header>
 
+        
+        <script>
+            function openModal() {
+                const modal = document.getElementById('modal');
+                modal.style.display = 'flex';
+            }
+    
+            function closeModal() {
+                const modal = document.getElementById('modal');
+                modal.style.display = 'none';
+            }
+
+            function showError() {
+                const error = document.getElementById("error-modal");
+                error.style.display = "flex";
+            }
+
+            function hideError() {
+                const error = document.getElementById("error-modal");
+                error.style.display = "none";
+            }
+        </script>
+
         <div class="add-song">
             <button class="add-song-button" onclick="openModal()">Add song</button>
         </div>
@@ -242,29 +265,7 @@
             </div>
         </div>
 
-        <script type="module" src="./code/song.verify.js"/>
-
-        <script>
-            function openModal() {
-                const modal = document.getElementById('modal');
-                modal.style.display = 'flex';
-            }
-    
-            function closeModal() {
-                const modal = document.getElementById('modal');
-                modal.style.display = 'none';
-            }
-
-            function showError() {
-                const error = document.getElementById("error-modal");
-                error.style.display = "flex";
-            }
-
-            function hideError() {
-                const error = document.getElementById("error-modal");
-                error.style.display = "none";
-            }
-        </script>
+        <script type="module" src="./code/song.verify.js"></script>
         
         <script>
             let dragItem = null;
