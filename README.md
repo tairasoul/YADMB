@@ -23,6 +23,12 @@ installing addons is as simple as putting their provided file or folder into the
 
 addon docs can be found [here](https://github.com/tairasoul/YADMB/blob/main/addon-docs.md)
 
+# noteworthy addons
+
+none yet.
+
+if you want yours to be considered open an issue
+
 # how to use
 
 simply install all the required packages, change your-token to your bot's token in config.json, and run node dist/bot
