@@ -1,0 +1,363 @@
+/* Styles for the mockup */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #181818; /* Dark background color */
+    color: #fff; /* Light text color */
+}
+header {
+    background-color: #282828; /* Darker header background color */
+    color: #ffffff;
+    padding: 10px;
+    text-align: center;
+}
+.player-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #444; /* Darker border color */
+    background-color: #1e1e1e; /* Darker container background color */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    cursor: grab; /* Change cursor on drag */
+    transition: opacity 0.3s ease-in-out; /* Add transition */
+    pointer-events: all
+}
+.playlist-editor-text {
+    text-align: center;
+    flex: 1;
+}
+.player-container.dragging {
+    opacity: 0.5; /* Change opacity when dragging */
+}
+.thumbnail {
+    flex: 0 0 80px;
+    margin-right: 20px;
+}
+.thumbnail img {
+    width: 100%;
+    height: auto;
+}
+.song-info {
+    flex: 1;
+}
+.song-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+}
+.artist {
+    font-style: italic;
+    color: #ccc; /* Lighter text color for artist */
+}
+.add-song {
+    font-style: normal;
+    color: #ccc;
+}
+.controls {
+    padding-top: 20px;
+}
+.control-button {
+    background-color: #ff0000;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    margin-right: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.drag-over {
+    background-color: #333; /* Darker color when dragging over */
+}
+.placeholder {
+    border: 1px dashed #777; /* Placeholder border */
+    height: 100px; /* Adjust placeholder height */
+    margin: 10px 0;
+}
+.add-song {
+    position: sticky;
+    margin-top: -80px;
+    z-index: 200;
+    right: 20px;
+    pointer-events: all;
+    float: right;
+}
+.sticky-header {
+    position: sticky;
+    top: 0;
+    padding: 10px;
+    z-index: 100; /* Ensure it appears above other content if necessary */
+    display: flex;
+    text-align: center;
+    justify-content: space-between; /* Align items to the start and end */
+    align-items: center; /* Align items vertically */
+}
+.add-song-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius:  10px;
+}
+.drop-area {
+    width: 300px;
+    height: 200px;
+    border: 2px dashed #ccc;
+    text-align: center;
+    padding: 20px;
+    margin: 20px;
+    background-color: #1e1e1e; /* Match the background color */
+    color: #fff; /* Match the text color */
+    border-radius: 5px; /* Apply border radius */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.drop-area p {
+    margin: 10px 0;
+}
+
+.drop-area.highlight {
+    border-color: #ff0000; /* Highlight color when dragging over */
+}
+
+.file-label {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: none;
+    pointer-events: all;
+}
+
+.file-label:empty {
+    padding: 50px 20px; /* Adjust padding when label is empty */
+    /* Additional styles */
+}
+
+/* Initially hide the Process File button */
+#processButton {
+    display: none;
+}
+
+.file-input {
+    display: none; /* Hide the file input */
+}
+.import {
+    position: sticky;
+    margin-top: -80px;
+    z-index: 200;
+    left: 200px;
+    pointer-events: all;
+    float: left;
+}
+.import-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius:  10px;
+    pointer-events: all;
+}
+.processButton {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius:  10px;
+    pointer-events: all;
+}
+.import-cancel {
+    background-color: rgb(209, 44, 11);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    pointer-events: all;
+}
+.export {
+    position: sticky;
+    margin-top: -80px;
+    z-index: 200;
+    left: 20px;
+    pointer-events: all;
+    float: left;
+}
+.export-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius:  10px;
+}
+.export-text-area {
+    width: calc(100% - 22px); /* Adjust width considering padding and borders */
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #333;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 5px;
+    pointer-events: all;
+}
+.export-confirm {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    pointer-events: all;
+}
+.export-cancel {
+    background-color: rgb(209, 44, 11);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    pointer-events: all;
+}
+/* Modal styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+.modal-content {
+    width: 400px; /* Set the width */
+    max-width: 600px; /* Set a max-width if desired */
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+.song-text-area {
+    width: calc(100% - 22px); /* Adjust width considering padding and borders */
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #333;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 5px;
+    pointer-events: all;
+}
+.song-url-confirm {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    pointer-events: all;
+}
+.song-url-cancel {
+    background-color: rgb(209, 44, 11);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    pointer-events: all;
+}
+.remove {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background: none;
+    border: none;
+}
+.remove-button {
+    background-color: transparent;
+    color: #ffffff;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    pointer-events: all;
+}
+.remove-button::before,
+.remove-button::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    background-color: #ffffff;
+    transform-origin: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.remove-button::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+.remove-button::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+img {
+    pointer-events: none;
+}
+textarea {
+    resize: none;
+}
+p {
+    pointer-events: none;
+}
+div {
+    pointer-events: none;
+}
