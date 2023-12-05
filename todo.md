@@ -17,6 +17,12 @@
     - you declare those in a packages.json file, and if the bot doesn't already have that package version or higher installed it'll install it.
     - if it's a strict version, and you NEED that specific version, it'll install it in the folder the addon is in.
     - if one of the packages goes unused (not declared in any packages.json file) it'll uninstall it
+  - potential solution
+    - a custom import defined by the bot.
+    - it should ONLY get used after you've tested the addon, and confirmed it works.
+    - then you replace all of your existing imports with said custom import
+    - it auto-resolves to either being await import("module-path").then((m) => m.default) or await import("./module-name/module-version").then((m) => m.default)
+    - unsure if i can make it inherit typing?
 
 - partial code rewrites
   - rewrite 2
