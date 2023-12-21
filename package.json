@@ -33,6 +33,8 @@
     "e_debug": "mv config.json template.json && mv debug.json config.json",
     "e_default": "mv config.json template.json && mv default.json config.json",
     "d_debug": "mv config.json debug.json && mv template.json config.json",
-    "d_default": "mv config.json default.json && mv template.json config.json"
+    "d_default": "mv config.json default.json && mv template.json config.json",
+    "run": "rm enableDebugging && node dist/bot",
+    "run_debug": "echo > enableDebugging && node dist/bot"
   }
 }

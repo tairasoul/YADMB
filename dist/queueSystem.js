@@ -23,11 +23,21 @@ export default class QueueHandler {
     get volume() {
         return this.volumeString;
     }
+    resetIndex() {
+        this.internalCurrentIndex = 0;
+    }
+    clearQueue() {
+        this.tracks = [];
+        this.resetIndex();
+        this.audioPlayer.stop(true);
+    }
     nextTrack() {
         const cur = this.tracks[this.internalCurrentIndex];
         if (this.internalLoop == "song") {
             return;
         }
+        if (!cur)
+            return;
         if (cur.type == "playlist" && (cur.trackNumber < cur.tracks.length || this.internalLoop == "playlist")) {
             if (this.internalLoop == "playlist") {
                 if (cur.trackNumber >= cur.tracks.length)

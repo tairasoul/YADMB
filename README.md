@@ -39,7 +39,7 @@ use [this installer](https://github.com/fheahdythdr/discord-music-bot-setup/rele
 
 # debugging
 
-to enable logging of more debug-related information, create a file called enableDebugging (no extension) in dist/
+to enable logging of more debug-related information, create a file called enableDebugging (no extension) in the root directory
 
 # installers
 
