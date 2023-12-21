@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-const { web_features, web_editor_port } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+const { web_editor_port } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 
 function isExcluded(filePath: string, exclusionList: string[]) {
     return exclusionList.some(exclusion => {
