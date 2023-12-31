@@ -174,7 +174,7 @@ export function parseVolumeString(volume) {
 export async function trackPager(array, callback = () => { return new Promise((resolve) => resolve()); }, resolvers) {
     const pages = [];
     for (let i = 0; i < array.length; i++) {
-        await callback(`paging ${array[i].name}`);
+        await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].url);
         let output;
         for (const pager of pagers) {
