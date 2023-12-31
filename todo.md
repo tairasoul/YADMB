@@ -37,12 +37,9 @@
   - ~~this means live-updating view-queue will be easier~~ it's just a snapshot now so
   - it wont take as much time to do view-queue
 
-- online playlist editor/viewer
-  - just an idea.
-  - runs off the same addons as the default bot (mostly the resolvers)
-  - allows you to create, view and edit custom playlists online
-  - bot host can choose to run it alongside the bot
-  - up to them to forward it though
+- rewrite search command
+  - it currently tries to exclude instead of exclusively searching for something
+  - and i cant search for all types from what i know
 
 # finished + comments
 
@@ -51,6 +48,13 @@
   - they also expose a priority variable, which means that:
     - if it is higher, it will be tried earlier.
     - if it is lower, it will be tried later.
+   
+- online playlist editor/viewer
+  - just an idea.
+  - runs off the same addons as the default bot (mostly the resolvers)
+  - allows you to create, view and edit custom playlists online
+  - bot host can choose to run it alongside the bot
+  - up to them to forward it though
 
 - update utils.ts
   - what to update:
