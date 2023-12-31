@@ -22,14 +22,15 @@ export default {
         }
     ],
     callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverUtils,  guild: Guild) => {
+        await interaction.defer();
         const volume = interaction.data.options.getString("volume", true);
         const characterRegex = /^[0-9%.]*$/g;
         if (characterRegex.test(volume)) {
             guild.queue.setVolume(volume);
-            await interaction.createMessage({embeds: [embedMessage(`Set volume for ${(interaction.guild as oceanic.Guild).id} to ${volume}, parsed: ${utils.parseVolumeString(volume)}\nThis will apply when the next song starts.`)]});
+            await interaction.editOriginal({embeds: [embedMessage(`Set volume for ${(interaction.guild as oceanic.Guild).id} to ${volume}, parsed: ${utils.parseVolumeString(volume)}\nThis will apply when the next song starts.`)]});
         }
         else {
-            await interaction.createMessage({embeds: [embedMessage(`Volume ${volume} contains invalid characters! volume can only contain the characters 0-9, . and %`)]});
+            await interaction.editOriginal({embeds: [embedMessage(`Volume ${volume} contains invalid characters! volume can only contain the characters 0-9, . and %`)]});
         }
     }
 }
