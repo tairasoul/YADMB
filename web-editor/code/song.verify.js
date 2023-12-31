@@ -93,7 +93,7 @@ document.exportQueue = async (/** @type {string} */ name) => {
     for (const element of elements) {
         const url = element.getAttribute("url")
         const title = element.getAttribute("title");
-        exported.tracks.push({url, title});
+        exported.tracks.push({url, name: title});
     }
     const encoded = JSON.stringify(exported);
     const b64 = btoa(encoded);
