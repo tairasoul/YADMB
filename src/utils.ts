@@ -160,7 +160,7 @@ export function Pager(pages: PageHolderData) {
 export async function queuedTrackPager(array: queuedTrack[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils) {
     const pages: PageData[] = []
     for (let i = 0; i < array.length; i++) {
-        await callback(`paging ${array[i].name}`);
+        await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].tracks[0].url);
         let output;
         for (const pager of pagers) {
