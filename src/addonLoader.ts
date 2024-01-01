@@ -53,7 +53,7 @@ export default class addonLoader {
     }
 
     private async readAddonFolder(addonPath: string) {
-        const exclusions: string[] = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json", "pnpm-lock.yaml"];
+        const exclusions: string[] = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json", "pnpm-lock.yaml", "tsconfig.json"];
         if (fs.existsSync(`${addonPath}/exclusions.json`)) {
             const newExclusions = JSON.parse(fs.readFileSync(`${addonPath}/exclusions.json`, 'utf8'));
             for (const exclusion of newExclusions) {
