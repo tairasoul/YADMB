@@ -38,6 +38,7 @@ const addon = {
                 return "deezer";
             }
         }
-    ]
+    ],
+    private: true
 };
 export default addon;

@@ -2,13 +2,13 @@ import playdl from "play-dl";
 import { createAudioResource } from "@discordjs/voice";
 import utils from "../../../dist/utils.js";
 const addon = {
-    name: "Base Audio Resolvers",
-    description: "The base audio resolvers for YADMB.",
+    name: "Base Addon",
+    description: "Base resolvers for YADMB.",
     credits: "tairasoul",
     version: "1.0.0",
     type: "audioResourceResolver",
     sources: [
-        "https://github.com/tairasoul/YADMB/blob/main/addons/base/src/audio.ts"
+        "https://github.com/tairasoul/YADMB/tree/main/addons/base/"
     ],
     resourceResolvers: [
         {
