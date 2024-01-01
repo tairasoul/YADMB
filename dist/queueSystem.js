@@ -38,7 +38,7 @@ export default class QueueHandler {
         }
         if (!cur)
             return;
-        if (cur.type == "playlist" && (cur.trackNumber < cur.tracks.length || this.internalLoop == "playlist")) {
+        if (cur.type == "playlist" && (cur.trackNumber <= cur.tracks.length || this.internalLoop == "playlist")) {
             if (this.internalLoop == "playlist") {
                 if (cur.trackNumber >= cur.tracks.length)
                     cur.trackNumber = 0;

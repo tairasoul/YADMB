@@ -36,7 +36,7 @@ export default {
             const qt = queue.tracks;
             const cst = qt[ct]?.trackNumber;
             const qst = qt[ct]?.tracks;
-            const string = `Joined VC <#${interaction.member.voiceState.channelID}>${qt.length > 0 ? ` starting track **${qst[cst].name}**` : ""}`;
+            const string = `Joined VC <#${interaction.member.voiceState.channelID}>${qt.length > 0 ? ` starting track **${qst[cst]?.name}**` : ""}`;
             const embed = new builders.EmbedBuilder();
             embed.setDescription(string);
             await interaction.editOriginal({ embeds: [embed.toJSON()] });

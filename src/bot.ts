@@ -83,7 +83,7 @@ client.on('error', (error) => {
 })
 
 client.on("ready", async () => {
-    if (setup) return;
+    if (setup) return console.log("why is it emitting ready again?");
     await loader.readAddons();
     loader.loadAddons();
     await client.loadCommands();
@@ -98,6 +98,7 @@ client.on("ready", async () => {
     console.log("removing commands unknown to this client");
     await client.removeUnknownCommands();
     console.log("setup done");
+    setup = true;
 })
 
 client.on("guildCreate", (guild) => client.addGuild(guild))
