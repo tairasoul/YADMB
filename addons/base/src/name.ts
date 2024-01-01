@@ -40,7 +40,8 @@ const addon: AddonInfo = {
                 return "deezer"
             }
         }
-    ]
+    ],
+    private: true
 }
 
 export default addon;

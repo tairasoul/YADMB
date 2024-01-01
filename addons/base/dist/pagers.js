@@ -90,6 +90,7 @@ const addon = {
                 };
             }
         }
-    ]
+    ],
+    private: true
 };
 export default addon;

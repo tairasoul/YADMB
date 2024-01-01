@@ -70,7 +70,8 @@ const addon: AddonInfo = {
                 })
             }
         }
-    ]
+    ],
+    private: true
 }
 
 export default addon;

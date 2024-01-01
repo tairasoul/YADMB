@@ -92,7 +92,8 @@ const addon: AddonInfo = {
                 } as PageData
             }
         }
-    ]
+    ],
+    private: true
 }
 
 export default addon;
