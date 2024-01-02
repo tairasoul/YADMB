@@ -15,7 +15,7 @@ const addon = {
             name: "youtube-resolver",
             priority: 0,
             async available(url) {
-                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/, /https:\/\/youtu\.be\/watch\?v=.*/].find((reg) => reg.test(url)) != undefined;
+                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/, /https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined;
             },
             async resolve(url) {
                 const info = await playdl.video_info(url);

@@ -18,7 +18,7 @@ const addon: AddonInfo = {
             name: "youtube",
             priority: 0,
             async available(url) {
-                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/,/https:\/\/youtu\.be\/watch\?v=.*/].find((reg) => reg.test(url)) != undefined;
+                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/,/https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined;
             },
             async queuedPager(track, index) {
                 const embed = new builders.EmbedBuilder();
