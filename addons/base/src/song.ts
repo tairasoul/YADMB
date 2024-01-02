@@ -22,7 +22,7 @@ const addon: AddonInfo = {
         {
             name: "base",
             async available(url) {
-                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/,/https:\/\/youtu\.be\/watch\?v=.*/,/https:\/\/soundcloud\.com\/.*/,/https:\/\/on\.soundcloud\.com\/.*/,/https:\/\/deezer\.(?:com|page\.link)\/.*/].find((reg) => reg.test(url)) != undefined;
+                return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/,/https:\/\/youtu\.be\/.*/,/https:\/\/soundcloud\.com\/.*/,/https:\/\/on\.soundcloud\.com\/.*/,/https:\/\/deezer\.(?:com|page\.link)\/.*/].find((reg) => reg.test(url)) != undefined;
             },
             priority: 0,
             async resolve(url) {
