@@ -41,11 +41,6 @@
   - it currently tries to exclude instead of exclusively searching for something
   - and i cant search for all types from what i know
 
-- change up pager addons a bit
-  - instead of making it so you're limited by fields already provided
-  - make it so each addon can declare their own fields
-  - so if a platform has specific metrics, you can add those in as fields
-
 # finished + comments
 
 - resolver priority + more effective way of checking if it can be used on a url
@@ -53,7 +48,12 @@
   - they also expose a priority variable, which means that:
     - if it is higher, it will be tried earlier.
     - if it is lower, it will be tried later.
-   
+
+- change up audio addons a bit
+  - instead of making it so you're limited by fields already provided
+  - make it so each addon can declare their own fields
+  - so if a platform has specific metrics, you can add those in as fields
+
 - online playlist editor/viewer
   - just an idea.
   - runs off the same addons as the default bot (mostly the resolvers)

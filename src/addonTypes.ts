@@ -456,15 +456,9 @@ export type infoData = {
      */
     channelName: string;
     /**
-     * Likes for the song.
-     * Set to "Unable to fetch likes" if you can't.
+     * Various fields for metrics available.
      */
-    likes: string;
-    /**
-     * Views, if possible to be fetched.
-     * Set to "Unable to fetch views" if you can't.
-     */
-    views: string;
+    fields?: oceanic.EmbedField[]
     /**
      * Highest resolution URL for the thumbnail.
      */

@@ -29,8 +29,12 @@ const addon = {
                     info: {
                         channelName: info.video_details.channel?.name || "Could not get channel name.",
                         durationInMs: info.video_details.durationInSec * 1000,
-                        likes: info.video_details.likes.toString(),
-                        views: info.video_details.views.toString(),
+                        fields: [
+                            { name: "likes", value: info.video_details.likes.toString() },
+                            { name: "views", value: info.video_details.views.toString() }
+                        ],
+                        //likes: info.video_details.likes.toString(),
+                        //views: info.video_details.views.toString(),
                         highestResUrl: utils.getHighestResUrl(info)
                     }
                 };
@@ -54,8 +58,6 @@ const addon = {
                     info: {
                         channelName: so.publisher?.name || so.publisher?.artist || "Could not get publisher name.",
                         durationInMs: so.durationInMs,
-                        likes: "Likes are not available for SoundCloud.",
-                        views: "Views are not available for SoundCloud.",
                         highestResUrl: so.thumbnail
                     }
                 };
