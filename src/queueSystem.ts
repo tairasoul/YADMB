@@ -50,10 +50,12 @@ export default class QueueHandler {
 
     nextTrack() {
         const cur = this.tracks[this.internalCurrentIndex];
-        if (this.internalLoop == "song") {
+        if (!cur) {
             return;
         }
-        if (!cur) return;
+        if (this.internalLoop == "song") {
+            return cur;
+        }
         if (cur.type == "playlist" && (cur.trackNumber <= cur.tracks.length || this.internalLoop == "playlist")) {
             if (this.internalLoop == "playlist") {
                 if (cur.trackNumber >= cur.tracks.length)
@@ -66,6 +68,7 @@ export default class QueueHandler {
                 cur.trackNumber++;
                 if (cur.trackNumber >= cur.tracks.length) {
                     if (this.internalLoop == "queue") {
+                        cur.trackNumber = 0;
                         this.internalCurrentIndex++;
                     }
                     else {

@@ -21,7 +21,7 @@ export default class QueueHandler {
     get volume(): string;
     resetIndex(): void;
     clearQueue(): void;
-    nextTrack(): import("./client.js").track | null | undefined;
+    nextTrack(): queuedTrack | import("./client.js").track | null | undefined;
     skip(): Promise<void>;
     pause(): boolean;
     resume(): boolean;

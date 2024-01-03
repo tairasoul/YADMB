@@ -188,7 +188,7 @@ export async function trackPager(array, callback = () => { return new Promise((r
             throw new Error(`Could not get pager for ${array[i].name}`);
         }
     }
-    return Pager({ pages: pages });
+    return pages;
 }
 export default {
     SelectMenu,

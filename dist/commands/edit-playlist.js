@@ -28,8 +28,7 @@ export default {
         const data = utils.decodeStr(text);
         const paged = [];
         for (const queued of data.tracks) {
-            // @ts-ignore
-            const pagedtrack = await utils.pageTrack(queued);
+            const pagedtrack = (await utils.trackPager([queued], async () => { }, resolvers))[0];
             pagedtrack.index = paged.length;
             pagedtrack.embed.addField("index", pagedtrack.index.toString());
             paged.push(pagedtrack);

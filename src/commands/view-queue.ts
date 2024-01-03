@@ -138,9 +138,9 @@ export default {
             if (i.data.customID !== inspectId) return;
             currentInspectPage = 0;
             await i.createMessage({embeds: [embedMessage("Paging tracks for playlist.")], flags: 1 << 6});
-            data.tracks = await utils.trackPager(guild.queue.tracks[currentPage].tracks, async (title) => {
+            data.tracks = utils.Pager({pages: await utils.trackPager(guild.queue.tracks[currentPage].tracks, async (title) => {
                 await i.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6})
-            }, resolvers);
+            }, resolvers)});
             isInspecting = true;
             /** @ts-ignore */
             await interaction.editOriginal({content: "", embeds: data.tracks.pages[0].embed.toJSON(true), components: actionRows.inspected, flags: 1 << 6});
