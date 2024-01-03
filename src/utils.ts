@@ -210,7 +210,7 @@ export async function trackPager(array: track[], callback: (title: string) => Pr
             throw new Error(`Could not get pager for ${array[i].name}`);    
         }
     }
-    return Pager({pages: pages});
+    return pages;
 }
 
 export default {
