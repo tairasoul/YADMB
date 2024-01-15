@@ -27,19 +27,9 @@ addon docs can be found [here](https://github.com/tairasoul/YADMB/blob/main/addo
 
 simply install all the required packages, change your-token to your bot's token in config.json, and run node dist/bot
 
-OR
-
-use [this installer](https://github.com/fheahdythdr/discord-music-bot-setup/releases/tag/v1.2.0)
-
 # debugging
 
 to enable logging of more debug-related information, create a file called enableDebugging (no extension) in the root directory
-
-# installers
-
-linux and windows are now supported with [the latest release](https://github.com/tairasoul/discord-music-bot-setup/releases/tag/v1.2.0)
-
-download discord-music-bot-installer-linux if on linux, otherwise discord-music-bot-installer-windows.rar
 
 # Changelog
 
