@@ -5,6 +5,8 @@ import path from "path";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 import { debugLog } from "./bot.js";
 import { AddonInfo } from "./addonTypes.js";
+import { managerDefs } from "./package.manager.js";
+import AddonPackages from "./addons.packages.js";
 
 function isExcluded(filePath: string, exclusionList: string[]) {
     return exclusionList.some(exclusion => {
@@ -21,12 +23,15 @@ function isExcluded(filePath: string, exclusionList: string[]) {
 
 export default class addonLoader {
     private _client: MusicClient;
+    private addonPackages: AddonPackages;
     private addons: AddonInfo[] = [];
-    constructor(client: MusicClient) {
+    constructor(client: MusicClient, managerDefs: managerDefs) {
         this._client = client;
+        this.addonPackages = new AddonPackages(managerDefs);
     }
 
     async readAddons() {
+        await this.addonPackages.checkPackages();
         for (const addon of fs.readdirSync(path.join(`${__dirname}`, "..", "addons"))) {
             console.log(`reading addon ${addon}`);
             // if addon is dir, re-call readAddons for addonPath/addon
@@ -53,13 +58,14 @@ export default class addonLoader {
     }
 
     private async readAddonFolder(addonPath: string) {
-        const exclusions: string[] = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json", "pnpm-lock.yaml", "tsconfig.json"];
+        const exclusions: string[] = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json", "pnpm-lock.yaml", "tsconfig.json", "packages.json"];
         if (fs.existsSync(`${addonPath}/exclusions.json`)) {
             const newExclusions = JSON.parse(fs.readFileSync(`${addonPath}/exclusions.json`, 'utf8'));
             for (const exclusion of newExclusions) {
                 exclusions.push(exclusion.replace(/\//g, "\\"));
             }
         }
+        await this.readAddonPackages(addonPath);
         debugLog(`exclusions for ${addonPath}: ${exclusions.join(" ")}`)
         for (const pathname of fs.readdirSync(addonPath, {recursive: true, encoding: "utf8"})) {
             if (fs.statSync(`${addonPath}/${pathname}`).isFile()) {
@@ -80,6 +86,25 @@ export default class addonLoader {
                     debugLog(`${pathname} is excluded, skipping.`)
                 }
             }
+        }
+    }
+
+    private async readAddonPackages(addonPath: string) {
+        if (fs.existsSync(`${addonPath}/packages.json`)) {
+            console.log(`reading packages for ${path.basename(addonPath)}`);
+            const packages: string[] = JSON.parse(fs.readFileSync(`${addonPath}/packages.json`, 'utf8'));
+            for (const pkg of packages) {
+                console.log(`checking package ${pkg}`);
+                if (!await this.addonPackages.checkPackage(pkg)) {
+                    console.log(`${pkg} is not installed, adding.`);
+                    await this.addonPackages.addPackage(path.basename(addonPath), pkg);
+                    this.addonPackages.saveList();
+                }
+                else {
+                    console.log(`${pkg} is installed, skipping.`);
+                }
+            }
+            await this.addonPackages.checkPackages();
         }
     }
 

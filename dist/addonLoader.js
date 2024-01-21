@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import path from "path";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 import { debugLog } from "./bot.js";
+import AddonPackages from "./addons.packages.js";
 function isExcluded(filePath, exclusionList) {
     return exclusionList.some(exclusion => {
         if (exclusion.endsWith("*")) {
@@ -18,11 +19,14 @@ function isExcluded(filePath, exclusionList) {
 }
 export default class addonLoader {
     _client;
+    addonPackages;
     addons = [];
-    constructor(client) {
+    constructor(client, managerDefs) {
         this._client = client;
+        this.addonPackages = new AddonPackages(managerDefs);
     }
     async readAddons() {
+        await this.addonPackages.checkPackages();
         for (const addon of fs.readdirSync(path.join(`${__dirname}`, "..", "addons"))) {
             console.log(`reading addon ${addon}`);
             // if addon is dir, re-call readAddons for addonPath/addon
@@ -48,13 +52,14 @@ export default class addonLoader {
         }
     }
     async readAddonFolder(addonPath) {
-        const exclusions = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json", "pnpm-lock.yaml", "tsconfig.json"];
+        const exclusions = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json", "pnpm-lock.yaml", "tsconfig.json", "packages.json"];
         if (fs.existsSync(`${addonPath}/exclusions.json`)) {
             const newExclusions = JSON.parse(fs.readFileSync(`${addonPath}/exclusions.json`, 'utf8'));
             for (const exclusion of newExclusions) {
                 exclusions.push(exclusion.replace(/\//g, "\\"));
             }
         }
+        await this.readAddonPackages(addonPath);
         debugLog(`exclusions for ${addonPath}: ${exclusions.join(" ")}`);
         for (const pathname of fs.readdirSync(addonPath, { recursive: true, encoding: "utf8" })) {
             if (fs.statSync(`${addonPath}/${pathname}`).isFile()) {
@@ -75,6 +80,24 @@ export default class addonLoader {
                     debugLog(`${pathname} is excluded, skipping.`);
                 }
             }
+        }
+    }
+    async readAddonPackages(addonPath) {
+        if (fs.existsSync(`${addonPath}/packages.json`)) {
+            console.log(`reading packages for ${path.basename(addonPath)}`);
+            const packages = JSON.parse(fs.readFileSync(`${addonPath}/packages.json`, 'utf8'));
+            for (const pkg of packages) {
+                console.log(`checking package ${pkg}`);
+                if (!await this.addonPackages.checkPackage(pkg)) {
+                    console.log(`${pkg} is not installed, adding.`);
+                    await this.addonPackages.addPackage(path.basename(addonPath), pkg);
+                    this.addonPackages.saveList();
+                }
+                else {
+                    console.log(`${pkg} is installed, skipping.`);
+                }
+            }
+            await this.addonPackages.checkPackages();
         }
     }
     loadAddons() {

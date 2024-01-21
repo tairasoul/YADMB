@@ -11,11 +11,6 @@
 
 - add optional DJ role (if specified, only that role can use commands)
 
-- packages system
-  - packages.json declares npm modules your addon needs
-  - bot installs them
-  - bot uninstalls npm modules if no addons use them
-
 - partial code rewrites
   - rewrite 2
     - make more util functions (or maybe just more classes) to handle more things
@@ -43,6 +38,12 @@
   - they also expose a priority variable, which means that:
     - if it is higher, it will be tried earlier.
     - if it is lower, it will be tried later.
+
+- packages system
+  - packages.json declares npm modules your addon needs
+  - bot installs them
+  - bot uninstalls npm modules if no addons use them
+  - if you need a specific version, include it in the addon and add the version's dependencies as dependencies in packages.json!
 
 - change up audio addons a bit
   - instead of making it so you're limited by fields already provided

@@ -30,11 +30,9 @@ const addon = {
                         channelName: info.video_details.channel?.name || "Could not get channel name.",
                         durationInMs: info.video_details.durationInSec * 1000,
                         fields: [
-                            { name: "likes", value: info.video_details.likes.toString() },
-                            { name: "views", value: info.video_details.views.toString() }
+                            { name: "Likes", value: info.video_details.likes.toString() },
+                            { name: "Views", value: info.video_details.views.toString() }
                         ],
-                        //likes: info.video_details.likes.toString(),
-                        //views: info.video_details.views.toString(),
                         highestResUrl: utils.getHighestResUrl(info)
                     }
                 };

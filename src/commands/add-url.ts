@@ -76,7 +76,7 @@ export default {
                     name: resolver.title
                 }
                 if (next) {
-                    if (nowPlaying.type === "playlist") {
+                    if (nowPlaying && nowPlaying.type === "playlist") {
                         nowPlaying.tracks.push(
                             {
                                 name: resolver.title,
