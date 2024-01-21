@@ -26,7 +26,6 @@ export default class addonLoader {
         this.addonPackages = new AddonPackages(managerDefs);
     }
     async readAddons() {
-        await this.addonPackages.checkPackages();
         for (const addon of fs.readdirSync(path.join(`${__dirname}`, "..", "addons"))) {
             console.log(`reading addon ${addon}`);
             // if addon is dir, re-call readAddons for addonPath/addon
@@ -50,6 +49,7 @@ export default class addonLoader {
             }
             console.log(`addon ${addon} has been read`);
         }
+        await this.addonPackages.checkPackages();
     }
     async readAddonFolder(addonPath) {
         const exclusions = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json", "pnpm-lock.yaml", "tsconfig.json", "packages.json"];
@@ -97,7 +97,6 @@ export default class addonLoader {
                     console.log(`${pkg} is installed, skipping.`);
                 }
             }
-            await this.addonPackages.checkPackages();
         }
     }
     loadAddons() {

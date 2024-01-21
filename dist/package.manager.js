@@ -28,7 +28,7 @@ export default class PackageManager {
     }
     async isPackageInstalled(_package) {
         return new Promise((resolve, reject) => {
-            exec(`${this.managerDefs.list}`, (error, stdout) => {
+            exec(`npm ls`, (error, stdout) => {
                 if (error) {
                     reject(error);
                     return;
@@ -37,8 +37,8 @@ export default class PackageManager {
                     .split('\n')
                     .map(line => line.trim())
                     .filter(line => line.length > 0)
-                    .filter((v) => v.startsWith("├──"))
-                    .map(line => line.replace(/^├──/, '').trim());
+                    .filter(line => line.startsWith("├──") || line.startsWith("+--") || line.startsWith("`--"))
+                    .map(line => line.replace(/^├──/, '').replace(/^\+--/, '').replace(/^\`--/, '').trim());
                 const isInstalled = installedPackages.some(line => {
                     const packageName = line.split('@')[0].trim();
                     return packageName === _package;
