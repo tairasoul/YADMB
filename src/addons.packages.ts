@@ -32,7 +32,7 @@ export default class AddonPackages {
     async checkPackages() {
         const packages = Object.keys(this.list);
         for (const pkg of packages) {
-            debugLog(`checking package ${pkg}`);
+            debugLog(`checking usage of package ${pkg}`);
             if ((this.list[pkg].length <= 0 || !this.checked.includes(pkg)) && !packageExclusions.includes(pkg)) {
                 debugLog(`removing package ${pkg}`);
                 await this.manager.removePackage(pkg);

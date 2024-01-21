@@ -3,7 +3,6 @@ import { exec } from "child_process";
 export type managerDefs = {
     install: string;
     uninstall: string;
-    list: string;
 }
 
 export default class PackageManager {
@@ -39,18 +38,18 @@ export default class PackageManager {
 
     async isPackageInstalled(_package: string) {
         return new Promise<boolean>((resolve, reject) => {
-            exec(`${this.managerDefs.list}`, (error, stdout) => {
+            exec(`npm ls`, (error, stdout) => {
                 if (error) {
                     reject(error);
                     return;
                 }
-
+                
                 const installedPackages = stdout
                     .split('\n')
                     .map(line => line.trim())
                     .filter(line => line.length > 0)
-                    .filter((v) => v.startsWith("├──"))
-                    .map(line => line.replace(/^├──/, '').trim());
+                    .filter(line => line.startsWith("├──") || line.startsWith("+--") || line.startsWith("`--"))
+                    .map(line => line.replace(/^├──/, '').replace(/^\+--/, '').replace(/^\`--/, '').trim());
 
                 const isInstalled = installedPackages.some(line => {
                     const packageName = line.split('@')[0].trim();

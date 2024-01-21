@@ -31,7 +31,6 @@ export default class addonLoader {
     }
 
     async readAddons() {
-        await this.addonPackages.checkPackages();
         for (const addon of fs.readdirSync(path.join(`${__dirname}`, "..", "addons"))) {
             console.log(`reading addon ${addon}`);
             // if addon is dir, re-call readAddons for addonPath/addon
@@ -55,6 +54,7 @@ export default class addonLoader {
             }
             console.log(`addon ${addon} has been read`);
         }
+        await this.addonPackages.checkPackages();
     }
 
     private async readAddonFolder(addonPath: string) {
@@ -104,7 +104,6 @@ export default class addonLoader {
                     console.log(`${pkg} is installed, skipping.`);
                 }
             }
-            await this.addonPackages.checkPackages();
         }
     }
 

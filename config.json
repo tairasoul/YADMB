@@ -5,7 +5,6 @@
   "web_editor_link": "url-anyone-can-access",
   "package_manager": {
     "install": "npm install",
-    "uninstall": "npm uninstall",
-    "list": "npm ls"
+    "uninstall": "npm uninstall"
   }
 }

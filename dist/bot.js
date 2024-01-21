@@ -17,8 +17,7 @@ let setup = false;
 const { token, web_features, package_manager } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 const defs = {
     install: package_manager.install.trim(),
-    uninstall: package_manager.uninstall.trim(),
-    list: package_manager.list.trim()
+    uninstall: package_manager.uninstall.trim()
 };
 const client = new MusicClient({
     auth: token,
