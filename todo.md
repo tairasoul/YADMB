@@ -22,9 +22,6 @@
   - it currently tries to exclude instead of exclusively searching for something
   - and i cant search for all types from what i know
 
-- add a "both" option to shuffle
-  - shuffles every playlist and the queue
-
 # finished + comments
 
 - resolver priority + more effective way of checking if it can be used on a url
@@ -32,6 +29,9 @@
   - they also expose a priority variable, which means that:
     - if it is higher, it will be tried earlier.
     - if it is lower, it will be tried later.
+
+- add a "both" option to shuffle
+  - shuffles every playlist and the queue
 
 - packages system
   - packages.json declares npm modules your addon needs

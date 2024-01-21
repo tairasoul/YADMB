@@ -18,6 +18,10 @@ export default {
                 {
                     name: "queue",
                     value: "queue"
+                },
+                {
+                    name: "all",
+                    value: "all"
                 }
             ]
         }
@@ -38,7 +42,15 @@ export default {
         if (shuffleType === "playlist") {
             utils.shuffleArray(ct.tracks);
         }
+        else if (shuffleType == "queue") {
+            utils.shuffleArray(queue.tracks);
+        }
         else {
+            for (const track of queue.tracks) {
+                if (track.type == "playlist") {
+                    utils.shuffleArray(track.tracks);
+                }
+            }
             utils.shuffleArray(queue.tracks);
         }
         const embed = new builders.EmbedBuilder();
