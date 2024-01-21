@@ -21,6 +21,9 @@
 - rewrite search command
   - it currently tries to exclude instead of exclusively searching for something
   - and i cant search for all types from what i know
+ 
+- add support for more package managers
+  - for the list part it only supports npm due to formatting
 
 # finished + comments
 
