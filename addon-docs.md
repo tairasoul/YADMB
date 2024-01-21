@@ -75,3 +75,18 @@ Commands are simple / commands, that work the same as the built in commands.
 They get the same parameters and have the same capabilities.
 
 You can take a look at any command in the rework/commands folder to see how one should be structured.
+
+## Module dependencies
+
+An addon can declare dependencies through a packages.json file.
+
+If you need a specific version of an NPM module, include it in the addon and add the module's dependencies into packages.json
+
+For example, if you need, say, the ws module, packages.json should look like this:
+```json
+[
+    "ws"
+]
+```
+
+The bot will automatically install the package, and uninstall it once no addons use it anymore.

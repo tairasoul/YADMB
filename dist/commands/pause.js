@@ -7,7 +7,7 @@ export default {
         if (queue.currentInfo) {
             queue.pause();
             const embed = new builders.EmbedBuilder();
-            embed.setDescription(`Paused track ${queue.currentInfo.name}`);
+            embed.setDescription(`Paused track **${queue.currentInfo.name}**`);
             await interaction.createMessage({ embeds: [embed.toJSON()] });
         }
         else {

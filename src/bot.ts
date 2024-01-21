@@ -8,6 +8,7 @@ const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)
 import * as voice from "@discordjs/voice";
 import { startWebFunctions } from "./web.fsapi.js";
 import web from "./web.command.js";
+import { managerDefs } from "./package.manager.js";
 let debug = false;
 if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
 
@@ -17,7 +18,13 @@ export function debugLog(text: any) {
 
 let setup = false;
 
-const { token, web_features } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+const { token, web_features, package_manager } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+
+const defs: managerDefs = {
+    install: package_manager.install.trim(),
+    uninstall: package_manager.uninstall.trim(),
+    list: package_manager.list.trim()
+}
 
 const client = new MusicClient({
     auth: token,
@@ -44,7 +51,7 @@ if (web_features) {
     client.addCommand(web.data.name, web.data.description as string, [], web.execute);
 }
 
-const loader = new addonLoader(client);
+const loader = new addonLoader(client, defs);
 
 client.on('voiceStateUpdate', (oldState: oceanic.Member, newState: oceanic.JSONVoiceState | null) => {
     const guild = client.m_guilds[oldState.guildID];

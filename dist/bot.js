@@ -14,7 +14,12 @@ export function debugLog(text) {
         console.log(text);
 }
 let setup = false;
-const { token, web_features } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+const { token, web_features, package_manager } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+const defs = {
+    install: package_manager.install.trim(),
+    uninstall: package_manager.uninstall.trim(),
+    list: package_manager.list.trim()
+};
 const client = new MusicClient({
     auth: token,
     allowedMentions: {
@@ -38,7 +43,7 @@ if (web_features) {
     startWebFunctions();
     client.addCommand(web.data.name, web.data.description, [], web.execute);
 }
-const loader = new addonLoader(client);
+const loader = new addonLoader(client, defs);
 client.on('voiceStateUpdate', (oldState, newState) => {
     const guild = client.m_guilds[oldState.guildID];
     if (client.getVoiceConnection(oldState.guildID) === undefined && guild.connection) {

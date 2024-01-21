@@ -7,7 +7,7 @@ export default {
         if (queue.currentInfo) {
             queue.resume();
             const embed = new builders.EmbedBuilder();
-            embed.setDescription(`Resumed track ${queue.currentInfo.name}`);
+            embed.setDescription(`Resumed track **${queue.currentInfo.name}**`);
             await interaction.createMessage({ embeds: [embed.toJSON()] });
         }
         else {
