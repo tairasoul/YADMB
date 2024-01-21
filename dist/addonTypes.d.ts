@@ -1,8 +1,9 @@
 import { AudioResource } from "@discordjs/voice";
-import MusicClient, { Guild, ResolverInformation, queuedTrack } from "./client";
+import MusicClient, { Guild, queuedTrack } from "./client";
 import * as oceanic from "oceanic.js";
 import { EmbedBuilder } from "@oceanicjs/builders";
 import { track } from "./client";
+import ResolverUtils from "./resolverUtils.js";
 export type resolver = {
     /**
      * Name of the resolver.
@@ -165,7 +166,7 @@ export type command = {
     /**
      * Callback for this command.
      */
-    callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverInformation, guild: Guild, client: MusicClient) => any;
+    callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => any;
 };
 export type AddonInfo = {
     /**
