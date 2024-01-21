@@ -31,9 +31,13 @@ simply install all the required packages, change your-token to your bot's token 
 
 to enable logging of more debug-related information, create a file called enableDebugging (no extension) in the root directory
 
-# Changelog
+# changelog
 
-Changelog has been moved to [changelog.md](https://github.com/tairasoul/YADMB/blob/main/changelog.md)
+changelog has been moved to [changelog.md](https://github.com/tairasoul/YADMB/blob/main/changelog.md)
+
+# additional info
+
+if you use pnpm or yarn instead of npm, you'll have to change package_manager.install, uninstall and list in config.json to use the respective variant for your package manager
 
 # features
 
