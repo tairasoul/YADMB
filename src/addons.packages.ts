@@ -9,6 +9,8 @@ export type PackageList = {
     [key: string]: string[];
 }
 
+const packageExclusions = ["@discordjs/voice", "@distube/ytdl-core", "@oceanicjs/builders", "express", "humanize-duration", "js-base64", "libsodium-wrappers", "lzwcompress", "oceanic.js", "opusscript", "play-dl", "randomstring", "ws", "ytpl"];
+
 export default class AddonPackages {
     private manager: PackageManager;
     private installedPath: string = `${path.join(__dirname, "..")}/modules.json`;
@@ -31,7 +33,7 @@ export default class AddonPackages {
         const packages = Object.keys(this.list);
         for (const pkg of packages) {
             debugLog(`checking package ${pkg}`);
-            if (this.list[pkg].length <= 0 || !this.checked.includes(pkg)) {
+            if ((this.list[pkg].length <= 0 || !this.checked.includes(pkg)) && !packageExclusions.includes(pkg)) {
                 debugLog(`removing package ${pkg}`);
                 await this.manager.removePackage(pkg);
                 delete this.list[pkg];
