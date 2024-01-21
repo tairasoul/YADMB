@@ -2,5 +2,9 @@
   "token": "Bot your-token",
   "web_features": true,
   "web_editor_port": 5500,
-  "web_editor_link": "url-anyone-can-access"
+  "web_editor_link": "url-anyone-can-access",
+  "package_manager": {
+    "install": "npm install",
+    "uninstall": "npm uninstall"
+  }
 }
