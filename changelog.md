@@ -1,3 +1,3 @@
-# Changelog for YADMB
+# Changelog
 
-Add an entire web-ui and new type of addon.
+You can now declare dependencies on NPM modules for your addon.
