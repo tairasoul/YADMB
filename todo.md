@@ -3,12 +3,6 @@
 - add capability to filter with regex to add-playlist and add-search
   - won't be too hard as then i just have to add an optional argument
 
-- add more view-queue options
-  - for example, making it so you can import a playlist and concat it with a viewed playlist
-  - moving a song around the queue
-  - exporting playlist
-  - others (suggest in issues)
-
 - add optional DJ role (if specified, only that role can use commands)
 
 - partial code rewrites
