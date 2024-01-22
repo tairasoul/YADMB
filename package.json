@@ -25,6 +25,7 @@
   },
   "scripts": {
     "build": "npm run build_bot && npm run build_base_addons && npm run build_web",
+    "build_base": "npm run build_bot && npm run build_base_addons",
     "build_bot": "rm -r dist && tsc && cd dist/commands  && rm *.d.ts",
     "build_base_addons": "cd addons/base && tsc",
     "build_web": "npm run build_web_base && npm run build_web_addons",

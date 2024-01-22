@@ -71,6 +71,11 @@ export default class addonLoader {
             if (fs.statSync(`${addonPath}/${pathname}`).isFile()) {
                 if (!isExcluded(pathname, exclusions)) {
                     const addonInfo: AddonInfo | AddonInfo[] = await import(`file://${addonPath}/${pathname}`).then(m => m.default);
+                    if (addonInfo == undefined) {
+                        debugLog(`file ${path.basename(`${addonPath}/${pathname}`)} has no default export! skipping.`);
+                        continue;
+                    }
+                    console.log(addonInfo);
                     if (addonInfo instanceof Array) {
                         console.log(`addon ${path.basename(`${addonPath}/${pathname}`)} has multiple addons, iterating.`)
                         addonInfo.forEach((saddon) => {

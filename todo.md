@@ -5,8 +5,6 @@
 
 - add optional DJ role (if specified, only that role can use commands)
 
-- rework addon system
-
 - partial code rewrites
   - rewrite 2
     - make more util functions (or maybe just more classes) to handle more things
@@ -23,7 +21,7 @@
 - rewrite search command
   - it currently tries to exclude instead of exclusively searching for something
   - and i cant search for all types from what i know
- 
+
 - add support for more package managers
   - for the list part it only supports npm due to formatting
 
@@ -34,6 +32,9 @@
   - they also expose a priority variable, which means that:
     - if it is higher, it will be tried earlier.
     - if it is lower, it will be tried later.
+
+- rework addon system
+  - an addon no longer has a type, and instead has a "data" property, containing resolvers and commands.
 
 - add a "both" option to shuffle
   - shuffles every playlist and the queue

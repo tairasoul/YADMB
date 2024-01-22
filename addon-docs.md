@@ -6,9 +6,9 @@ These types are used for autocomplete.
 
 ## Project setup
 
-The only files you actually need will be a .ts file, however if you plan to use custom libs within your addon, make an exclusions.json in the root and add the path of the files.
+The only files you actually need will be a .js file, however if you plan to use custom libs within your addon, make an exclusions.json in the root and add the path of the files.
 
-An addon looks something like [this base addon](https://github.com/tairasoul/YADMB/blob/main/addons/base/src/name.ts) used for resolving providers.
+An addon looks something like [this base addon](https://github.com/tairasoul/YADMB/blob/main/addons/base/src/addon.ts).
 
 You can use [this template](https://github.com/tairasoul/yadmb-addon-template) as a base.
 
