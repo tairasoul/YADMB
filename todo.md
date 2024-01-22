@@ -5,6 +5,8 @@
 
 - add optional DJ role (if specified, only that role can use commands)
 
+- rework addon system
+
 - partial code rewrites
   - rewrite 2
     - make more util functions (or maybe just more classes) to handle more things
