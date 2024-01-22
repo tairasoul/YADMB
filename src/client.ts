@@ -92,49 +92,28 @@ export default class MusicClient extends Client {
     registerAddons() {
         for (const addon of this.addons) {
             console.log(`registering addon ${addon.name}`);
-            switch(addon.type) {
-                case "songResolver":
-                    for (const resolver of addon.resolvers) {
-                        this.resolvers.songResolvers.push(resolver);
-                    }
-                    break;
-                case "command":
-                    for (const command of addon.commands) {
-                        this.addonCommands.push(command);
-                    }
-                    break;
-                case "songDataResolver":
-                    for (const songResolver of addon.dataResolvers) {
-                        this.resolvers.songDataResolvers.push(songResolver);
-                    }
-                    break;
-                case "playlistDataResolver":
-                    for (const playlistResolver of addon.playlistResolvers) {
-                        this.resolvers.playlistResolvers.push(playlistResolver);
-                    }
-                    break;
-                case "audioResourceResolver":
-                    for (const audioResolver of addon.resourceResolvers) {
-                        this.resolvers.audioResourceResolvers.push(audioResolver);
-                    }
-                    break;
-                case "songThumbnailResolver":
-                    for (const thumbnailResolver of addon.thumbnailResolvers) {
-                        this.resolvers.songThumbnailResolvers.push(thumbnailResolver);
-                    }
-                    break;
-                case "playlistThumbnailResolver":
-                    for (const thumbnailResolver of addon.thumbnailResolvers) {
-                        this.resolvers.playlistThumbnailResolvers.push(thumbnailResolver);
-                    }
-                    break;
-                case "pagerAddon":
-                    for (const pager of addon.pagers) {
-                        this.resolvers.pagers.push(pager);
-                    }
-                    break;
+            const data = addon.data;
+            if (data.resolvers != undefined) {
+                const resolvers = data.resolvers;
+                for (const audio of resolvers.audio ?? [])
+                    this.resolvers.audioResourceResolvers.push(audio);
+                for (const resolver of resolvers.provider ?? [])
+                    this.resolvers.songResolvers.push(resolver);
+                for (const songData of resolvers.songData ?? [])
+                    this.resolvers.songDataResolvers.push(songData);
+                for (const playlistData of resolvers.playlist ?? [])
+                    this.resolvers.playlistResolvers.push(playlistData);
+                for (const thumbnail of resolvers.thumbnail ?? []) {
+                    this.resolvers.songThumbnailResolvers.push(thumbnail);
+                    this.resolvers.playlistThumbnailResolvers.push(thumbnail);
+                }
+                for (const pager of resolvers.pager ?? [])
+                    this.resolvers.pagers.push(pager);
             }
-            
+            if (data.commands != undefined) {
+                for (const command of data.commands) 
+                    this.addonCommands.push(command);
+            }
         }
     }
 

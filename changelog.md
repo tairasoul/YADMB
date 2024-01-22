@@ -1,3 +1,3 @@
 # Changelog
 
-You can now declare dependencies on NPM modules for your addon.
+A single addon can now contain every type of resolver.

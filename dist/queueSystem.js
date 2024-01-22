@@ -34,7 +34,7 @@ export default class QueueHandler {
     nextTrack() {
         const cur = this.tracks[this.internalCurrentIndex];
         if (!cur) {
-            return;
+            return null;
         }
         if (this.internalLoop == "song") {
             return cur;
