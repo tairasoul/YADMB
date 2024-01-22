@@ -62,7 +62,7 @@ Web data resolvers resolve a URL into songArtist, songName, songThumbnail and so
 
 Pagers resolve a URL and an index into usable data for view-queue, and any other potential addon commands.
 
-Check out [the base pagers](https://github.com/tairasoul/YADMB/blob/main/addons/base/src/pagers.ts) to see how they look.
+Check out [the base pagers](https://github.com/tairasoul/YADMB/blob/main/addons/base/src/resolvers/pagers.ts) to see how they look.
 
 ### Playlist data resolvers
 
