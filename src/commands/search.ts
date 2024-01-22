@@ -18,66 +18,35 @@ export default {
             description: "What to search for.",
             required: true,
             type: 3
-        },
-        {
-            name: "exclude-playlist",
-            description: "Exclude playlists?",
-            required: false,
-            type: oceanic.ApplicationCommandOptionTypes.BOOLEAN
-        },
-        {
-            name: "exclude-channel",
-            description: "Exclude channels?",
-            required: false,
-            type: oceanic.ApplicationCommandOptionTypes.BOOLEAN
-        },
-        {
-            name: "exclude-video",
-            description: "Exclude videos?",
-            required: false,
-            type: oceanic.ApplicationCommandOptionTypes.BOOLEAN
         }
     ],
     callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => {
         await interaction.defer();
         const term = interaction.data.options.getString('term', true);
-        const excludes = [];
-        const enames = [
-            "exclude-playlist",
-            "exclude-channel",
-            "exclude-video"
-        ] as const;
-        for (const name of enames) {
-            if (interaction.data.options.getBoolean(name) === true) {
-                excludes.push(name.split("-")[1])
-            }
-        }
         const results = await playdl.search(term);
         const searches: Array<{name: string}> = [];
         const names: { [key: string]: {embed: builders.EmbedBuilder, url: string, title: string}} = {};
         let currentVideo: { embed: any; title: any; url: any; };
         for (const item of results) {
-            if (!excludes.includes(item.type)) {
-                const embed = new builders.EmbedBuilder();
-                embed.setImage(item.thumbnails[0].url);
-                embed.setTitle(item.title as string);
-                if (item.uploadedAt) embed.addField('Uploaded', item.uploadedAt);
-                if (item.channel?.name) embed.addField("Author",  item.channel.name);
-                if (item.views) embed.addField("Views", item.views.toString());
-                if (item.durationInSec) embed.addField("Duration", humanize(item.durationInSec * 1000));
-                names[item.title as string] = {
-                    embed: embed,
-                    url: item.url,
-                    title: item.title as string
-                }
-                // @ts-ignore
-                if (!currentVideo) currentVideo = {
-                    embed: embed,
-                    url: item.url,
-                    title: item.title
-                };
-                searches.push({name: item.title as string});
+            const embed = new builders.EmbedBuilder();
+            embed.setImage(item.thumbnails[0].url);
+            embed.setTitle(item.title as string);
+            if (item.uploadedAt) embed.addField('Uploaded', item.uploadedAt);
+            if (item.channel?.name) embed.addField("Author",  item.channel.name);
+            if (item.views) embed.addField("Views", item.views.toString());
+            if (item.durationInSec) embed.addField("Duration", humanize(item.durationInSec * 1000));
+            names[item.title as string] = {
+                embed: embed,
+                url: item.url,
+                title: item.title as string
             }
+            // @ts-ignore
+            if (!currentVideo) currentVideo = {
+                embed: embed,
+                url: item.url,
+                title: item.title
+            };
+            searches.push({name: item.title as string});
         }
         const accept = new builders.Button(oceanic.ButtonStyles.PRIMARY, `${interaction.user.id}Add${term}`);
         accept.type = oceanic.ComponentTypes.BUTTON;
