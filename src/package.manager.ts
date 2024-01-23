@@ -3,6 +3,7 @@ import { exec } from "child_process";
 export type managerDefs = {
     install: string;
     uninstall: string;
+    list: string;
 }
 
 export default class PackageManager {
@@ -38,7 +39,7 @@ export default class PackageManager {
 
     async isPackageInstalled(_package: string) {
         return new Promise<boolean>((resolve, reject) => {
-            exec(`npm ls`, (error, stdout) => {
+            exec(`${this.managerDefs.list}`, (error, stdout) => {
                 if (error) {
                     reject(error);
                     return;

@@ -22,7 +22,8 @@ const { token, web_features, package_manager } = JSON.parse(fs.readFileSync(path
 
 const defs: managerDefs = {
     install: package_manager.install.trim(),
-    uninstall: package_manager.uninstall.trim()
+    uninstall: package_manager.uninstall.trim(),
+    list: package_manager.list.trim()
 }
 
 const client = new MusicClient({

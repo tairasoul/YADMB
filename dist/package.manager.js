@@ -28,7 +28,7 @@ export default class PackageManager {
     }
     async isPackageInstalled(_package) {
         return new Promise((resolve, reject) => {
-            exec(`npm ls`, (error, stdout) => {
+            exec(`${this.managerDefs.list}`, (error, stdout) => {
                 if (error) {
                     reject(error);
                     return;
