@@ -69,7 +69,6 @@ export default class addonLoader {
                         debugLog(`file ${path.basename(`${addonPath}/${pathname}`)} has no default export! skipping.`);
                         continue;
                     }
-                    console.log(addonInfo);
                     if (addonInfo instanceof Array) {
                         console.log(`addon ${path.basename(`${addonPath}/${pathname}`)} has multiple addons, iterating.`);
                         addonInfo.forEach((saddon) => {
