@@ -1,6 +1,7 @@
 export type managerDefs = {
     install: string;
     uninstall: string;
+    list: string;
 };
 export default class PackageManager {
     private managerDefs;
