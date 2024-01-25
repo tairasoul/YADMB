@@ -21,6 +21,8 @@ function isExcluded(filePath: string, exclusionList: string[]) {
     });
 }
 
+const addonDir = path.join(`${__dirname}`, "..", "addons");
+
 export default class addonLoader {
     private _client: MusicClient;
     private addonPackages: AddonPackages;
@@ -31,16 +33,16 @@ export default class addonLoader {
     }
 
     async readAddons() {
-        for (const addon of fs.readdirSync(path.join(`${__dirname}`, "..", "addons"))) {
+        for (const addon of fs.readdirSync(addonDir)) {
             console.log(`reading addon ${addon}`);
             // if addon is dir, re-call readAddons for addonPath/addon
-            if (fs.statSync(`${path.join(`${__dirname}`, "..", "addons")}/${addon}`).isDirectory()) {
+            if (fs.statSync(`${addonDir}/${addon}`).isDirectory()) {
                 console.log(`addon ${addon} is dir, reading from all files in ${addon}`)
-                await this.readAddonFolder(`${path.join(`${__dirname}`, "..", "addons")}/${addon}`);
+                await this.readAddonFolder(`${addonDir}/${addon}`);
             }
             // else, continue as normal with importing addon.
             else {
-                const addonInfo: AddonInfo | AddonInfo[] = await import(`file://${path.join(`${__dirname}`, "..", "addons")}/${addon}`).then(m => m.default);
+                const addonInfo: AddonInfo | AddonInfo[] = await import(`file://${addonDir}/${addon}`).then(m => m.default);
                 if (addonInfo instanceof Array) {
                     console.log(`addon ${addon} has multiple addons, iterating.`)
                     addonInfo.forEach((saddon) => {
