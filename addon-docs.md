@@ -12,27 +12,9 @@ An addon looks something like [this base addon](https://github.com/tairasoul/YAD
 
 You can use [this template](https://github.com/tairasoul/yadmb-addon-template) as a base.
 
-## Addon types
-
-You have 7 types of addons:
-
-- Custom commands
-
-- Audio resolvers
-
-- Provider resolvers
-
-- Song data resolvers
-
-- Web data resolvers (for the web-ui)
-
-- Pagers
-
-and finally,
-
-- Playlist data resolvers
-
 ## Resolver types
+
+Addons have 7 types of resolvers, those being:
 
 ### Audio resolvers
 
@@ -69,6 +51,8 @@ Check out [the base pagers](https://github.com/tairasoul/YADMB/blob/main/addons/
 Playlist data resolvers resolve a playlist URL into a table, containing an array called items that contains all the song data, and the title of the playlist.
 
 ## Commands
+
+Addons can also contain commands.
 
 Commands are simple / commands, that work the same as the built in commands.
 
