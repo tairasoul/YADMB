@@ -74,7 +74,7 @@ Commands are simple / commands, that work the same as the built in commands.
 
 They get the same parameters and have the same capabilities.
 
-You can take a look at any command in the rework/commands folder to see how one should be structured.
+You can take a look at any command in the src/commands folder to see how one should be structured.
 
 ## Module dependencies
 
