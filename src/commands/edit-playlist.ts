@@ -227,7 +227,7 @@ export default {
         const addCallback = async (int: oceanic.AnyModalSubmitInteraction, resolve: any) => {
             if (int.data.customID !== modalId) return;
             if (!int.acknowledged) await int.defer(1 << 6);
-            const video = int.data.components[0].components[0].value as string;
+            const video = int.data.components.getComponents()[0].value as string;
             const nameProviders = await resolvers.getNameResolvers(video);
             let provider;
             for (const prov of nameProviders) {
