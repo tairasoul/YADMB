@@ -5,3 +5,6 @@ node_modules/
 discord-music-bot.code-workspace
 .gitignore
 enableDebugging
+modules.json
+addons/*
+!addons/base/

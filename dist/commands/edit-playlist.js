@@ -228,7 +228,7 @@ export default {
                 return;
             if (!int.acknowledged)
                 await int.defer(1 << 6);
-            const video = int.data.components[0].components[0].value;
+            const video = int.data.components.getComponents()[0].value;
             const nameProviders = await resolvers.getNameResolvers(video);
             let provider;
             for (const prov of nameProviders) {

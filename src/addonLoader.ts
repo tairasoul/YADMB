@@ -64,12 +64,12 @@ export default class addonLoader {
         if (fs.existsSync(`${addonPath}/exclusions.json`)) {
             const newExclusions = JSON.parse(fs.readFileSync(`${addonPath}/exclusions.json`, 'utf8'));
             for (const exclusion of newExclusions) {
-                exclusions.push(exclusion.replace(/\//g, "\\"));
+                exclusions.push(exclusion);
             }
         }
         await this.readAddonPackages(addonPath);
         debugLog(`exclusions for ${addonPath}: ${exclusions.join(" ")}`)
-        for (const pathname of fs.readdirSync(addonPath, {recursive: true, encoding: "utf8"})) {
+        for (const pathname of fs.readdirSync(addonPath, {recursive: true, encoding: "utf8"}).map((v) => v.replace(/\\/g, "/"))) {
             if (fs.statSync(`${addonPath}/${pathname}`).isFile()) {
                 if (!isExcluded(pathname, exclusions)) {
                     const addonInfo: AddonInfo | AddonInfo[] = await import(`file://${addonPath}/${pathname}`).then(m => m.default);
