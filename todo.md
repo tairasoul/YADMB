@@ -24,7 +24,7 @@
 
 - add support for more package managers
   - for the list part it only supports npm due to formatting
-  - you know what maybe i should just check the node_modules folder lmao
+  - you know what maybe i should just check the node_modules folder or package.json lmao
 
 # finished + comments
 

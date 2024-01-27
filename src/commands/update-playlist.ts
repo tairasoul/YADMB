@@ -47,7 +47,7 @@ export default {
             await interaction.editOriginal({content: `Updated playlist **${oldData.name}**. Save this as a file:`, files: [
                 {
                     name: `${(interaction.member as oceanic.Member).username}.playlist.${oldData.name}.export.txt`,
-                    contents: new Buffer(newData)
+                    contents: Buffer.from(newData)
                 }
             ], flags: 1 << 6})
         }

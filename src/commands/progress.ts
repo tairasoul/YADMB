@@ -18,7 +18,7 @@ export default {
             embed.addField("Time remaining", remaining);
             embed.addField("Song duration", humanize(progressTime));
             embed.addField("Author", guild.queue.currentInfo.info.channelName || "None found.");
-            for (const field of guild.queue.currentInfo.info.fields != undefined ? guild.queue.currentInfo.info.fields : []) {
+            for (const field of guild.queue.currentInfo.info.fields ?? []) {
                 embed.addField(field.name, field.value, field.inline);
             }
             //embed.addField("Likes", guild.queue.currentInfo.info.likes);
