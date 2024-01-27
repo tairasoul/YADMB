@@ -9,6 +9,10 @@ function getProvider(url: string) {
     if (/https:\/\/deezer\.(?:com|page\.link)\/./.test(url)) return "deezer";
 }
 
+// todo:
+// seperate this into multiple resolvers.
+// why did i make it all one resolver??
+
 export const base: dataResolver = {
     name: "base",
     async available(url) {

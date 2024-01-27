@@ -8,6 +8,10 @@ function getProvider(url: string) {
     if (/https:\/\/deezer\.(?:com|page\.link)\/./.test(url)) return "deezer";
 }
 
+// todo:
+// why did i make these resolvers, of all of them, a single "base" resolver??
+// bruh
+
 export const base: playlistResolver = {
     name: "base",
     async available(url) {

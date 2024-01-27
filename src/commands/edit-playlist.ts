@@ -26,7 +26,7 @@ export default {
             description: "Playlist file."
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => {
+    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, _guild: Guild, client: MusicClient) => {
         await interaction.defer(1 << 6);
         const attachment = interaction.data.options.getAttachment("playlist", true);
         const text = await (await fetch(attachment.url)).text();
@@ -101,7 +101,7 @@ export default {
             await i.createFollowup({content: `Exported playlist **${data.name}**. Save this as a file:`, files: [
                 {
                     name: `${(interaction.member as oceanic.Member).username}.playlist.${data.name}.export.txt`,
-                    contents: new Buffer(encoded)
+                    contents: Buffer.from(encoded)
                 }
             ], flags: 1 << 6})
             /** @ts-ignore */
