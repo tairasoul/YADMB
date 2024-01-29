@@ -1,5 +1,7 @@
 # todo 
 
+- update web-ui to work with latest addon update
+
 - add capability to filter with regex to add-playlist and add-search
   - won't be too hard as then i just have to add an optional argument
 
