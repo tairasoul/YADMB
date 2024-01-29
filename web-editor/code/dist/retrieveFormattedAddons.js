@@ -1,5 +1,5 @@
 export function retrieveAddonProperties(addon) {
-    switch (addon.type) {
+    /*switch(addon.type) {
         case "audioResourceResolver":
             return addon.resourceResolvers;
         case "playlistDataResolver":
@@ -16,18 +16,15 @@ export function retrieveAddonProperties(addon) {
             return addon.commands;
         case "pagerAddon":
             return addon.pagers;
+    }*/
+    if (addon.data.resolvers) {
+        return addon.data.resolvers;
     }
 }
 export function hasResolvers(addon) {
-    switch (addon.type) {
-        case "audioResourceResolver":
-        case "playlistDataResolver":
-        case "playlistThumbnailResolver":
-        case "songThumbnailResolver":
-        case "songDataResolver":
-        case "songResolver":
+    if (addon.data) {
+        if (addon.data.resolvers)
             return true;
-        default:
-            return false;
     }
+    return false;
 }

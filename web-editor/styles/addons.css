@@ -72,6 +72,18 @@ body {
     font-style: italic;
 }
 
+.resolver-info {
+    margin-left: 8px;
+}
+
+.resolver-type {
+    font-size: 14px;
+    font-weight: bold;
+    color: #FFA500; /* Orange color for addon type */
+    margin-bottom: 5px;
+    font-style: italic;
+}
+
 .addon-sources {
     margin-top: 15px;
 }
@@ -109,13 +121,6 @@ body {
 
 .source-item a:hover {
     text-decoration: underline; /* Underline link on hover */
-}
-
-.addon-type {
-    font-size: 14px;
-    font-weight: bold;
-    color: #FFA500; /* Orange color for addon type */
-    margin-bottom: 5px;
 }
 
 .addon-author {
