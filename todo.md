@@ -1,7 +1,5 @@
 # todo 
 
-- update web-ui to work with latest addon update
-
 - add capability to filter with regex to add-playlist and add-search
   - won't be too hard as then i just have to add an optional argument
 
@@ -29,6 +27,8 @@
   - you know what maybe i should just check the node_modules folder or package.json lmao
 
 # finished + comments
+
+- update web-ui to work with latest addon update
 
 - resolver priority + more effective way of checking if it can be used on a url
   - resolvers now expose an available() function that returns true or false. if true, it can be used.
