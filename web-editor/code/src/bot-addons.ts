@@ -54,34 +54,84 @@ function createAddon(addon: AddonInfo) {
     helper.createElement("p", {class:"addon-description"}, addon.description);
     helper.createElement("p", {class:"addon-author"}, addon.credits);
     helper.createElement("p", {class:"addon-version"}, addon.version);
-    helper.createElement("p", {class:"addon-type"}, addon.type);
     const resolverList = helper.createElement("ul", {class:"resolver-item"});
     const rHelper = new HtmlHelper(resolverList);
     if (hasResolvers(addon)) {
-        for (const resolver of retrieveAddonProperties(addon)) {
+        const data = addon.data.resolvers as types.data_resolvers;
+        for (const resolver of data.audio ?? []) {
+            const li = rHelper.createElement("li", {class:"resolver-item"});
+            const li_h = new HtmlHelper(li);
+            li_h.createElement("strong", {class:"resolver-name"}, resolver.name);
+            const li2 = new HtmlHelper(li_h.createElement("li", { class: "resolver-info" }));
+            // @ts-ignore
+            li2.createElement("span", { class: "resolver-description" }, "Priority: " + resolver.priority);
+            const li3 = new HtmlHelper(li_h.createElement("li", {class:"resolver-info"}));
+            li3.createElement("strong", {class:"resolver-type"}, "Type: Audio Resolver")
+        }
+        for (const resolver of data.pager ?? []) {
+            const li = rHelper.createElement("li", {class:"resolver-item"});
+            const li_h = new HtmlHelper(li);
+            li_h.createElement("strong", {class:"resolver-name"}, resolver.name);
+            const li2 = new HtmlHelper(li_h.createElement("li", { class: "resolver-info" }));
+            // @ts-ignore
+            li2.createElement("span", { class: "resolver-description" }, "Priority: " + resolver.priority);
+            const li3 = new HtmlHelper(li_h.createElement("li", {class:"resolver-info"}));
+            li3.createElement("strong", {class:"resolver-type"}, "Type: Data Pager")
+        }
+        for (const resolver of data.playlist ?? []) {
+            const li = rHelper.createElement("li", {class:"resolver-item"});
+            const li_h = new HtmlHelper(li);
+            li_h.createElement("strong", {class:"resolver-name"}, resolver.name);
+            const li2 = new HtmlHelper(li_h.createElement("li", { class: "resolver-info" }));
+            // @ts-ignore
+            li2.createElement("span", { class: "resolver-description" }, "Priority: " + resolver.priority);
+            const li3 = new HtmlHelper(li_h.createElement("li", {class:"resolver-info"}));
+            li3.createElement("strong", {class:"resolver-type"}, "Type: Playlist Resolver")
+        }
+        for (const resolver of data.provider ?? []) {
+            const li = rHelper.createElement("li", { class: "resolver-item" });
+            const li_h = new HtmlHelper(li);
+            li_h.createElement("strong", { class: "resolver-name" }, resolver.name);
+            const li2 = new HtmlHelper(li_h.createElement("li", { class: "resolver-info" }));
+            // @ts-ignore
+            li2.createElement("span", { class: "resolver-description" }, "Priority: " + resolver.priority);
+            const li3 = new HtmlHelper(li_h.createElement("li", {class:"resolver-info"}));
+            li3.createElement("strong", {class:"resolver-type"}, "Type: Provider Resolver")
+        }
+        for (const resolver of data.songData ?? []) {
+            const li = rHelper.createElement("li", { class: "resolver-item" });
+            const li_h = new HtmlHelper(li);
+            li_h.createElement("strong", { class: "resolver-name" }, resolver.name);
+            const li2 = new HtmlHelper(li_h.createElement("li", { class: "resolver-info" }));
+            // @ts-ignore
+            li2.createElement("span", { class: "resolver-description" }, "Priority: " + resolver.priority);
+            const li3 = new HtmlHelper(li_h.createElement("li", {class:"resolver-info"}));
+            li3.createElement("strong", {class:"resolver-type"}, "Type: Song Resolver")
+        }
+        for (const resolver of data.thumbnail ?? []) {
+            const li = rHelper.createElement("li", {class:"resolver-item"});
+            const li_h = new HtmlHelper(li);
+            li_h.createElement("strong", {class:"resolver-name"}, resolver.name);
+            const li2 = new HtmlHelper(li_h.createElement("li", {class:"resolver-info"}));
+            // @ts-ignore
+            li2.createElement("span", {class:"resolver-description"}, "Priority: " + resolver.priority)
+            const li3 = new HtmlHelper(li_h.createElement("li", {class:"resolver-info"}));
+            li3.createElement("strong", {class:"resolver-type"}, "Type: Thumbnail Resolver")
+        }
+        /*for (const resolver of retrieveAddonProperties(addon)) {
             const li = rHelper.createElement("li", {class:"resolver-item"});
             const li_h = new HtmlHelper(li);
             li_h.createElement("strong", {class:"resolver-name"}, resolver.name);
             // @ts-ignore
             li_h.createElement("span", {class:"resolver-description"}, " - Priority: " + resolver.priority)
-        }
+        }*/
     }
-    else {
-        if (addon.type === "command") {
-            for (const cmd of addon.commands) {
-                const li = rHelper.createElement("li", {class:"resolver-item"});
-                const li_h = new HtmlHelper(li);
-                li_h.createElement("strong", {class:"resolver-name"}, cmd.name);
-                li_h.createElement("span", {class:"resolver-description"}, " - " + cmd.description);
-            }
-        }
-        else if (addon.type === "pagerAddon") {
-            for (const pager of addon.pagers) {
-                const li = rHelper.createElement("li", {class:"resolver-item"});
-                const li_h = new HtmlHelper(li);
-                li_h.createElement("strong", {class:"resolver-name"}, pager.name);
-                li_h.createElement("span", {class:"resolver-description"}, " - Priority: " + pager.priority)
-            }
+    if (addon.data.commands) {
+        for (const cmd of addon.data.commands ?? []) {
+            const li = rHelper.createElement("li", {class:"resolver-item"});
+            const li_h = new HtmlHelper(li);
+            li_h.createElement("strong", {class:"resolver-name"}, cmd.name);
+            li_h.createElement("span", {class:"resolver-description"}, " - " + cmd.description);
         }
     }
     if (addon.sources && addon.sources.length > 0) {

@@ -51,17 +51,20 @@ class addonloader {
     }
 
     private async readAddonFolder(addonPath: string) {
-        const exclusions: string[] = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json"];
+        const exclusions: string[] = ["exclusions.json", "node_modules/*", "package.json", "package-lock.json", "pnpm-lock.yaml", "tsconfig.json", "packages.json"];
         if (fs.existsSync(`${addonPath}/exclusions.json`)) {
             const newExclusions = JSON.parse(fs.readFileSync(`${addonPath}/exclusions.json`, 'utf8'));
             for (const exclusion of newExclusions) {
-                exclusions.push(exclusion.replace(/\//g, "\\"));
+                exclusions.push(exclusion);
             }
         }
-        for (const pathname of fs.readdirSync(addonPath, {recursive: true, encoding: "utf8"})) {
+        for (const pathname of fs.readdirSync(addonPath, {recursive: true, encoding: "utf8"}).map((v) => v.replace(/\\/g, "/"))) {
             if (fs.statSync(`${addonPath}/${pathname}`).isFile()) {
                 if (!isExcluded(pathname, exclusions)) {
                     const addonInfo = await import(`file://${addonPath}/${pathname}`).then(m => m.default);
+                    if (addonInfo == undefined) {
+                        continue;
+                    }
                     if (addonInfo instanceof Array) {
                         console.log(`addon ${path.basename(`${addonPath}/${pathname}`)} has multiple addons, iterating.`)
                         addonInfo.forEach((saddon) => {

@@ -156,6 +156,26 @@ export type command = {
      * The command options.
      */
     options: oceanic.ApplicationCommandOptions[];
+    /**
+     * Callback for this command.
+     */
+}
+
+export type data_resolvers = {
+    thumbnail?: thumbnailResolver[];
+    playlist?: playlistResolver[];
+    songData?: dataResolver[];
+    audio?: AudioResolver[];
+    pager?: PagerResolver[];
+    provider?: resolver[];
+}
+
+export type AddonData = {
+    resolvers: data_resolvers;
+    commands?: command[];
+} | {
+    resolvers?: data_resolvers;
+    commands: command[];
 }
 
 export type AddonInfo = {
@@ -180,256 +200,14 @@ export type AddonInfo = {
      */
     credits: string;
     /**
-     * Song resolvers.
+     * The data for the addon. Contains the resolvers and commands the addon uses.
      */
-    resolvers: resolver[];
+    data: AddonData;
     /**
      * Is this addon private?
      * Addons will not be shown when the user checks addons through /view-addons if it is.
      */
     private?: boolean;
-    /**
-     * A provider resolver.
-     */
-    type: "songResolver";
-} | {
-    /**
-     * The name of your addon.
-     */
-    name: string;
-    /**
-     * Description of your addon.
-     */
-    description: string;
-    /**
-     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
-     */
-    version: string;
-    /**
-     * Where can other people find the source of this addon?
-     */
-    sources?: string[];
-    /**
-     * Credits for this addon.
-     */
-    credits: string;
-    /**
-     * Commands this addon adds.
-     */
-    commands: command[];
-    /**
-     * Is this addon private?
-     * Addons will not be shown when the user checks addons through /view-addons if it is.
-     */
-    private?: boolean;
-    /**
-     * An addon that adds its own commands.
-     */
-    type: "command";
-} | {
-    /**
-     * The name of your addon.
-     */
-    name: string;
-    /**
-     * Description of your addon.
-     */
-    description: string;
-    /**
-     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
-     */
-    version: string;
-    /**
-     * Where can other people find the source of this addon?
-     */
-    sources?: string[];
-    /**
-     * Credits for this addon.
-     */
-    credits: string;
-    /**
-     * List of song data resolvers.
-     */
-    dataResolvers: dataResolver[];
-    /**
-     * Is this addon private?
-     * Addons will not be shown when the user checks addons through /view-addons if it is.
-     */
-    private?: boolean;
-    /**
-     * An addon that resolves song data into something usable.
-     */
-    type: "songDataResolver";
-} | {
-    /**
-     * The name of your addon.
-     */
-    name: string;
-    /**
-     * Description of your addon.
-     */
-    description: string;
-    /**
-     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
-     */
-    version: string;
-    /**
-     * Where can other people find the source of this addon?
-     */
-    sources?: string[];
-    /**
-     * Credits for this addon.
-     */
-    credits: string;
-    /**
-     * List of playlist resolvers.
-     */
-    playlistResolvers: playlistResolver[];
-    /**
-     * Is this addon private?
-     * Addons will not be shown when the user checks addons through /view-addons if it is.
-     */
-    private?: boolean;
-    /**
-     * An addon that resolves playlists into usable data.
-     */
-    type: "playlistDataResolver";
-} | {
-    /**
-     * The name of your addon.
-     */
-    name: string;
-    /**
-     * Description of your addon.
-     */
-    description: string;
-    /**
-     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
-     */
-    version: string;
-    /**
-     * Where can other people find the source of this addon?
-     */
-    sources?: string[];
-    /**
-     * Credits for this addon.
-     */
-    credits: string;
-    /**
-     * List of playlist resolvers.
-     */
-    resourceResolvers: AudioResolver[];
-    /**
-     * Is this addon private?
-     * Addons will not be shown when the user checks addons through /view-addons if it is.
-     */
-    private?: boolean;
-    /**
-     * An addon that resolves a song URL into an Audio Resource
-     */
-    type: "audioResourceResolver";
-} | {
-    /**
-     * The name of your addon.
-     */
-    name: string;
-    /**
-     * Description of your addon.
-     */
-    description: string;
-    /**
-     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
-     */
-    version: string;
-    /**
-     * Where can other people find the source of this addon?
-     */
-    sources?: string[];
-    /**
-     * Credits for this addon.
-     */
-    credits: string;
-    /**
-     * List of thumbnail resolvers.
-     */
-    thumbnailResolvers: thumbnailResolver[];
-    /**
-     * Is this addon private?
-     * Addons will not be shown when the user checks addons through /view-addons if it is.
-     */
-    private?: boolean;
-    /**
-     * An addon that resolves a song URL into a thumbnail URL.
-     */
-    type: "songThumbnailResolver";
-} | {
-    /**
-     * The name of your addon.
-     */
-    name: string;
-    /**
-     * Description of your addon.
-     */
-    description: string;
-    /**
-     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
-     */
-    version: string;
-    /**
-     * Where can other people find the source of this addon?
-     */
-    sources?: string[];
-    /**
-     * Credits for this addon.
-     */
-    credits: string;
-    /**
-     * List of thumbnail resolvers.
-     */
-    thumbnailResolvers: thumbnailResolver[];
-    /**
-     * Is this addon private?
-     * Addons will not be shown when the user checks addons through /view-addons if it is.
-     */
-    private?: boolean;
-    /**
-     * An addon that resolves a song URL into a thumbnail URL.
-     */
-    type: "playlistThumbnailResolver";
-} | {
-    /**
-     * The name of your addon.
-     */
-    name: string;
-    /**
-     * Description of your addon.
-     */
-    description: string;
-    /**
-     * Addon version. Gets formatted as v{version}, no need to prefix the version with v
-     */
-    version: string;
-    /**
-     * Where can other people find the source of this addon?
-     */
-    sources?: string[];
-    /**
-     * Credits for this addon.
-     */
-    credits: string;
-    /**
-     * List of thumbnail resolvers.
-     */
-    pagers: PagerResolver[];
-    /**
-     * Is this addon private?
-     * Addons will not be shown when the user checks addons through /view-addons if it is.
-     */
-    private?: boolean;
-    /**
-     * An addon that resolves a URL into page data.
-     */
-    type: "pagerAddon";
 }
 
 export type infoData = {
@@ -438,15 +216,9 @@ export type infoData = {
      */
     channelName: string;
     /**
-     * Likes for the song.
-     * Set to "Unable to fetch likes" if you can't.
+     * Various fields for metrics available.
      */
-    likes: string;
-    /**
-     * Views, if possible to be fetched.
-     * Set to "Unable to fetch views" if you can't.
-     */
-    views: string;
+    fields?: oceanic.EmbedField[]
     /**
      * Highest resolution URL for the thumbnail.
      */
