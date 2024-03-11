@@ -9,12 +9,12 @@
   - rewrite 2
     - make more util functions (or maybe just more classes) to handle more things
     - for example, paging. paging is currently mostly done by the command itself, only having some functions generate pages for it.
-    - paging may be done easier if it's mapped internally instead of within just the command.
+    - ~~paging may be done easier if it's mapped internally instead of within just the command.~~
 
 - rewrite the commands that use pages, so the PageHolder class is ACTUALLY used
   - currently ~~bot.ts~~ the command handles the paging instead of just.. using the functions
 
-- instead of paging at command execute time, page when a song is added and add some embeds for each song if playlist
+- instead of paging at command execute time, ~~page when a song is added and add some embeds for each song if playlist~~ cache info about a song
   - ~~this means live-updating view-queue will be easier~~ it's just a snapshot now so
   - it wont take as much time to do view-queue
 
