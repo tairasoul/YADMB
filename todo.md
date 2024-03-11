@@ -17,6 +17,17 @@
 - instead of paging at command execute time, ~~page when a song is added and add some embeds for each song if playlist~~ cache info about a song
   - ~~this means live-updating view-queue will be easier~~ it's just a snapshot now so
   - it wont take as much time to do view-queue
+  - may use an sql database
+  - cache will be formatted like
+    - service name
+      - song identifier
+        - data (thumbnail, name, etc.)
+  - resolvers implement checking and getting/saving cache
+  - config.json can be used to configure invalidation or disable it
+  - if the cache for the song is invalidated, itll go through the same resolving process as normal
+  - considering:
+    - each addon gets its own cache
+    - all addons share the same cache
 
 - rewrite search command
   - it currently tries to exclude instead of exclusively searching for something
