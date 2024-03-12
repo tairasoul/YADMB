@@ -3,7 +3,9 @@ a music bot because i got bored and made one
 
 the concept is a decentralized music bot.
 
-no instance of this stores any of your data in the filesystem, everything that is stored on filesystem will be stored on the user's filesystem and not the host machine
+no instance of this stores any of your data in the filesystem, everything that is stored on filesystem will be stored on the user's filesystem and not the host machine.
+
+the only data that gets stored is a cache of song data, for faster song/playlist adding and paging.
 
 started in december 2022, this is one of the projects i've been working on the longest.
 
