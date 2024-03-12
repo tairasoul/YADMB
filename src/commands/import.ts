@@ -17,9 +17,13 @@ export default {
             required: true
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, info: {
+        resolvers: ResolverUtils, 
+        guild: Guild, 
+        cache: Cache
+    }) => {
         await interaction.defer()
-        const queue = guild.queue;
+        const queue = info.guild.queue;
         const encoded = interaction.data.options.getAttachment("encoded", true);
         const data = await fetch(encoded.url, {
             method: "GET"
@@ -40,6 +44,6 @@ export default {
         const embed = new builders.EmbedBuilder();
         embed.setDescription(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"} from ${encoded.filename}`);
         await interaction.editOriginal({embeds: [embed.toJSON()]});
-        if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection) await queue.play(resolvers);
+        if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers);
     }
 }

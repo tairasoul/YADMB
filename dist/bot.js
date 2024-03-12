@@ -14,7 +14,7 @@ export function debugLog(text) {
         console.log(text);
 }
 let setup = false;
-const { token, web_features, package_manager } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+const { token, web_features, package_manager, db_path } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 const defs = {
     install: package_manager.install.trim(),
     uninstall: package_manager.uninstall.trim(),
@@ -37,7 +37,8 @@ const client = new MusicClient({
         ],
         autoReconnect: true,
         connectionTimeout: 900000
-    }
+    },
+    database_path: db_path ?? "./cache.db"
 });
 if (web_features) {
     startWebFunctions();
@@ -100,13 +101,13 @@ client.on("ready", async () => {
 });
 client.on("guildCreate", (guild) => client.addGuild(guild));
 client.on("guildDelete", (guild) => client.removeGuild(guild));
-client.on("m_interactionCreate", async (interaction, resolvers, guild, m_client) => {
+client.on("m_interactionCreate", async (interaction, info) => {
     const command = client.commands.get(interaction.data.name);
     if (!command) {
         return;
     }
     try {
-        await command.execute(interaction, resolvers, guild, m_client);
+        await command.execute(interaction, info);
     }
     catch (error) {
         if (error)

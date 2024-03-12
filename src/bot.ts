@@ -9,6 +9,7 @@ import * as voice from "@discordjs/voice";
 import { startWebFunctions } from "./web.fsapi.js";
 import web from "./web.command.js";
 import { managerDefs } from "./package.manager.js";
+import Cache from "./cache.js";
 let debug = false;
 if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
 
@@ -18,7 +19,7 @@ export function debugLog(text: any) {
 
 let setup = false;
 
-const { token, web_features, package_manager } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+const { token, web_features, package_manager, cache_path, expiry_time, check_interval } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 
 const defs: managerDefs = {
     install: package_manager.install.trim(),
@@ -43,7 +44,10 @@ const client = new MusicClient({
         ],
         autoReconnect: true,
         connectionTimeout: 900000
-    }
+    },
+    database_path: cache_path ?? "./cache.db",
+    database_expiry_time: expiry_time ?? "3d",
+    database_cleanup_interval: check_interval ?? "1m"
 });
 
 if (web_features) {
@@ -112,13 +116,13 @@ client.on("guildCreate", (guild) => client.addGuild(guild))
 
 client.on("guildDelete", (guild) => client.removeGuild(guild as oceanic.Guild))
 
-client.on("m_interactionCreate", async (interaction, resolvers, guild, m_client) => {
+client.on("m_interactionCreate", async (interaction, info) => {
     const command = client.commands.get(interaction.data.name);
     if (!command) {
         return;
     }
     try {
-        await command.execute(interaction, resolvers, guild, m_client);
+        await command.execute(interaction, info);
     } catch (error) {
         if (error) console.error(error);
         

@@ -14,6 +14,16 @@
 - rewrite the commands that use pages, so the PageHolder class is ACTUALLY used
   - currently ~~bot.ts~~ the command handles the paging instead of just.. using the functions
 
+- rewrite search command
+  - it currently tries to exclude instead of exclusively searching for something
+  - and i cant search for all types from what i know
+
+- add support for more package managers
+  - for the list part it only supports npm due to formatting
+  - you know what maybe i should just check the node_modules folder or package.json lmao
+
+# finished + comments
+
 - instead of paging at command execute time, ~~page when a song is added and add some embeds for each song if playlist~~ cache info about a song
   - ~~this means live-updating view-queue will be easier~~ it's just a snapshot now so
   - it wont take as much time to do view-queue
@@ -25,19 +35,7 @@
   - resolvers implement checking and getting/saving cache
   - config.json can be used to configure invalidation or disable it
   - if the cache for the song is invalidated, itll go through the same resolving process as normal
-  - considering:
-    - each addon gets its own cache
-    - all addons share the same cache
-
-- rewrite search command
-  - it currently tries to exclude instead of exclusively searching for something
-  - and i cant search for all types from what i know
-
-- add support for more package managers
-  - for the list part it only supports npm due to formatting
-  - you know what maybe i should just check the node_modules folder or package.json lmao
-
-# finished + comments
+  - all addons share the same cache
 
 - update web-ui to work with latest addon update
 

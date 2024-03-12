@@ -9,6 +9,7 @@ import * as builders from "@oceanicjs/builders";
 import util from "node:util";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 import { debugLog } from "./bot.js";
+import Cache from "./cache.js";
 export default class MusicClient extends Client {
     m_guilds;
     commands;
@@ -24,11 +25,13 @@ export default class MusicClient extends Client {
     };
     addonCommands = [];
     rawCommands;
+    cache_database;
     constructor(options) {
         super(options);
         this.m_guilds = {};
         this.commands = new Collection();
         this.rawCommands = [];
+        this.cache_database = new Cache(options.database_path, options.database_expiry_time);
         this.setMaxListeners(0);
         this.on("guildCreate", () => {
             this.editStatus("online", [{ name: (this.guilds.size).toString() + ' servers', type: 3 }]);
@@ -126,7 +129,12 @@ export default class MusicClient extends Client {
         if (event == "m_interactionCreate") {
             super.on("interactionCreate", (interaction) => 
             // @ts-ignore
-            listener(interaction, new ResolverUtils(this.resolvers), this.m_guilds[interaction.guildID], this));
+            listener(interaction, {
+                resolvers: new ResolverUtils(this.resolvers),
+                guild: this.m_guilds[interaction.guildID],
+                client: this,
+                cache: this.cache_database
+            }));
         }
         else {
             // @ts-ignore
@@ -138,7 +146,12 @@ export default class MusicClient extends Client {
         if (event == "m_interactionCreate") {
             super.off("interactionCreate", (interaction) => 
             // @ts-ignore
-            listener(interaction, new ResolverUtils(this.resolvers), this.m_guilds[interaction.guildID], this));
+            listener(interaction, {
+                resolvers: new ResolverUtils(this.resolvers),
+                guild: this.m_guilds[interaction.guildID],
+                client: this,
+                cache: this.cache_database
+            }));
         }
         else {
             // @ts-ignore

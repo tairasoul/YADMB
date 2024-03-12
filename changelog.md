@@ -1,3 +1,3 @@
 # Changelog
 
-A single addon can now contain every type of resolver.
+Add caching through an SQLite3 database so adding songs and playlists don't take as long.

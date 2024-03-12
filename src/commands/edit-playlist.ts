@@ -8,6 +8,7 @@ import util from "util";
 import ResolverUtils from "../resolverUtils.js";
 import { debugLog } from "../bot.js";
 import { PageData } from "../addonTypes.js";
+import Cache from "../cache.js";
 
 function embedMessage(text: string) {
     const embed = new builders.EmbedBuilder();
@@ -26,14 +27,19 @@ export default {
             description: "Playlist file."
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, _guild: Guild, client: MusicClient) => {
+    callback: async (interaction: oceanic.CommandInteraction, info: {
+        resolvers: ResolverUtils, 
+        guild: Guild, 
+        client: MusicClient,
+        cache: Cache
+    }) => {
         await interaction.defer(1 << 6);
         const attachment = interaction.data.options.getAttachment("playlist", true);
         const text = await (await fetch(attachment.url)).text();
         const data = utils.decodeStr(text);
         const paged: PageData[] = []
         for (const queued of data.tracks) {
-            const pagedtrack: PageData = (await utils.trackPager([queued], async () => {}, resolvers))[0];
+            const pagedtrack: PageData = (await utils.trackPager([queued], async () => {}, info.resolvers, info.cache))[0];
             pagedtrack.index = paged.length;
             pagedtrack.embed.addField("index", pagedtrack.index.toString())
             paged.push(pagedtrack);
@@ -228,7 +234,7 @@ export default {
             if (int.data.customID !== modalId) return;
             if (!int.acknowledged) await int.defer(1 << 6);
             const video = int.data.components.getComponents()[0].value as string;
-            const nameProviders = await resolvers.getNameResolvers(video);
+            const nameProviders = await info.resolvers.getNameResolvers(video);
             let provider;
             for (const prov of nameProviders) {
                 if (await prov.resolve(video)) {
@@ -239,10 +245,10 @@ export default {
             if (provider == undefined) {
                 return int.editOriginal({embeds: [embedMessage("Invalid song link.")], flags: 1 << 6});
             }
-            const dataResolvers = await resolvers.getSongResolvers(video);
+            const dataResolvers = await info.resolvers.getSongResolvers(video);
             let dataResolver;
             for (const resolver of dataResolvers) {
-                const output = await resolver.resolve(video);
+                const output = await resolver.resolve(video, info.cache);
                 if (output && typeof output != "string") {
                     dataResolver = output;
                     break;
@@ -253,11 +259,11 @@ export default {
                     name: dataResolver.title,
                     url: dataResolver.url
                 }
-                const pagers = await resolvers.getPagers(add.url);
+                const pagers = await info.resolvers.getPagers(add.url);
                 if (pagers) {
                     let pager;
                     for (const page of pagers) {
-                        const output = await page.trackPager(add, paged.length);
+                        const output = await page.trackPager(add, paged.length, info.cache);
                         if (output) {
                             pager = output;
                             break;

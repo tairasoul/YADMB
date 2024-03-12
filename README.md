@@ -69,3 +69,6 @@ if you use pnpm or yarn instead of npm, you'll have to change package_manager.in
 - view a snapshot of the queue
 
 - make addons if you want support for other services
+
+- caches data about playlists and songs so adding them again doesn't take as long.
+    - they have a configurable expiry date, so the database doesnt get too big

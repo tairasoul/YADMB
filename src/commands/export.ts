@@ -24,10 +24,12 @@ export default {
             ]
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverInformation, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, info: {
+        guild: Guild
+    }) => {
         await interaction.defer()
         const type: "playlist" | "queue" = interaction.data.options.getString("type", true);
-        const queue = guild.queue
+        const queue = info.guild.queue
         switch(type) {
             case "playlist":
                 const q = queue.tracks[queue.internalCurrentIndex];

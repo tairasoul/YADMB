@@ -19,7 +19,7 @@ export default {
             description: "Name of the playlist."
         }
     ],
-    callback: async (interaction, resolvers, guild, client) => {
+    callback: async (interaction, info) => {
         await interaction.defer(1 << 6);
         const name = interaction.data.options.getString("playlist-name", true);
         const playlist_embed = new builders.EmbedBuilder();
@@ -226,7 +226,7 @@ export default {
             if (!int.acknowledged)
                 await int.defer(1 << 6);
             const video = int.data.components.getComponents()[0].value;
-            const nameProviders = await resolvers.getNameResolvers(video);
+            const nameProviders = await info.resolvers.getNameResolvers(video);
             let provider;
             for (const prov of nameProviders) {
                 if (await prov.resolve(video)) {
@@ -237,10 +237,10 @@ export default {
             if (provider == undefined) {
                 return int.editOriginal({ embeds: [embedMessage("Invalid song link.")], flags: 1 << 6 });
             }
-            const dataResolvers = await resolvers.getSongResolvers(video);
+            const dataResolvers = await info.resolvers.getSongResolvers(video);
             let dataResolver;
             for (const resolver of dataResolvers) {
-                const output = await resolver.resolve(video);
+                const output = await resolver.resolve(video, info.cache);
                 if (output && typeof output != "string") {
                     dataResolver = output;
                     break;
@@ -252,11 +252,11 @@ export default {
                     url: dataResolver.url
                 };
                 data.tracks.push(add);
-                const pagers = await resolvers.getPagers(add.url);
+                const pagers = await info.resolvers.getPagers(add.url);
                 if (pagers) {
                     let pager;
                     for (const page of pagers) {
-                        const output = await page.trackPager(add, paged.length);
+                        const output = await page.trackPager(add, paged.length, info.cache);
                         if (output) {
                             pager = output;
                             break;

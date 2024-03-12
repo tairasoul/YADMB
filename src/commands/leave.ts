@@ -1,17 +1,18 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import { Guild } from "../client.js";
-import ResolverUtils from "../resolverUtils.js";
 
 export default {
     name: "leave",
     description: "Leave the current VC.",
-    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverUtils, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, info: {
+        guild: Guild
+    }) => {
         await interaction.defer();
-        if (guild.connection) {
-            guild.connection.disconnect();
-            guild.connection = null;
-            guild.voiceChannel = null;
+        if (info.guild.connection) {
+            info.guild.connection.disconnect();
+            info.guild.connection = null;
+            info.guild.voiceChannel = null;
             const embed = new builders.EmbedBuilder();
             embed.setDescription("Disconnected.");
             await interaction.editOriginal({embeds: [embed.toJSON()]});

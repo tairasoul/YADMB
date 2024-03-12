@@ -29,17 +29,20 @@ export default {
             ]
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, info: {
+        resolvers: ResolverUtils, 
+        guild: Guild
+    }) => {
         await interaction.defer();
         const shuffleType = interaction.data.options.getString("type", true);
-        const queue = guild.queue;
+        const queue = info.guild.queue;
         const ct = queue.tracks[queue.internalCurrentIndex];
         if (ct.type === "song" && shuffleType === "playlist") {
             const embed = new builders.EmbedBuilder();
             embed.setDescription("The current track is a song, not a playlist.");
             return await interaction.editOriginal({embeds: [embed.toJSON()]});
         }
-        guild.audioPlayer.stop(true);
+        info.guild.audioPlayer.stop(true);
         queue.internalCurrentIndex = 0;
         ct.trackNumber = 0;
         if (shuffleType === "playlist") {
@@ -59,6 +62,6 @@ export default {
         const embed = new builders.EmbedBuilder();
         embed.setDescription(`Shuffled queue, now playing ${queue.tracks[queue.internalCurrentIndex].tracks[0].name}.`);
         await interaction.editOriginal({embeds: [embed.toJSON()]});
-        await queue.play(resolvers);
+        await queue.play(info.resolvers);
     }
 }

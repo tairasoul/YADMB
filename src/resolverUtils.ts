@@ -1,4 +1,5 @@
 import { AudioResolver, PagerResolver, dataResolver, playlistResolver, resolver } from "./addonTypes";
+import Cache from "./cache.js";
 import { ResolverInformation } from "./client.js";
 
 export default class ResolverUtils {
@@ -47,9 +48,9 @@ export default class ResolverUtils {
         return resolvers.sort((a, b) => b.priority - a.priority);
     }
 
-    async getSongThumbnail(url: string): Promise<string | undefined> {
+    async getSongThumbnail(url: string, cache: Cache): Promise<string | undefined> {
         for (const resolver of this.resolvers.songThumbnailResolvers) {
-            const resolved = await resolver.resolve(url);
+            const resolved = await resolver.resolve(url, cache);
             if (resolved) {
                 return resolved;
             }
@@ -57,9 +58,9 @@ export default class ResolverUtils {
         return;
     }
 
-    async getPlaylistThumbnail(url: string): Promise<string | undefined> {
+    async getPlaylistThumbnail(url: string, cache: Cache): Promise<string | undefined> {
         for (const resolver of this.resolvers.playlistThumbnailResolvers) {
-            const resolved = await resolver.resolve(url);
+            const resolved = await resolver.resolve(url, cache);
             if (resolved) {
                 return resolved;
             }

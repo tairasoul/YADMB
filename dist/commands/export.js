@@ -22,10 +22,10 @@ export default {
             ]
         }
     ],
-    callback: async (interaction, _resolvers, guild) => {
+    callback: async (interaction, info) => {
         await interaction.defer();
         const type = interaction.data.options.getString("type", true);
-        const queue = guild.queue;
+        const queue = info.guild.queue;
         switch (type) {
             case "playlist":
                 const q = queue.tracks[queue.internalCurrentIndex];

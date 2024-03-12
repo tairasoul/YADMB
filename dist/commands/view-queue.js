@@ -14,13 +14,13 @@ function embedMessage(text) {
 export default {
     name: "view-queue",
     description: "View a snapshot of the queue.",
-    callback: async (interaction, resolvers, guild, client) => {
+    callback: async (interaction, info) => {
         await interaction.defer(1 << 6);
         await interaction.editOriginal({ embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")], flags: 1 << 6 });
         const data = {
-            queued: await utils.queuedTrackPager(guild.queue.tracks, async (title) => {
+            queued: await utils.queuedTrackPager(info.guild.queue.tracks, async (title) => {
                 await interaction.editOriginal({ embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6 });
-            }, resolvers),
+            }, info.resolvers, info.cache),
             tracks: null
         };
         let isInspecting = false;
@@ -92,19 +92,19 @@ export default {
             if (i.data.customID !== exitId)
                 return;
             /** @ts-ignore */
-            client.off("interactionCreate", onNext);
+            info.client.off("interactionCreate", onNext);
             /** @ts-ignore */
-            client.off("interactionCreate", onPrev);
+            info.client.off("interactionCreate", onPrev);
             /** @ts-ignore */
-            client.off("interactionCreate", onInspect);
+            info.client.off("interactionCreate", onInspect);
             /** @ts-ignore */
-            client.off("interactionCreate", onPlayNext);
+            info.client.off("interactionCreate", onPlayNext);
             /** @ts-ignore */
-            client.off("interactionCreate", onExitInspect);
+            info.client.off("interactionCreate", onExitInspect);
             /** @ts-ignore */
-            client.off("interactionCreate", onExport);
+            info.client.off("interactionCreate", onExport);
             /** @ts-ignore */
-            client.off("interactionCreate", onExit);
+            info.client.off("interactionCreate", onExit);
             /** @ts-ignore */
             await interaction.editOriginal({ components: isInspecting ? actionRows.disabled.inspected : data.queued.pages[currentPage].type == "song" ? actionRows.disabled.song : actionRows.disabled.playlist });
             await i.createMessage({ content: "Exited view.", flags: 1 << 6 });
@@ -113,7 +113,7 @@ export default {
             if (i.data.customID !== exportId)
                 return;
             await i.defer(1 << 6);
-            const q = guild.queue.tracks[currentPage];
+            const q = info.guild.queue.tracks[currentPage];
             const clone = {
                 trackNumber: 0,
                 tracks: q.tracks,
@@ -134,9 +134,9 @@ export default {
                 return;
             currentInspectPage = 0;
             await i.createMessage({ embeds: [embedMessage("Paging tracks for playlist.")], flags: 1 << 6 });
-            data.tracks = utils.Pager({ pages: await utils.trackPager(guild.queue.tracks[currentPage].tracks, async (title) => {
+            data.tracks = utils.Pager({ pages: await utils.trackPager(info.guild.queue.tracks[currentPage].tracks, async (title) => {
                     await i.editOriginal({ embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6 });
-                }, resolvers) });
+                }, info.resolvers, info.cache) });
             isInspecting = true;
             /** @ts-ignore */
             await interaction.editOriginal({ content: "", embeds: data.tracks.pages[0].embed.toJSON(true), components: actionRows.inspected, flags: 1 << 6 });
@@ -184,8 +184,8 @@ export default {
                 return;
             await i.defer();
             const queueIndex = data.queued.pages[currentPage].index;
-            const queued = guild.queue.tracks;
-            queued.splice(guild.queue.internalCurrentIndex, 0, queued[queueIndex]);
+            const queued = info.guild.queue.tracks;
+            queued.splice(info.guild.queue.internalCurrentIndex, 0, queued[queueIndex]);
             await i.createMessage({ embeds: [embedMessage("Playing " + queued[queueIndex].name + " next.")], flags: 1 << 6 });
         };
         const onExitInspect = async (i) => {
@@ -198,37 +198,37 @@ export default {
             await interaction.editOriginal({ content: "", embeds: current.embed.toJSON(true), components: current.type === "playlist" ? actionRows.playlist : actionRows.song, flags: 1 << 6 });
         };
         /** @ts-ignore */
-        client.on("interactionCreate", onNext);
+        info.client.on("interactionCreate", onNext);
         /** @ts-ignore */
-        client.on("interactionCreate", onPrev);
+        info.client.on("interactionCreate", onPrev);
         /** @ts-ignore */
-        client.on("interactionCreate", onInspect);
+        info.client.on("interactionCreate", onInspect);
         /** @ts-ignore */
-        client.on("interactionCreate", onPlayNext);
+        info.client.on("interactionCreate", onPlayNext);
         /** @ts-ignore */
-        client.on("interactionCreate", onExitInspect);
+        info.client.on("interactionCreate", onExitInspect);
         /** @ts-ignore */
-        client.on("interactionCreate", onExport);
+        info.client.on("interactionCreate", onExport);
         /** @ts-ignore */
-        client.on("interactionCreate", onExit);
+        info.client.on("interactionCreate", onExit);
         const currentpage = data.queued.pages[0];
         /** @ts-ignore */
         await interaction.editOriginal({ content: "", embeds: currentpage.embed.toJSON(true), components: currentpage.type === "playlist" ? actionRows.playlist : actionRows.song, flags: 1 << 6 });
         setTimeout(async () => {
             /** @ts-ignore */
-            client.off("interactionCreate", onNext);
+            info.client.off("interactionCreate", onNext);
             /** @ts-ignore */
-            client.off("interactionCreate", onPrev);
+            info.client.off("interactionCreate", onPrev);
             /** @ts-ignore */
-            client.off("interactionCreate", onInspect);
+            info.client.off("interactionCreate", onInspect);
             /** @ts-ignore */
-            client.off("interactionCreate", onPlayNext);
+            info.client.off("interactionCreate", onPlayNext);
             /** @ts-ignore */
-            client.off("interactionCreate", onExitInspect);
+            info.client.off("interactionCreate", onExitInspect);
             /** @ts-ignore */
-            client.off("interactionCreate", onExport);
+            info.client.off("interactionCreate", onExport);
             /** @ts-ignore */
-            client.off("interactionCreate", onExit);
+            info.client.off("interactionCreate", onExit);
             if (isInspecting) {
                 /** @ts-ignore */
                 const embed = data.tracks?.pages[currentInspectPage].embed;

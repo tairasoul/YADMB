@@ -5,8 +5,10 @@ import { Guild } from "../client";
 export default {
     name: "pause",
     description: "Pause current track.",
-    callback: async (interaction: oceanic.CommandInteraction, _resolvers: any, guild: Guild) => {
-        const queue = guild.queue;
+    callback: async (interaction: oceanic.CommandInteraction, info: {
+        guild: Guild,
+    }) => {
+        const queue = info.guild.queue;
         if (queue.currentInfo) {
             queue.pause();
             const embed = new builders.EmbedBuilder();

@@ -138,14 +138,14 @@ export function Pager(pages) {
     }
     return new PageHolder(PageClasses);
 }
-export async function queuedTrackPager(array, callback = () => { return new Promise((resolve) => resolve()); }, resolvers) {
+export async function queuedTrackPager(array, callback = () => { return new Promise((resolve) => resolve()); }, resolvers, cache) {
     const pages = [];
     for (let i = 0; i < array.length; i++) {
         await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].tracks[0].url);
         let output;
         for (const pager of pagers) {
-            output = await pager.queuedPager(array[i], i);
+            output = await pager.queuedPager(array[i], i, cache);
             if (output) {
                 pages.push(output);
                 break;
@@ -171,14 +171,14 @@ export function parseVolumeString(volume) {
     }
     return result;
 }
-export async function trackPager(array, callback = () => { return new Promise((resolve) => resolve()); }, resolvers) {
+export async function trackPager(array, callback = () => { return new Promise((resolve) => resolve()); }, resolvers, cache) {
     const pages = [];
     for (let i = 0; i < array.length; i++) {
         await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].url);
         let output;
         for (const pager of pagers) {
-            output = await pager.trackPager(array[i], i);
+            output = await pager.trackPager(array[i], i, cache);
             if (output) {
                 pages.push(output);
                 break;

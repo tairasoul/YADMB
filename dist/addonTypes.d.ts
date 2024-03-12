@@ -4,6 +4,7 @@ import * as oceanic from "oceanic.js";
 import { EmbedBuilder } from "@oceanicjs/builders";
 import { track } from "./client";
 import ResolverUtils from "./resolverUtils.js";
+import Cache from "./cache.js";
 export type resolver = {
     /**
      * Name of the resolver.
@@ -46,11 +47,11 @@ export type PagerResolver = {
     /**
      * Pager for a queued item.
      */
-    queuedPager: (track: queuedTrack, index: number) => Promise<PageData>;
+    queuedPager: (track: queuedTrack, index: number, cache: Cache) => Promise<PageData>;
     /**
      * Pager for a track within a playlist.
      */
-    trackPager: (track: track, index: number) => Promise<PageData>;
+    trackPager: (track: track, index: number, cache: Cache) => Promise<PageData>;
 };
 export type AudioResolver = {
     /**
@@ -115,7 +116,7 @@ export type dataResolver = {
     /**
      * Function that resolves the URL into song data. Returns undefined if it can't resolve the URL into data.
      */
-    resolve: (url: string) => Promise<songData | string | undefined>;
+    resolve: (url: string, cache: Cache) => Promise<songData | string | undefined>;
 };
 export type playlistResolver = {
     /**
@@ -134,7 +135,7 @@ export type playlistResolver = {
     /**
      * Function that resolves the URL into playlist data. Returns undefined if it can't resolve the URL into playlist data.
      */
-    resolve: (url: string) => Promise<playlistData | string | undefined>;
+    resolve: (url: string, cache: Cache) => Promise<playlistData | string | undefined>;
 };
 export type thumbnailResolver = {
     /**
@@ -148,7 +149,7 @@ export type thumbnailResolver = {
     /**
      * Function that resolves the URL into a thumnbail URL or undefined (if it can't resolve the url)
      */
-    resolve: (url: string) => Promise<string | undefined>;
+    resolve: (url: string, cache: Cache) => Promise<string | undefined>;
 };
 export type command = {
     /**
@@ -166,7 +167,12 @@ export type command = {
     /**
      * Callback for this command.
      */
-    callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => any;
+    callback: (interaction: oceanic.CommandInteraction, info: {
+        resolvers: ResolverUtils;
+        guild: Guild;
+        client: MusicClient;
+        cache: Cache;
+    }) => any;
 };
 export type data_resolvers = {
     thumbnail?: thumbnailResolver[];

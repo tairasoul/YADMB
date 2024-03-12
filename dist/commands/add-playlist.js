@@ -18,12 +18,12 @@ export default {
             type: 5
         }
     ],
-    callback: async (interaction, resolvers, guild) => {
+    callback: async (interaction, info) => {
         await interaction.defer();
         const playlist = interaction.data.options.getString("playlist", true);
         const shuffle = interaction.data.options.getBoolean("shuffle");
         let videos = undefined;
-        const p_resolvers = await (await resolvers.getPlaylistResolvers(playlist));
+        const p_resolvers = await (await info.resolvers.getPlaylistResolvers(playlist));
         if (p_resolvers.length == 0) {
             const embed = new builders.EmbedBuilder();
             embed.setDescription("Invalid playlist link.");
@@ -31,7 +31,7 @@ export default {
         }
         else {
             for (const resolver of p_resolvers) {
-                const resolved = await resolver.resolve(playlist);
+                const resolved = await resolver.resolve(playlist, info.cache);
                 if (typeof resolved == "string") {
                     const embed = new builders.EmbedBuilder();
                     embed.setDescription(resolved);
@@ -66,10 +66,10 @@ export default {
                 utils.shuffleArray(added_playlist.tracks);
             const embed = new builders.EmbedBuilder();
             embed.setDescription(`Added **${videos.items.length} tracks** to the queue as a playlist.`);
-            const queue = guild.queue;
+            const queue = info.guild.queue;
             queue.tracks.push(added_playlist);
-            if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection)
-                await queue.play(resolvers);
+            if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection)
+                await queue.play(info.resolvers);
             await interaction.editOriginal({ embeds: [embed.toJSON()] });
         }
     }
