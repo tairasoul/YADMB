@@ -1,7 +1,6 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import { Guild, loopType } from "../client.js";
-import ResolverUtils from "../resolverUtils.js";
 
 const loopTypeStrs = {
     "none": "No longer looping anything.",
@@ -35,12 +34,14 @@ export default {
             required: true
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, _resolvers: ResolverUtils, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, info: {
+        guild: Guild, 
+    }) => {
         await interaction.defer();
         const choice: loopType = interaction.data.options.getString("type", true);
         const embed = new builders.EmbedBuilder();
         embed.setDescription(loopTypeStrs[choice])
-        guild.queue.setLoopType(choice);
+        info.guild.queue.setLoopType(choice);
         await interaction.editOriginal({embeds: [embed.toJSON()]});
     }
 }

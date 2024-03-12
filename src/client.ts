@@ -11,6 +11,8 @@ import util from "node:util"
 import { AddonInfo, AudioResolver, PagerResolver, command, dataResolver, playlistResolver, resolver, thumbnailResolver } from "./addonTypes.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 import { debugLog } from "./bot.js";
+import Cache from "./cache.js";
+import ms from "ms";
 
 export type track = {
     name: string;
@@ -47,11 +49,27 @@ export type ResolverInformation = {
 
 export type Command = {
     data: builders.ApplicationCommandBuilder, 
-    execute: ((interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => Promise<any>)
+    execute: ((interaction: oceanic.CommandInteraction, info: {
+        resolvers: ResolverUtils, 
+        guild: Guild, 
+        client: MusicClient,
+        cache: Cache
+    }) => Promise<any>)
 }
 
 interface MusicEvents extends oceanic.ClientEvents {
-    "m_interactionCreate": [interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient];
+    "m_interactionCreate": [interaction: oceanic.CommandInteraction, info: {
+        resolvers: ResolverUtils, 
+        guild: Guild, 
+        client: MusicClient,
+        cache: Cache
+    }];
+}
+
+interface MClientOptions extends ClientOptions {
+    database_path: string;
+    database_expiry_time: string;
+    database_cleanup_interval: string;
 }
 
 export default class MusicClient extends Client {
@@ -71,11 +89,19 @@ export default class MusicClient extends Client {
     }
     private addonCommands: command[] = [];
     private rawCommands: Command[];
-    constructor(options: ClientOptions) {
+    private cache_database: Cache;
+    constructor(options: MClientOptions) {
         super(options);
         this.m_guilds = {};
         this.commands = new Collection();
         this.rawCommands = [];
+        this.cache_database = new Cache(options.database_path, options.database_expiry_time);
+        
+        const intervalMs = ms(options.database_cleanup_interval);
+        setInterval(() => {
+            this.cache_database.removeInvalidFromAllTables();
+        }, intervalMs);
+
         this.setMaxListeners(0);
         this.on("guildCreate", () => {
             this.editStatus("online", [{name: (this.guilds.size).toString() + ' servers', type: 3}]);
@@ -131,13 +157,23 @@ export default class MusicClient extends Client {
                 name: string;
                 description: string;
                 options: oceanic.ApplicationCommandOptions[];
-                callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => any;
+                callback: (interaction: oceanic.CommandInteraction, info: {
+                    resolvers: ResolverUtils, 
+                    guild: Guild, 
+                    client: MusicClient,
+                    cache: Cache
+                }) => any;
             } = await import(`file://${__dirname}/commands/${command}`).then(m => m.default);
             this.addCommand(cmd.name, cmd.description, cmd.options, cmd.callback);
         }
     }
 
-    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[] = [], callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => any) {
+    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[] = [], callback: (interaction: oceanic.CommandInteraction, info: {
+        resolvers: ResolverUtils, 
+        guild: Guild, 
+        client: MusicClient,
+        cache: Cache
+    }) => any) {
         const command = new builders.ApplicationCommandBuilder(1, name);
         for (const option of options) {
             command.addOption(option);
@@ -186,7 +222,12 @@ export default class MusicClient extends Client {
         if (event == "m_interactionCreate") {
             super.on("interactionCreate", (interaction) => 
                 // @ts-ignore
-                listener(interaction as oceanic.CommandInteraction, new ResolverUtils(this.resolvers), this.m_guilds[interaction.guildID as string], this)
+                listener(interaction as oceanic.CommandInteraction, {
+                    resolvers: new ResolverUtils(this.resolvers), 
+                    guild: this.m_guilds[interaction.guildID as string],
+                    client: this,
+                    cache: this.cache_database
+                })
             )
         }
         else {
@@ -199,8 +240,13 @@ export default class MusicClient extends Client {
     off<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this {
         if (event == "m_interactionCreate") {
             super.off("interactionCreate", (interaction) => 
-            // @ts-ignore
-                listener(interaction as oceanic.CommandInteraction, new ResolverUtils(this.resolvers), this.m_guilds[interaction.guildID as string], this)
+                // @ts-ignore
+                listener(interaction as oceanic.CommandInteraction, {
+                    resolvers: new ResolverUtils(this.resolvers), 
+                    guild: this.m_guilds[interaction.guildID as string],
+                    client: this,
+                    cache: this.cache_database
+                })
             )
         }
         else {

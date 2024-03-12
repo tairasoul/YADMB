@@ -6,6 +6,7 @@ import QueueHandler from "./queueSystem.js";
 import voice from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
 import { AddonInfo, AudioResolver, PagerResolver, dataResolver, playlistResolver, resolver, thumbnailResolver } from "./addonTypes.js";
+import Cache from "./cache.js";
 export type track = {
     name: string;
     url: string;
@@ -36,10 +37,27 @@ export type ResolverInformation = {
 };
 export type Command = {
     data: builders.ApplicationCommandBuilder;
-    execute: ((interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => Promise<any>);
+    execute: ((interaction: oceanic.CommandInteraction, info: {
+        resolvers: ResolverUtils;
+        guild: Guild;
+        client: MusicClient;
+        cache: Cache;
+    }) => Promise<any>);
 };
 interface MusicEvents extends oceanic.ClientEvents {
-    "m_interactionCreate": [interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient];
+    "m_interactionCreate": [
+        interaction: oceanic.CommandInteraction,
+        info: {
+            resolvers: ResolverUtils;
+            guild: Guild;
+            client: MusicClient;
+            cache: Cache;
+        }
+    ];
+}
+interface MClientOptions extends ClientOptions {
+    database_path?: string;
+    database_expiry_time?: string;
 }
 export default class MusicClient extends Client {
     m_guilds: {
@@ -50,12 +68,18 @@ export default class MusicClient extends Client {
     private resolvers;
     private addonCommands;
     private rawCommands;
-    constructor(options: ClientOptions);
+    private cache_database;
+    constructor(options: MClientOptions);
     addAddon(addon: AddonInfo): void;
     registerAddons(): void;
     registerAddonCommands(): void;
     loadCommands(): Promise<void>;
-    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[] | undefined, callback: (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild, client: MusicClient) => any): void;
+    addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[] | undefined, callback: (interaction: oceanic.CommandInteraction, info: {
+        resolvers: ResolverUtils;
+        guild: Guild;
+        client: MusicClient;
+        cache: Cache;
+    }) => any): void;
     registerCommands(): Promise<void>;
     removeUnknownCommands(): Promise<void>;
     on<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this;

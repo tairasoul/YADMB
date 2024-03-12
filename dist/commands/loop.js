@@ -30,12 +30,12 @@ export default {
             required: true
         }
     ],
-    callback: async (interaction, _resolvers, guild) => {
+    callback: async (interaction, info) => {
         await interaction.defer();
         const choice = interaction.data.options.getString("type", true);
         const embed = new builders.EmbedBuilder();
         embed.setDescription(loopTypeStrs[choice]);
-        guild.queue.setLoopType(choice);
+        info.guild.queue.setLoopType(choice);
         await interaction.editOriginal({ embeds: [embed.toJSON()] });
     }
 };

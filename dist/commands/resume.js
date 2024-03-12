@@ -2,8 +2,8 @@ import * as builders from "@oceanicjs/builders";
 export default {
     name: "resume",
     description: "Resume current track.",
-    callback: async (interaction, _resolvers, guild) => {
-        const queue = guild.queue;
+    callback: async (interaction, info) => {
+        const queue = info.guild.queue;
         if (queue.currentInfo) {
             queue.resume();
             const embed = new builders.EmbedBuilder();

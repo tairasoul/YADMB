@@ -7,6 +7,7 @@ import { InfoData } from "play-dl";
 import { queuedTrack, track } from './client.js';
 import ResolverUtils from './resolverUtils.js';
 import { PageData } from './addonTypes.js';
+import Cache from './cache.js';
 export declare function getHighestResUrl(data: InfoData): string;
 export declare function SelectMenu(options: Array<{
     name: string;
@@ -43,10 +44,10 @@ export interface PageHolderData {
     pages: PageData[];
 }
 export declare function Pager(pages: PageHolderData): PageHolder;
-export declare function queuedTrackPager(array: queuedTrack[], callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils): Promise<PageHolder>;
+export declare function queuedTrackPager(array: queuedTrack[], callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils, cache: Cache): Promise<PageHolder>;
 export type volumeMode = "percent" | "whole number";
 export declare function parseVolumeString(volume: string): number;
-export declare function trackPager(array: track[], callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils): Promise<PageData[]>;
+export declare function trackPager(array: track[], callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils, cache: Cache): Promise<PageData[]>;
 declare const _default: {
     SelectMenu: typeof SelectMenu;
     mkdsf: typeof mkdsf;

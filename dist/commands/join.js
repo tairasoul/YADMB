@@ -2,24 +2,24 @@ import * as builders from "@oceanicjs/builders";
 export default {
     name: "join",
     description: "Join a VC and start playing tracks if available.",
-    callback: async (interaction, resolvers, guild, client) => {
+    callback: async (interaction, info) => {
         await interaction.defer();
         if (interaction.member?.voiceState?.channelID) {
-            if (guild.connection) {
+            if (info.guild.connection) {
                 const embed = new builders.EmbedBuilder();
                 embed.setDescription("I am already in a VC.");
                 return await interaction.editOriginal({ embeds: [embed.toJSON()] });
             }
-            guild.connection = client.joinVoiceChannel({
+            info.guild.connection = info.client.joinVoiceChannel({
                 channelID: interaction.member.voiceState.channelID,
                 guildID: interaction.guildID,
                 selfDeaf: true,
                 selfMute: false,
                 voiceAdapterCreator: interaction.guild?.voiceAdapterCreator
             });
-            guild.voiceChannel = interaction.member.voiceState.channel;
-            guild.connection.subscribe(guild.audioPlayer);
-            guild.connection.on("error", (error) => {
+            info.guild.voiceChannel = interaction.member.voiceState.channel;
+            info.guild.connection.subscribe(info.guild.audioPlayer);
+            info.guild.connection.on("error", (error) => {
                 const id = interaction.channelID;
                 const ig = interaction.guild;
                 if (ig) {
@@ -31,7 +31,7 @@ export default {
                     }
                 }
             });
-            const queue = guild.queue;
+            const queue = info.guild.queue;
             const ct = queue.internalCurrentIndex;
             const qt = queue.tracks;
             const cst = qt[ct]?.trackNumber;
@@ -41,7 +41,7 @@ export default {
             embed.setDescription(string);
             await interaction.editOriginal({ embeds: [embed.toJSON()] });
             if (qt.length > 0) {
-                await queue.play(resolvers);
+                await queue.play(info.resolvers);
             }
         }
     }

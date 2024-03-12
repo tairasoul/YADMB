@@ -17,7 +17,7 @@ export default {
             type: 3
         }
     ],
-    callback: async (interaction, resolvers, guild, client) => {
+    callback: async (interaction, info) => {
         await interaction.defer();
         const term = interaction.data.options.getString('term', true);
         const results = await playdl.search(term);
@@ -93,7 +93,7 @@ export default {
             await i.editOriginal({
                 embeds: [embed.toJSON()]
             });
-            const queue = guild.queue;
+            const queue = info.guild.queue;
             const ct = queue.internalCurrentIndex;
             const t = queue.tracks[ct];
             const cst = t.trackNumber;
@@ -103,21 +103,21 @@ export default {
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].trackNumber: ${cst}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].tracks[cst]: ${util.inspect(st, false, 5, true)}`);
-            if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection)
-                await queue.play(resolvers);
+            if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection)
+                await queue.play(info.resolvers);
         };
         // play video next
         //@ts-ignore
         const vla = async (i) => {
             await i.defer();
-            const g = guild;
+            const g = info.guild;
             const queue = g.queue;
             const ct = queue.internalCurrentIndex;
             const t = queue.tracks[ct];
             if (t.type === "playlist") {
                 const cst = t.trackNumber;
                 const track_embed = new builders.EmbedBuilder();
-                const track_thumbnail = await resolvers.getSongThumbnail(currentVideo.url);
+                const track_thumbnail = await info.resolvers.getSongThumbnail(currentVideo.url, info.cache);
                 track_embed.setTitle(currentVideo.title);
                 if (track_thumbnail)
                     track_embed.setThumbnail(track_thumbnail);
@@ -128,7 +128,7 @@ export default {
             }
             else {
                 const track_embed = new builders.EmbedBuilder();
-                const track_thumbnail = await resolvers.getSongThumbnail(currentVideo.url);
+                const track_thumbnail = await info.resolvers.getSongThumbnail(currentVideo.url, info.cache);
                 track_embed.setTitle(currentVideo.title);
                 if (track_thumbnail)
                     track_embed.setThumbnail(track_thumbnail);
@@ -152,13 +152,13 @@ export default {
         };
         // @ts-ignore
         await interaction.editOriginal({ components: [actionRow, actionRow2], embeds: [currentVideo.embed.toJSON()] });
-        utils.LFGIC(client, interaction.guildID, interaction.user.id, `${interaction.user.id}Search${term}`, pl);
-        utils.LFGIC(client, interaction.guildID, interaction.user.id, `${interaction.user.id}Add${term}`, vl);
-        utils.LFGIC(client, interaction.guildID, interaction.user.id, `${interaction.user.id}AddNext${term}`, vla);
+        utils.LFGIC(info.client, interaction.guildID, interaction.user.id, `${interaction.user.id}Search${term}`, pl);
+        utils.LFGIC(info.client, interaction.guildID, interaction.user.id, `${interaction.user.id}Add${term}`, vl);
+        utils.LFGIC(info.client, interaction.guildID, interaction.user.id, `${interaction.user.id}AddNext${term}`, vla);
         setTimeout(async () => {
-            client.off("interactionCreate", pl);
-            client.off("interactionCreate", vl);
-            client.off("interactionCreate", vla);
+            info.client.off("interactionCreate", pl);
+            info.client.off("interactionCreate", vl);
+            info.client.off("interactionCreate", vla);
             actionRow.getComponents().forEach((component) => component.disable());
             actionRow2.getComponents().forEach((component) => component.disable());
             // @ts-ignore

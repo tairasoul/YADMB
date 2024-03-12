@@ -1,10 +1,11 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import { Guild, queuedTrack, track } from "../client.js";
+import MusicClient, { Guild, queuedTrack, track } from "../client.js";
 import utils from "../utils.js";
 import * as voice from "@discordjs/voice";
 import { playlistData } from "../addonTypes.js";
 import ResolverUtils from "../resolverUtils.js";
+import Cache from "../cache.js";
 
 export default {
     name: "add-playlist",
@@ -23,12 +24,17 @@ export default {
             type: 5
         }
     ],
-    callback: async (interaction: oceanic.CommandInteraction, resolvers: ResolverUtils, guild: Guild) => {
+    callback: async (interaction: oceanic.CommandInteraction, info: {
+        resolvers: ResolverUtils, 
+        guild: Guild, 
+        client: MusicClient,
+        cache: Cache
+    }) => {
         await interaction.defer();
         const playlist = interaction.data.options.getString("playlist", true);
         const shuffle = interaction.data.options.getBoolean("shuffle");
         let videos: playlistData | undefined = undefined;
-        const p_resolvers = await (await resolvers.getPlaylistResolvers(playlist));
+        const p_resolvers = await (await info.resolvers.getPlaylistResolvers(playlist));
         if (p_resolvers.length == 0) {
             const embed = new builders.EmbedBuilder();
             embed.setDescription("Invalid playlist link.");
@@ -36,7 +42,7 @@ export default {
         }
         else {
             for (const resolver of p_resolvers) {
-                const resolved = await resolver.resolve(playlist);
+                const resolved = await resolver.resolve(playlist, info.cache);
                 if (typeof resolved == "string") {
                     const embed = new builders.EmbedBuilder();
                     embed.setDescription(resolved);
@@ -70,9 +76,9 @@ export default {
             if (shuffle) utils.shuffleArray(added_playlist.tracks);
             const embed = new builders.EmbedBuilder();
             embed.setDescription(`Added **${videos.items.length} tracks** to the queue as a playlist.`);
-            const queue = guild.queue;
+            const queue = info.guild.queue;
             queue.tracks.push(added_playlist);
-            if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection) await queue.play(resolvers);
+            if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers);
             await interaction.editOriginal({embeds: [embed.toJSON()]});
         }
     }

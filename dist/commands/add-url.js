@@ -26,11 +26,11 @@ export default {
             required: false
         }
     ],
-    callback: async (interaction, resolvers, guild) => {
+    callback: async (interaction, info) => {
         await interaction.defer();
         const video = interaction.data.options.getString("link", true);
         const next = interaction.data.options.getBoolean("next");
-        const nameResolvers = await resolvers.getNameResolvers(video);
+        const nameResolvers = await info.resolvers.getNameResolvers(video);
         let provider;
         for (const resolver of nameResolvers) {
             provider = await resolver.resolve(video);
@@ -44,14 +44,14 @@ export default {
             return await interaction.editOriginal({ embeds: [embed.toJSON()] });
         }
         if (interaction.guildID) {
-            const queue = guild.queue;
+            const queue = info.guild.queue;
             const ct = queue.internalCurrentIndex;
             const nowPlaying = queue.tracks[ct];
             const qt = queue.tracks;
-            const s_resolvers = await resolvers.getSongResolvers(video);
+            const s_resolvers = await info.resolvers.getSongResolvers(video);
             let resolver;
             for (const s_res of s_resolvers) {
-                const output = await s_res.resolve(video);
+                const output = await s_res.resolve(video, info.cache);
                 if (output && typeof output != "string") {
                     resolver = output;
                     break;
@@ -100,8 +100,8 @@ export default {
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].trackNumber: ${cst}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].tracks[cst]: ${util.inspect(st, false, 5, true)}`);
-            if (guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && guild.connection)
-                await queue.play(resolvers);
+            if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection)
+                await queue.play(info.resolvers);
         }
     }
 };

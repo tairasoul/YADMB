@@ -8,3 +8,5 @@ enableDebugging
 modules.json
 addons/*
 !addons/base/
+*/*.db
+*.db

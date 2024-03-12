@@ -8,6 +8,7 @@ import { queuedTrack, track } from './client.js';
 import { debugLog } from './bot.js';
 import ResolverUtils from './resolverUtils.js';
 import { PageData } from './addonTypes.js';
+import Cache from './cache.js';
 
 export function getHighestResUrl(data: InfoData) {
     const thumbnails = data.video_details.thumbnails;
@@ -157,14 +158,14 @@ export function Pager(pages: PageHolderData) {
     return new PageHolder(PageClasses);
 }
 
-export async function queuedTrackPager(array: queuedTrack[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils) {
+export async function queuedTrackPager(array: queuedTrack[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache) {
     const pages: PageData[] = []
     for (let i = 0; i < array.length; i++) {
         await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].tracks[0].url);
         let output;
         for (const pager of pagers) {
-            output = await pager.queuedPager(array[i], i);
+            output = await pager.queuedPager(array[i], i, cache);
             if (output) {
                 pages.push(output);
                 break;
@@ -193,14 +194,14 @@ export function parseVolumeString(volume: string) {
     return result;
 }
 
-export async function trackPager(array: track[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils) {
+export async function trackPager(array: track[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache) {
     const pages: PageData[] = []
     for (let i = 0; i < array.length; i++) {
         await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].url);
         let output;
         for (const pager of pagers) {
-            output = await pager.trackPager(array[i], i);
+            output = await pager.trackPager(array[i], i, cache);
             if (output) {
                 pages.push(output);
                 break;

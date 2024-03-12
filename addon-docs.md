@@ -74,3 +74,28 @@ For example, if you need, say, the ws module, packages.json should look like thi
 ```
 
 The bot will automatically install the package, and uninstall it once no addons use it anymore.
+
+## Caching data
+
+For the types of addons that have the global cache passed in, it's fairly simple.
+
+You get data (or null if no data exists) for a specific id by doing:
+```ts
+// End the first string with -___-data, replacing ___ with the type of data.
+// If you're caching playlist data, end it with -playlist-data.
+// If you're caching song data, end it with -song-data.
+// If you're caching a queued item's data, end it with -queued-pager-data.
+// If you're caching an individual track's data (trackPager), end it with -track-pager-data.
+// This way no data ends up overlapping.
+const data = await cache.get("service-name", "song-id")
+```
+
+The data has 3 properties.
+
+id - a string containing the unique identifier for the track
+
+title - a string with the track's name
+
+extra - a key-value pair of any extra data. gets turned into json when caching, gets parsed when calling .get()
+
+Use extra to store any extra data you may need, like tracks (for playlists) or thumbnails (for pagers).
