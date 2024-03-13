@@ -5,6 +5,12 @@ type CacheInfo = {
         [info: string]: any;
     };
 };
+type PreprocessCached = {
+    title: string;
+    expires: number;
+    id: string;
+    extra: string;
+};
 export default class Cache {
     private database;
     private expiryOffset;
@@ -18,5 +24,6 @@ export default class Cache {
     removeInvalidFromAllTables(): Promise<void>;
     private getAllTables;
     get(service: string, id: string): Promise<CacheInfo | null>;
+    getRaw(service: string, id: string): Promise<PreprocessCached | null>;
 }
 export {};

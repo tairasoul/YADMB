@@ -1,3 +1,3 @@
 # Changelog
 
-Add caching through an SQLite3 database so adding songs and playlists don't take as long.
+Add `cache.getRaw()` in order to get the raw data, without parsing the extra json, if you need to do your own processing.
