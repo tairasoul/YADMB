@@ -16,11 +16,8 @@ export default class Cache {
         });
     }
     async createTableIfNotExists(service) {
-        debugLog(`checking table ${service}`);
         const tableExists = await this.database.schema.hasTable(service);
-        debugLog(`table ${service} ${tableExists ? "exists" : "does not exist"}`);
         if (!tableExists) {
-            debugLog(`creating table ${service}`);
             await this.database.schema.createTable(service, (table) => {
                 table.string('id').primary();
                 table.string('title');
@@ -54,25 +51,38 @@ export default class Cache {
     async uncache(service, id) {
         await this.database(service).where("id", id).del();
     }
-    async removeInvalid(service) {
-        await this.createTableIfNotExists(service);
+    async removeInvalidFromTable(service) {
         const time = Date.now();
         await this.database(service).where("expires", "<", time).del();
     }
+    async removeInvalidFromAllTables() {
+        const tables = await this.getAllTables();
+        for (const table of tables) {
+            await this.removeInvalidFromTable(table);
+        }
+    }
+    async getAllTables() {
+        const result = await this.database.raw("SELECT name FROM sqlite_master WHERE type='table';");
+        return result.map(row => row.name);
+    }
     async get(service, id) {
         await this.createTableIfNotExists(service);
-        debugLog(`attempting grab of ${id} from ${service}`);
-        if (await this.isValid(service, id) && await this.isCached(service, id)) {
-            debugLog(`${id} is cached and valid for ${service}, returning`);
-            const info = (await this.database(service).where("id", id).first());
-            const newInfo = {
-                title: info.title,
-                id: info.id,
-                extra: JSON.parse(info.extra)
-            };
-            return newInfo;
+        const cached = await this.isCached(service, id);
+        if (cached) {
+            const valid = await this.isValid(service, id);
+            if (valid) {
+                const info = (await this.database(service).where("id", id).first());
+                const newInfo = {
+                    title: info.title,
+                    id: info.id,
+                    extra: JSON.parse(info.extra)
+                };
+                return newInfo;
+            }
+            else {
+                await this.uncache(service, id);
+            }
         }
-        debugLog("returning null");
         return null;
     }
 }

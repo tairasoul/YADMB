@@ -114,6 +114,9 @@ export default class Cache {
                 }
                 return newInfo;
             }
+            else {
+                await this.uncache(service, id);
+            }
         }
         return null;
     }

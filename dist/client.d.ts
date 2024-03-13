@@ -56,8 +56,9 @@ interface MusicEvents extends oceanic.ClientEvents {
     ];
 }
 interface MClientOptions extends ClientOptions {
-    database_path?: string;
-    database_expiry_time?: string;
+    database_path: string;
+    database_expiry_time: string;
+    database_cleanup_interval: string;
 }
 export default class MusicClient extends Client {
     m_guilds: {
