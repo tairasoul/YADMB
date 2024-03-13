@@ -86,6 +86,8 @@ You get data (or null if no data exists) for a specific id by doing:
 // If you're caching song data, end it with -song-data.
 // If you're caching a queued item's data, end it with -queued-pager-data.
 // If you're caching an individual track's data (trackPager), end it with -track-pager-data.
+// Or, if you wish to cache all types of data on any initial request for a track, don't end it with -___-data.
+// This does mean that the first time that data gets requested, it'll take longer, but it means that any subsequent requests for the data will be very quick.
 // This way no data ends up overlapping.
 const data = await cache.get("service-name", "song-id")
 ```
@@ -99,3 +101,15 @@ title - a string with the track's name
 extra - a key-value pair of any extra data. gets turned into json when caching, gets parsed when calling .get()
 
 Use extra to store any extra data you may need, like tracks (for playlists) or thumbnails (for pagers).
+
+In order to cache data, do:
+```ts
+await cache.cache("service-name", {
+    id: "song-id", // Any identifier you'll use in your addon.
+    title: "song-title", // The title of the song.
+    extra: {
+        // Any extra information you wish to store.
+        // Keep in mind this does get turned into JSON, but does get parsed automatically when doing cache.get();
+    }
+})
+```
