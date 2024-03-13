@@ -14,7 +14,9 @@ export default class Cache {
     isValid(service: string, id: string): Promise<boolean>;
     cache(service: string, info: CacheInfo): Promise<void>;
     uncache(service: string, id: string): Promise<void>;
-    removeInvalid(service: string): Promise<void>;
+    removeInvalidFromTable(service: string): Promise<void>;
+    removeInvalidFromAllTables(): Promise<void>;
+    private getAllTables;
     get(service: string, id: string): Promise<CacheInfo | null>;
 }
 export {};

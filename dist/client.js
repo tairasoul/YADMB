@@ -10,6 +10,7 @@ import util from "node:util";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 import { debugLog } from "./bot.js";
 import Cache from "./cache.js";
+import ms from "ms";
 export default class MusicClient extends Client {
     m_guilds;
     commands;
@@ -32,6 +33,10 @@ export default class MusicClient extends Client {
         this.commands = new Collection();
         this.rawCommands = [];
         this.cache_database = new Cache(options.database_path, options.database_expiry_time);
+        const intervalMs = ms(options.database_cleanup_interval);
+        setInterval(() => {
+            this.cache_database.removeInvalidFromAllTables();
+        }, intervalMs);
         this.setMaxListeners(0);
         this.on("guildCreate", () => {
             this.editStatus("online", [{ name: (this.guilds.size).toString() + ' servers', type: 3 }]);

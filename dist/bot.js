@@ -14,7 +14,7 @@ export function debugLog(text) {
         console.log(text);
 }
 let setup = false;
-const { token, web_features, package_manager, db_path } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+const { token, web_features, package_manager, cache_path, expiry_time, check_interval } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 const defs = {
     install: package_manager.install.trim(),
     uninstall: package_manager.uninstall.trim(),
@@ -38,7 +38,9 @@ const client = new MusicClient({
         autoReconnect: true,
         connectionTimeout: 900000
     },
-    database_path: db_path ?? "./cache.db"
+    database_path: cache_path ?? "./cache.db",
+    database_expiry_time: expiry_time ?? "3d",
+    database_cleanup_interval: check_interval ?? "1m"
 });
 if (web_features) {
     startWebFunctions();
