@@ -120,4 +120,20 @@ export default class Cache {
         }
         return null;
     }
+
+    async getRaw(service: string, id: string) {
+        await this.createTableIfNotExists(service);
+        const cached = await this.isCached(service, id);
+        if (cached) {
+            const valid = await this.isValid(service, id);
+            if (valid) {
+                const info = (await this.database<PreprocessCached>(service).where("id", id).first()) as PreprocessCached;
+                return info;
+            }
+            else {
+                await this.uncache(service, id);
+            }
+        }
+        return null;
+    }
 }
