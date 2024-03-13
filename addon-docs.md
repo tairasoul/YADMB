@@ -81,14 +81,16 @@ For the types of addons that have the global cache passed in, it's fairly simple
 
 You get data (or null if no data exists or existing data is invalid) for a specific id by doing:
 ```ts
-// End the first string with -___-data, replacing ___ with the type of data.
-// If you're caching playlist data, end it with -playlist-data.
-// If you're caching song data, end it with -song-data.
-// If you're caching a queued item's data, end it with -queued-pager-data.
-// If you're caching an individual track's data (trackPager), end it with -track-pager-data.
-// Or, if you wish to cache all types of data on any initial request for a track, don't end it with -___-data.
-// This does mean that the first time that data gets requested, it'll take longer, but it means that any subsequent requests for the data will be very quick.
-// This way no data ends up overlapping.
+/* End the first string with -___-data, replacing ___ with the type of data.
+   If you're caching playlist data, end it with -playlist-data.
+   If you're caching song data, end it with -song-data.
+   If you're caching a queued item's data, end it with -queued-pager-data.
+   If you're caching an individual track's data (trackPager), end it with -track-pager-data.
+   Or, if you wish to cache all types of data on any initial request for a track, don't end it with -___-data.
+   This does mean that the first time that data gets requested, it'll take longer,
+   but it means that any subsequent requests for the data will be very quick.
+   This way no data ends up overlapping.
+*/
 const data = await cache.get("service-name", "song-id")
 ```
 
