@@ -21,6 +21,10 @@
 - add support for more package managers
   - for the list part it only supports npm due to formatting
   - you know what maybe i should just check the node_modules folder or package.json lmao
+ 
+- for cache, maybe expose methods within cache that allows you to get a unique identifier for a specific track?
+  - maybe filtering by like, say the first query param (so for youtube, v=id)
+  - this way you can get an identifier that other addons (if there are multiple for the same service) can access the same video despite potentially not knowing how the other's identifier looks
 
 # finished + comments
 
