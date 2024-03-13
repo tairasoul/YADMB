@@ -79,7 +79,7 @@ The bot will automatically install the package, and uninstall it once no addons 
 
 For the types of addons that have the global cache passed in, it's fairly simple.
 
-You get data (or null if no data exists) for a specific id by doing:
+You get data (or null if no data exists or existing data is invalid) for a specific id by doing:
 ```ts
 // End the first string with -___-data, replacing ___ with the type of data.
 // If you're caching playlist data, end it with -playlist-data.
@@ -113,3 +113,8 @@ await cache.cache("service-name", {
     }
 })
 ```
+
+If you want to uncache data, call `await cache.uncache("service-name", "song-id")`
+
+If you want to remove all invalid data from your service, call `await cache.removeInvalidFromTable("service-name")`
+
