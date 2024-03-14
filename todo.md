@@ -39,6 +39,12 @@
 - maybe make it possible for end-users to view the cache if they wanna see what gets cached?
   - probably a good idea for transparency in what gets cached
   - raw .db file gets sent (or if it's in-memory, it gets put into a .db file to then get sent)
+ 
+- i may work on an addon that uses cobalt's api (locally hosted so no ratelimit) to play songs
+   - this means it'll pretty much automatically have support for everything cobalt has support for
+   - which is.. a lot
+   - ![image](https://github.com/tairasoul/YADMB/assets/100938045/78dc450c-f0ae-4af4-b750-c4e780935729)
+
 
 # finished + comments
 
