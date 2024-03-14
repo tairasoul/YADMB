@@ -25,6 +25,20 @@
 - for cache, maybe expose methods within cache that allows you to get a unique identifier for a specific track?
   - maybe filtering by like, say the first query param (so for youtube, v=id)
   - this way you can get an identifier that other addons (if there are multiple for the same service) can access the same video despite potentially not knowing how the other's identifier looks
+ 
+- ability to force cache invalidation
+  - this way playlists can be forcefully re-cached if you have a playlist you made modifications to on youtube
+ 
+- ability to use an in-memory database instead
+  - if you don't want persistent caching, this will work best
+  - will probably be default
+ 
+- optionally, make it possible to set the knex database client
+  - youll need the client installed first obviously
+ 
+- maybe make it possible for end-users to view the cache if they wanna see what gets cached?
+  - probably a good idea for transparency in what gets cached
+  - raw .db file gets sent (or if it's in-memory, it gets put into a .db file to then get sent)
 
 # finished + comments
 
