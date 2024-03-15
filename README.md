@@ -25,7 +25,7 @@ this means if you want to add a playlist to get your opinion on it, and don't li
 
 i havent used this much, but it seems a lot better if you don't want a slash-command based bot, and don't want to do more complex setup.
 
-in total all it has is 2 files, the .jar and a file w/ the token.
+~~in total all it has is 2 files, the .jar and a file w/ the token.~~ nevermind checked the setup and it's got 2 files and 1 folder now, folder being playlists folder.
 
 [YADMB](https://github.com/TheTipo01/YADMB) made by [TheTipo01](https://github.com/TheTipo01) and made with golang instead of ts.
 
