@@ -28,6 +28,8 @@
  
 - ability to force cache invalidation
   - this way playlists can be forcefully re-cached if you have a playlist you made modifications to on youtube
+  - no clue how to tell the cache where it's being called and if it should invalidate the get request for that function, so ill just pass it into the resolvers that have cache passed in.
+  - while this does mean invalidation is up to the resolver, it shouldn't be too hard for resolvers to implement
  
 - ability to use an in-memory database instead
   - if you don't want persistent caching, this will work best
