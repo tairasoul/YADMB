@@ -7,6 +7,6 @@ discord-music-bot.code-workspace
 enableDebugging
 modules.json
 addons/*
-!addons/base/
+!addons/base/*
 */*.db
 *.db
