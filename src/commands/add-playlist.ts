@@ -22,6 +22,12 @@ export default {
             description: "Should the playlist be shuffled before being added to queue?",
             required: false,
             type: 5
+        },
+        {
+            name: "force-invalidation",
+            description: "Should invalidation be forced for the cache on this playlist?",
+            required: false,
+            type: 5
         }
     ],
     callback: async (interaction: oceanic.CommandInteraction, info: {
@@ -33,6 +39,7 @@ export default {
         await interaction.defer();
         const playlist = interaction.data.options.getString("playlist", true);
         const shuffle = interaction.data.options.getBoolean("shuffle");
+        const forceInvalidation = interaction.data.options.getBoolean("force-invalidation") ?? false;
         let videos: playlistData | undefined = undefined;
         const p_resolvers = await (await info.resolvers.getPlaylistResolvers(playlist));
         if (p_resolvers.length == 0) {
@@ -42,7 +49,7 @@ export default {
         }
         else {
             for (const resolver of p_resolvers) {
-                const resolved = await resolver.resolve(playlist, info.cache);
+                const resolved = await resolver.resolve(playlist, info.cache, forceInvalidation);
                 if (typeof resolved == "string") {
                     const embed = new builders.EmbedBuilder();
                     embed.setDescription(resolved);

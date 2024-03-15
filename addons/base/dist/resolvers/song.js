@@ -18,7 +18,7 @@ export const base = {
         return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/, /https:\/\/youtu\.be\/.*/, /https:\/\/soundcloud\.com\/.*/, /https:\/\/on\.soundcloud\.com\/.*/, /https:\/\/deezer\.(?:com|page\.link)\/.*/].find((reg) => reg.test(url)) != undefined;
     },
     priority: 0,
-    async resolve(url, cache) {
+    async resolve(url, cache, forceInvalidation) {
         const provider = getProvider(url);
         return new Promise(async (resolve) => {
             switch (provider) {
@@ -26,7 +26,10 @@ export const base = {
                     if (!ytdl.validateURL(url)) {
                         resolve("Invalid URL!");
                     }
-                    const id = playdl.extractID(url);
+                    const y_url = new URL(url);
+                    const id = y_url.searchParams.get("v");
+                    if (forceInvalidation)
+                        await cache.uncache("youtube-song-data", id);
                     const cached = await cache.get("youtube-song-data", id);
                     if (cached) {
                         resolve({
@@ -40,7 +43,6 @@ export const base = {
                     await cache.cache("youtube-song-data", {
                         title: info.video_details.title,
                         id,
-                        expires: Date.now() + (3 * 24 * 60 * 60 * 1000),
                         extra: {
                             url
                         }
@@ -52,8 +54,11 @@ export const base = {
                     });
                     break;
                 case "deezer":
-                    const dvid = await playdl.deezer(url);
-                    const dcached = await cache.get("deezer-song-data", dvid.id.toString());
+                    const d_url = new URL(url);
+                    const d_id = d_url.pathname;
+                    if (forceInvalidation)
+                        await cache.uncache("deezer-song-data", d_id);
+                    const dcached = await cache.get("deezer-song-data", d_id);
                     if (dcached) {
                         resolve({
                             url: dcached.extra.url,
@@ -61,6 +66,7 @@ export const base = {
                         });
                         break;
                     }
+                    const dvid = await playdl.deezer(url);
                     if (dvid.type != "track") {
                         resolve("Deezer url must be a track.");
                     }
@@ -69,8 +75,7 @@ export const base = {
                     }))[0];
                     await cache.cache("deezer-song-data", {
                         title: dvid.title,
-                        id: dvid.id.toString(),
-                        expires: Date.now() + (3 * 24 * 60 * 60 * 1000),
+                        id: d_id,
                         extra: {
                             url: yvid.url
                         }
@@ -81,7 +86,24 @@ export const base = {
                     });
                     break;
                 case "soundcloud":
+                    const s_url = new URL(url);
+                    const s_id = s_url.pathname;
+                    if (forceInvalidation)
+                        await cache.uncache("soundcloud-song-data", s_id);
+                    const scached = await cache.get("soundcloud-song-data", s_id);
+                    if (scached) {
+                        resolve({
+                            title: scached.title,
+                            url
+                        });
+                        break;
+                    }
                     const sinfo = await playdl.soundcloud(url);
+                    await cache.cache("soundcloud-song-data", {
+                        title: sinfo.name,
+                        id: s_id,
+                        extra: {}
+                    });
                     resolve({
                         title: sinfo.name,
                         url: url

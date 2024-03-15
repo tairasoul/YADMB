@@ -18,7 +18,7 @@ export const base: playlistResolver = {
         return [/https:\/\/(?:music|www)\.youtube\.com\/(?:watch\?v|playlist\?list)=.*/,/https:\/\/youtu\.be\/.*/,/https:\/\/soundcloud\.com\/.*/,/https:\/\/on\.soundcloud\.com\/.*/,/https:\/\/deezer\.(?:com|page\.link)\/.*/].find((reg) => reg.test(url)) != undefined;
     },
     priority: 0,
-    async resolve(url, cache) {
+    async resolve(url, cache, forceInvalidation) {
         const prov = getProvider(url);
         const returnVal: playlistData = {
             title: "temp",
@@ -27,9 +27,10 @@ export const base: playlistResolver = {
         }
         switch(prov) {
             case "deezer":
-                const playdl_deezer = await playdl.deezer(url);
-                const id = playdl_deezer.id;
-                const cached = await cache.get("deezer-playlist-data", id.toString());
+                const d_url = new URL(url);
+                if (forceInvalidation)
+                    await cache.uncache("deezer-playlist-data", d_url.pathname);
+                const cached = await cache.get("deezer-playlist-data", d_url.pathname);
                 if (cached) {
                     const tracks = JSON.parse(cached.extra.tracks) as YouTubeVideo[];
                     returnVal.title = cached.title;
@@ -41,6 +42,7 @@ export const base: playlistResolver = {
                     }
                     return returnVal;
                 }
+                const playdl_deezer = await playdl.deezer(url);
                 await playdl_deezer.fetch();
                 if (playdl_deezer instanceof DeezerPlaylist || playdl_deezer instanceof DeezerAlbum) {
                     returnVal.title = playdl_deezer.title;
@@ -53,7 +55,7 @@ export const base: playlistResolver = {
                         })
                     }
                     await cache.cache("deezer-playlist-data", {
-                        id: id.toString(),
+                        id: d_url.pathname,
                         title: playdl_deezer.title,
                         extra: {
                             tracks: JSON.stringify(returnVal.items)
@@ -65,8 +67,10 @@ export const base: playlistResolver = {
                 }
                 return returnVal;
             case "soundcloud":
-                const playdl_so = await playdl.soundcloud(url);
-                const scached = await cache.get("soundcloud-playlist-data", playdl_so.id.toString());
+                const s_url = new URL(url);
+                if (forceInvalidation)
+                    await cache.uncache("soundcloud-playlist-data", s_url.pathname);
+                const scached = await cache.get("soundcloud-playlist-data", s_url.pathname);
                 if (scached) {
                     const tracks = JSON.parse(scached.extra.tracks) as SoundCloudTrack[];
                     returnVal.title = scached.title;
@@ -78,6 +82,7 @@ export const base: playlistResolver = {
                     }
                     return returnVal;
                 }
+                const playdl_so = await playdl.soundcloud(url);
                 if (playdl_so instanceof SoundCloudPlaylist) {
                     returnVal.title = playdl_so.name;
                     const tracks = await playdl_so.all_tracks();
@@ -88,7 +93,7 @@ export const base: playlistResolver = {
                         })
                     }
                     await cache.cache("soundcloud-playlist-data", {
-                        id: playdl_so.id.toString(),
+                        id: s_url.pathname,
                         title: playdl_so.name,
                         extra: {
                             tracks: JSON.stringify(tracks)
@@ -101,6 +106,8 @@ export const base: playlistResolver = {
                 return returnVal;
             case "youtube":
                 const y_id = playdl.extractID(url);
+                if (forceInvalidation)
+                    await cache.uncache("youtube-playlist-data", y_id);
                 const ycached = await cache.get("youtube-playlist-data", y_id);
                 if (ycached) {
                     returnVal.title = ycached.title;

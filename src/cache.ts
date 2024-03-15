@@ -2,6 +2,8 @@ import pkg from "knex";
 const { knex } = pkg;
 import { debugLog } from "./bot.js";
 import ms from "ms";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 
 type CacheInfo = {
     title: string;
@@ -30,9 +32,13 @@ type PreprocessCached = {
 export default class Cache {
     private database: pkg.Knex;
     private expiryOffset: number;
+    private isInMemory = false;
+    private databasePath: string;
 
     constructor(databasePath: string = "./cache.db", database_expiry_time: string = "3d") {
         this.expiryOffset = ms(database_expiry_time);
+        this.databasePath = path.resolve(databasePath);
+        if (databasePath == ":memory:") this.isInMemory = true;
         this.database = knex({
             client: "better-sqlite3",
             connection: {
@@ -52,6 +58,18 @@ export default class Cache {
                 table.json('extra');
             });
         }
+    }
+
+    async getCacheData() {
+        const connection = await this.database.client.acquireConnection();
+        return connection.serialize();
+    }
+
+    async getDatabaseName() {
+        if (this.isInMemory) {
+            return "in-memory-cache.db";
+        }
+        return path.basename(path.resolve(this.databasePath));
     }
 
     async isCached(service: string, id: string) {

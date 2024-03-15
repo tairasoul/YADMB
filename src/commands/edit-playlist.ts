@@ -25,6 +25,12 @@ export default {
             required: true,
             name: "playlist",
             description: "Playlist file."
+        },
+        {
+            name: "force-invalidation",
+            description: "Should invalidation be forced for the cache?",
+            required: false,
+            type: 5
         }
     ],
     callback: async (interaction: oceanic.CommandInteraction, info: {
@@ -35,11 +41,12 @@ export default {
     }) => {
         await interaction.defer(1 << 6);
         const attachment = interaction.data.options.getAttachment("playlist", true);
+        const invalidation = interaction.data.options.getBoolean("force-invalidation") ?? false;
         const text = await (await fetch(attachment.url)).text();
         const data = utils.decodeStr(text);
         const paged: PageData[] = []
         for (const queued of data.tracks) {
-            const pagedtrack: PageData = (await utils.trackPager([queued], async () => {}, info.resolvers, info.cache))[0];
+            const pagedtrack: PageData = (await utils.trackPager([queued], async () => {}, info.resolvers, info.cache, invalidation))[0];
             pagedtrack.index = paged.length;
             pagedtrack.embed.addField("index", pagedtrack.index.toString())
             paged.push(pagedtrack);
@@ -248,7 +255,7 @@ export default {
             const dataResolvers = await info.resolvers.getSongResolvers(video);
             let dataResolver;
             for (const resolver of dataResolvers) {
-                const output = await resolver.resolve(video, info.cache);
+                const output = await resolver.resolve(video, info.cache, invalidation);
                 if (output && typeof output != "string") {
                     dataResolver = output;
                     break;
@@ -263,7 +270,7 @@ export default {
                 if (pagers) {
                     let pager;
                     for (const page of pagers) {
-                        const output = await page.trackPager(add, paged.length, info.cache);
+                        const output = await page.trackPager(add, paged.length, info.cache, invalidation);
                         if (output) {
                             pager = output;
                             break;

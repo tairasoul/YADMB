@@ -9,6 +9,6 @@ export default class ResolverUtils {
     getPlaylistResolvers(url: string): Promise<playlistResolver[]>;
     getNameResolvers(url: string): Promise<resolver[]>;
     getSongResolvers(url: string): Promise<dataResolver[]>;
-    getSongThumbnail(url: string, cache: Cache): Promise<string | undefined>;
-    getPlaylistThumbnail(url: string, cache: Cache): Promise<string | undefined>;
+    getSongThumbnail(url: string, cache: Cache, forceInvalidation?: boolean): Promise<string | undefined>;
+    getPlaylistThumbnail(url: string, cache: Cache, forceInvalidation?: boolean): Promise<string | undefined>;
 }

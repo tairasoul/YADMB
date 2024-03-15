@@ -24,12 +24,19 @@ export default {
             name: "next",
             description: "Should this song play next? This will either add it in the current playlist, or in the queue.",
             required: false
+        },
+        {
+            name: "force-invalidation",
+            description: "Should invalidation be forced for the cache on this song?",
+            required: false,
+            type: 5
         }
     ],
     callback: async (interaction, info) => {
         await interaction.defer();
         const video = interaction.data.options.getString("link", true);
         const next = interaction.data.options.getBoolean("next");
+        const forceInvalidation = interaction.data.options.getBoolean("force-invalidation") ?? false;
         const nameResolvers = await info.resolvers.getNameResolvers(video);
         let provider;
         for (const resolver of nameResolvers) {
@@ -51,7 +58,7 @@ export default {
             const s_resolvers = await info.resolvers.getSongResolvers(video);
             let resolver;
             for (const s_res of s_resolvers) {
-                const output = await s_res.resolve(video, info.cache);
+                const output = await s_res.resolve(video, info.cache, forceInvalidation);
                 if (output && typeof output != "string") {
                     resolver = output;
                     break;
