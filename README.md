@@ -11,14 +11,6 @@ started in december 2022, this is one of the projects i've been working on the l
 
 if you encounter any problems or have any suggestions, open an issue.
 
-if you want a different, probably more stable music bot, check out [jagrosh's music bot](https://github.com/jagrosh/MusicBot)
-
-it's easier to use/setup than this one, and works better out of the box (havent tested it much so im not sure, but it works well) imo
-
-also, turns out there's another bot called [YADMB](https://github.com/TheTipo01/YADMB) made by [TheTipo01](https://github.com/TheTipo01) and made with golang instead of ts.
-
-go check it out!
-
 the queue system this uses is custom and.. fairly different from other queue systems i've seen
 
 instead of simply being an array of name-url objects (atleast what i used in my initial version), it's basically a queue of mini-queues
@@ -26,6 +18,18 @@ instead of simply being an array of name-url objects (atleast what i used in my 
 each item in the queue is either a single track or an entire playlist.
 
 this means if you want to add a playlist to get your opinion on it, and don't like it, you can just skip the entire thing.
+
+# alternatives i know of
+
+[jagrosh's music bot](https://github.com/jagrosh/MusicBot)
+
+i havent used this much, but it seems a lot better if you don't want a slash-command based bot, and don't want to do more complex setup.
+
+in total all it has is 2 files, the .jar and a file w/ the token.
+
+[YADMB](https://github.com/TheTipo01/YADMB) made by [TheTipo01](https://github.com/TheTipo01) and made with golang instead of ts.
+
+havent tried it out, but it seems interesting, so go check it out!
 
 # config info
 
