@@ -17,6 +17,14 @@ also, turns out there's another bot called [YADMB](https://github.com/TheTipo01/
 
 go check it out!
 
+the queue system this uses is custom and.. fairly different from other queue systems i've seen
+
+instead of simply being an array of name-url objects (atleast what i used in my initial version), it's basically a queue of mini-queues
+
+each item in the queue is either a single track or an entire playlist.
+
+this means if you want to add a playlist to get your opinion on it, and don't like it, you can just skip the entire thing.
+
 # config info
 
 the template config looks like this:
