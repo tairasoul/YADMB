@@ -47,7 +47,7 @@ web_editor_link - the link to the web features.
 
 package_manager - for addons. install is the install command for your package manager, uninstall is the uninstall command for your package manager, and list is the command to list all packages. keep list as is for now.
 
-cache_path - the path to the cache database. :memory: means it's in-memory, but if you want to set it to, say, cache.db in the root directory (where this file is), set it to ./cache.db
+cache_path - the path to the cache database. :memory: means it's in-memory, but if you want to set it to, say, cache.db in the root directory (where this file is), set it to ./cache.db (this is relative to where you run bot.js from, so if you're one directory above it'll put cache.db one directory above)
 
 expiry_time - how long should cached info be valid for?
 
