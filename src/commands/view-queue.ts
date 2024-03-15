@@ -19,6 +19,14 @@ function embedMessage(text: string) {
 export default {
     name: "view-queue",
     description: "View a snapshot of the queue.",
+    options: [
+        {
+            name: "force-invalidation",
+            description: "Should invalidation be forced for the cache?",
+            required: false,
+            type: 5
+        }
+    ],
     callback: async (interaction: oceanic.CommandInteraction, info: {
         resolvers: ResolverUtils, 
         guild: Guild, 
@@ -27,10 +35,11 @@ export default {
     }) => {
         await interaction.defer(1 << 6)
         await interaction.editOriginal({embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")], flags: 1 << 6})
+        const invalidation = interaction.data.options.getBoolean("force-invalidation") ?? false;
         const data: {queued: PageHolder, tracks: PageHolder | null} = {
             queued: await utils.queuedTrackPager(info.guild.queue.tracks, async (title) => {
                 await interaction.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6})
-            }, info.resolvers, info.cache),
+            }, info.resolvers, info.cache, invalidation),
             tracks: null
         }
         let isInspecting = false;
@@ -146,7 +155,7 @@ export default {
             await i.createMessage({embeds: [embedMessage("Paging tracks for playlist.")], flags: 1 << 6});
             data.tracks = utils.Pager({pages: await utils.trackPager(info.guild.queue.tracks[currentPage].tracks, async (title) => {
                 await i.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6})
-            }, info.resolvers, info.cache)});
+            }, info.resolvers, info.cache, invalidation)});
             isInspecting = true;
             /** @ts-ignore */
             await interaction.editOriginal({content: "", embeds: data.tracks.pages[0].embed.toJSON(true), components: actionRows.inspected, flags: 1 << 6});

@@ -17,6 +17,42 @@ also, turns out there's another bot called [YADMB](https://github.com/TheTipo01/
 
 go check it out!
 
+# config info
+
+the template config looks like this:
+```json
+{
+  "token": "Bot your-token",
+  "web_features": false,
+  "web_editor_port": 5500,
+  "web_editor_link": "url-anyone-can-access",
+  "package_manager": {
+    "install": "npm install",
+    "uninstall": "npm uninstall",
+    "list": "npm list"
+  },
+  "cache_path": ":memory:",
+  "expiry_time": "3d",
+  "check_interval": "1m"
+}
+```
+
+token - the token for the bot. replace your-token with your bot's token.
+
+web_features - should web features be enabled? this isn't needed unless you're planning to forward the web interface for users.
+
+web_editor_port - the port for the web features.
+
+web_editor_link - the link to the web features.
+
+package_manager - for addons. install is the install command for your package manager, uninstall is the uninstall command for your package manager, and list is the command to list all packages. keep list as is for now.
+
+cache_path - the path to the cache database. :memory: means it's in-memory, but if you want to set it to, say, cache.db in the root directory (where this file is), set it to ./cache.db
+
+expiry_time - how long should cached info be valid for?
+
+check_interval - how often should the bot try to remove invalid information?
+
 # installing addons
 
 installing addons is as simple as putting their provided file or folder into the addons folder, and making sure the bot runs correctly!

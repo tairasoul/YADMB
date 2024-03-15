@@ -11,25 +11,45 @@ export const youtube: PagerResolver = {
     async available(url) {
         return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/,/https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined;
     },
-    async queuedPager(track, index, cache) {
+    async queuedPager(track, index, cache, forceInvalidation) {
         const embed = new builders.EmbedBuilder();
         embed.setTitle(track.name);
-        const id = playdl.extractID(track.tracks[0].url);
+        const url = new URL(track.tracks[0].url);
+        const id = url.searchParams.get("v") as string;
         embed.addField("index", index.toString(), true)
         embed.addField("type", track.type, true)
         embed.addField("songs", track.tracks.length.toString(), true)
+        if (forceInvalidation)
+            await cache.uncache("youtube-queued-pager-data", id);
         const cachedata = await cache.get("youtube-queued-pager-data", id);
         if (cachedata) {
             embed.setImage(cachedata.extra.thumbnail)
+            // @ts-ignore
+            embed.addField("Author", cachedata.extra.channelname);
+            embed.addField("Likes", cachedata.extra.likes.toString());
+            embed.addField("Views", cachedata.extra.views.toString());
+            embed.addField("Duration", humanizeDuration(cachedata.extra.durationInSec * 1000));
+            embed.addField("Uploaded", new Date(cachedata.extra.uploadedAt as string).toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"}));
         }
         else {
             const info = await playdl.video_basic_info(track.tracks[0].url)
             const thumbnail = getHighestResUrl(info);
             embed.setImage(thumbnail);
+            // @ts-ignore
+            embed.addField("Author", info.video_details.channel.name);
+            embed.addField("Likes", info.video_details.likes.toString());
+            embed.addField("Views", info.video_details.views.toString());
+            embed.addField("Duration", humanizeDuration(info.video_details.durationInSec * 1000));
+            embed.addField("Uploaded", new Date(info.video_details.uploadedAt as string).toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"}));
             await cache.cache("youtube-queued-pager-data", {
                 id,
                 title: track.name,
                 extra: {
+                    channelname: info.video_details.channel?.name,
+                    likes: info.video_details.likes,
+                    views: info.video_details.views,
+                    durationInSec: info.video_details.durationInSec,
+                    uploadedAt: info.video_details.uploadedAt,
                     thumbnail
                 }
             })
@@ -42,10 +62,13 @@ export const youtube: PagerResolver = {
         };
         return data;
     },
-    async trackPager(track, index, cache) {
+    async trackPager(track, index, cache, forceInvalidation) {
         const embed = new builders.EmbedBuilder();
         embed.setTitle(track.name);
-        const id = playdl.extractID(track.url);
+        const url = new URL(track.url);
+        const id = url.searchParams.get("v") as string;
+        if (forceInvalidation)
+            await cache.uncache("youtube-track-pager-data", id);
         const data = await cache.get("youtube-track-pager-data", id);
         if (data) {
             embed.setImage(data.extra.thumbnail);
@@ -100,7 +123,7 @@ export const soundcloud: PagerResolver = {
         const info = await playdl.soundcloud(track.tracks[0].url) as SoundCloudTrack;
         embed.setImage(info.thumbnail);
         // @ts-ignore
-        embed.addField("Author", info.publisher?.artist);
+        embed.addField("Author", info.publisher?.artist ?? "Could not get artist.");
         embed.addField("Duration", humanizeDuration(info.durationInSec * 1000));
         return {
             id: track.name,
@@ -115,7 +138,7 @@ export const soundcloud: PagerResolver = {
         const info = await playdl.soundcloud(track.url) as SoundCloudTrack;
         embed.setImage(info.thumbnail);
         // @ts-ignore
-        embed.addField("Author", info.publisher?.artist);
+        embed.addField("Author", info.publisher?.artist ?? "Could not get artist.");
         embed.addField("Duration", humanizeDuration(info.durationInSec * 1000));
         return {
             id: track.name,

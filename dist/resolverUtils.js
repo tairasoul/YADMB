@@ -43,18 +43,18 @@ export default class ResolverUtils {
         }
         return resolvers.sort((a, b) => b.priority - a.priority);
     }
-    async getSongThumbnail(url, cache) {
+    async getSongThumbnail(url, cache, forceInvalidation = false) {
         for (const resolver of this.resolvers.songThumbnailResolvers) {
-            const resolved = await resolver.resolve(url, cache);
+            const resolved = await resolver.resolve(url, cache, forceInvalidation);
             if (resolved) {
                 return resolved;
             }
         }
         return;
     }
-    async getPlaylistThumbnail(url, cache) {
+    async getPlaylistThumbnail(url, cache, forceInvalidation = false) {
         for (const resolver of this.resolvers.playlistThumbnailResolvers) {
-            const resolved = await resolver.resolve(url, cache);
+            const resolved = await resolver.resolve(url, cache, forceInvalidation);
             if (resolved) {
                 return resolved;
             }

@@ -2,11 +2,17 @@ import pkg from "knex";
 const { knex } = pkg;
 import { debugLog } from "./bot.js";
 import ms from "ms";
+import path from "node:path";
 export default class Cache {
     database;
     expiryOffset;
+    isInMemory = false;
+    databasePath;
     constructor(databasePath = "./cache.db", database_expiry_time = "3d") {
         this.expiryOffset = ms(database_expiry_time);
+        this.databasePath = path.resolve(databasePath);
+        if (databasePath == ":memory:")
+            this.isInMemory = true;
         this.database = knex({
             client: "better-sqlite3",
             connection: {
@@ -25,6 +31,16 @@ export default class Cache {
                 table.json('extra');
             });
         }
+    }
+    async getCacheData() {
+        const connection = await this.database.client.acquireConnection();
+        return connection.serialize();
+    }
+    async getDatabaseName() {
+        if (this.isInMemory) {
+            return "in-memory-cache.db";
+        }
+        return path.basename(path.resolve(this.databasePath));
     }
     async isCached(service, id) {
         const query = await this.database(service).where("id", id).first();

@@ -158,14 +158,14 @@ export function Pager(pages: PageHolderData) {
     return new PageHolder(PageClasses);
 }
 
-export async function queuedTrackPager(array: queuedTrack[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache) {
+export async function queuedTrackPager(array: queuedTrack[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean = false) {
     const pages: PageData[] = []
     for (let i = 0; i < array.length; i++) {
         await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].tracks[0].url);
         let output;
         for (const pager of pagers) {
-            output = await pager.queuedPager(array[i], i, cache);
+            output = await pager.queuedPager(array[i], i, cache, forceInvalidation);
             if (output) {
                 pages.push(output);
                 break;
@@ -194,14 +194,14 @@ export function parseVolumeString(volume: string) {
     return result;
 }
 
-export async function trackPager(array: track[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache) {
+export async function trackPager(array: track[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean) {
     const pages: PageData[] = []
     for (let i = 0; i < array.length; i++) {
         await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].url);
         let output;
         for (const pager of pagers) {
-            output = await pager.trackPager(array[i], i, cache);
+            output = await pager.trackPager(array[i], i, cache, forceInvalidation);
             if (output) {
                 pages.push(output);
                 break;

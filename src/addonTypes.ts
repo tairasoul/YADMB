@@ -50,12 +50,20 @@ export type PagerResolver = {
     available: (url: string) => Promise<boolean>;
     /**
      * Pager for a queued item.
+     * @param track The track being paged.
+     * @param index The index of the track being paged.
+     * @param cache The global cache. Use this to cache and retrieve data for the track.
+     * @param forceInvalidation Is cache invalidation being forced for this? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    queuedPager: (track: queuedTrack, index: number, cache: Cache) => Promise<PageData>;
+    queuedPager: (track: queuedTrack, index: number, cache: Cache, forceInvalidation: boolean) => Promise<PageData>;
     /**
      * Pager for a track within a playlist.
+     * @param track The track being paged.
+     * @param index The index of the track being paged.
+     * @param cache The global cache. Use this to cache and retrieve data for the track.
+     * @param forceInvalidation Is cache invalidation being forced for this? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    trackPager: (track: track, index: number, cache: Cache) => Promise<PageData>;
+    trackPager: (track: track, index: number, cache: Cache, forceInvalidation: boolean) => Promise<PageData>;
 }
 
 export type AudioResolver = {
@@ -120,8 +128,11 @@ export type dataResolver = {
     available: (url: string) => Promise<boolean>;
     /**
      * Function that resolves the URL into song data. Returns undefined if it can't resolve the URL into data.
+     * @param url The URL of the song.
+     * @param cache The global cache. Use this to cache and retrieve data for the URL.
+     * @param forceInvalidation Is cache invalidation being forced for this call? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    resolve: (url: string, cache: Cache) => Promise<songData | string | undefined>;
+    resolve: (url: string, cache: Cache, forceInvalidation: boolean) => Promise<songData | string | undefined>;
 }
 
 export type playlistResolver = {
@@ -140,8 +151,11 @@ export type playlistResolver = {
     available: (url: string) => Promise<boolean>;
     /**
      * Function that resolves the URL into playlist data. Returns undefined if it can't resolve the URL into playlist data.
+     * @param url The URL of the playlist.
+     * @param cache The global cache. Use this to cache and retrieve data for the URL.
+     * @param forceInvalidation Is cache invalidation being forced for this call? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    resolve: (url: string, cache: Cache) => Promise<playlistData | string | undefined>;
+    resolve: (url: string, cache: Cache, forceInvalidation: boolean) => Promise<playlistData | string | undefined>;
 }
 
 export type thumbnailResolver = {
@@ -155,8 +169,11 @@ export type thumbnailResolver = {
     available: (url: string) => Promise<boolean>;
     /**
      * Function that resolves the URL into a thumnbail URL or undefined (if it can't resolve the url)
+     * @param url The URL to get thumbnail for.
+     * @param cache The global cache. Use this to cache and retrieve data for the URL.
+     * @param forceInvalidation Is cache invalidation being forced for this call? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    resolve: (url: string, cache: Cache) => Promise<string | undefined>;
+    resolve: (url: string, cache: Cache, forceInvalidation: boolean) => Promise<string | undefined>;
 }
 
 export type command = {

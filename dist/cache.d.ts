@@ -14,8 +14,12 @@ type PreprocessCached = {
 export default class Cache {
     private database;
     private expiryOffset;
+    private isInMemory;
+    private databasePath;
     constructor(databasePath?: string, database_expiry_time?: string);
     private createTableIfNotExists;
+    getCacheData(): Promise<any>;
+    getDatabaseName(): Promise<string>;
     isCached(service: string, id: string): Promise<boolean>;
     isValid(service: string, id: string): Promise<boolean>;
     cache(service: string, info: CacheInfo): Promise<void>;

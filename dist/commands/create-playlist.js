@@ -17,11 +17,18 @@ export default {
             required: true,
             name: "playlist-name",
             description: "Name of the playlist."
+        },
+        {
+            name: "force-invalidation",
+            description: "Should invalidation be forced for the cache?",
+            required: false,
+            type: 5
         }
     ],
     callback: async (interaction, info) => {
         await interaction.defer(1 << 6);
         const name = interaction.data.options.getString("playlist-name", true);
+        const invalidation = interaction.data.options.getBoolean("force-invalidation") ?? false;
         const playlist_embed = new builders.EmbedBuilder();
         playlist_embed.setTitle(name);
         const data = {
@@ -240,7 +247,7 @@ export default {
             const dataResolvers = await info.resolvers.getSongResolvers(video);
             let dataResolver;
             for (const resolver of dataResolvers) {
-                const output = await resolver.resolve(video, info.cache);
+                const output = await resolver.resolve(video, info.cache, invalidation);
                 if (output && typeof output != "string") {
                     dataResolver = output;
                     break;
@@ -256,7 +263,7 @@ export default {
                 if (pagers) {
                     let pager;
                     for (const page of pagers) {
-                        const output = await page.trackPager(add, paged.length, info.cache);
+                        const output = await page.trackPager(add, paged.length, info.cache, invalidation);
                         if (output) {
                             pager = output;
                             break;

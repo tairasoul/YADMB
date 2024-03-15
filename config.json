@@ -8,7 +8,7 @@
     "uninstall": "npm uninstall",
     "list": "npm list"
   },
-  "cache_path": "./cache.db",
+  "cache_path": ":memory:",
   "expiry_time": "3d",
   "check_interval": "1m"
 }
