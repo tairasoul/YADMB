@@ -51,7 +51,7 @@ cache_path - the path to the cache database. :memory: means it's in-memory, but 
 
 expiry_time - how long should cached info be valid for?
 
-check_interval - how often should the bot try to remove invalid information?
+check_interval - how often should the bot try to remove invalidated cached data?
 
 # installing addons
 
