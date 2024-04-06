@@ -37,15 +37,22 @@ export default {
             return await interaction.editOriginal({ embeds: [embed.toJSON()] });
         }
         info.guild.audioPlayer.stop(true);
-        queue.internalCurrentIndex = 0;
+        let track;
         ct.trackNumber = 0;
         if (shuffleType === "playlist") {
             utils.shuffleArray(ct.tracks);
         }
         else if (shuffleType == "queue") {
+            track = queue.tracks.splice(queue.internalCurrentIndex, 1)[0];
             utils.shuffleArray(queue.tracks);
         }
         else {
+            track = queue.tracks.splice(queue.internalCurrentIndex, 1)[0];
+            if (track.type == "playlist") {
+                const subTrack = track.tracks.splice(track.trackNumber, 1)[0];
+                utils.shuffleArray(track.tracks);
+                track.tracks.unshift(subTrack);
+            }
             for (const track of queue.tracks) {
                 if (track.type == "playlist") {
                     utils.shuffleArray(track.tracks);
@@ -53,6 +60,9 @@ export default {
             }
             utils.shuffleArray(queue.tracks);
         }
+        if (track)
+            queue.tracks.unshift(track);
+        queue.internalCurrentIndex = 0;
         const embed = new builders.EmbedBuilder();
         embed.setDescription(`Shuffled queue, now playing ${queue.tracks[queue.internalCurrentIndex].tracks[0].name}.`);
         await interaction.editOriginal({ embeds: [embed.toJSON()] });
