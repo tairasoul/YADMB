@@ -28,6 +28,7 @@ export default class QueueHandler {
 
     setVolume(volumeString: string) {
         this.volumeString = volumeString;
+        this.currentInfo?.resource.volume?.setVolume(utils.parseVolumeString(this.volumeString));
     }
 
     get loopType() {
