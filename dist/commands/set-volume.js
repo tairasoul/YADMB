@@ -23,7 +23,7 @@ export default {
         const characterRegex = /^[0-9%.]*$/g;
         if (characterRegex.test(volume)) {
             info.guild.queue.setVolume(volume);
-            await interaction.editOriginal({ embeds: [embedMessage(`Set volume for ${interaction.guild.id} to ${volume}, parsed: ${utils.parseVolumeString(volume)}\nThis will apply when the next song starts.`)] });
+            await interaction.editOriginal({ embeds: [embedMessage(`Set volume for ${interaction.guild.id} to ${volume}, parsed: ${utils.parseVolumeString(volume)}`)] });
         }
         else {
             await interaction.editOriginal({ embeds: [embedMessage(`Volume ${volume} contains invalid characters! volume can only contain the characters 0-9, . and %`)] });
