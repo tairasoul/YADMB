@@ -31,6 +31,10 @@ i havent used this much, but it seems a lot better if you don't want a slash-com
 
 havent tried it out, but it seems interesting, so go check it out!
 
+[TradeW1nd](https://github.com/North-West-Wind/TradeW1nd)
+
+another bot made with ts. looks pretty cool, is a version of N0rthWestW1nd with only it's music functions.
+
 # config info
 
 the template config looks like this:
