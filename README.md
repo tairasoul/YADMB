@@ -1,3 +1,5 @@
+## currently broken (base addon i think), sorry!! will fix soon (when i stop working on other projects :3)
+
 # Yet Another Discord Music Bot
 a music bot because i got bored and made one
 
