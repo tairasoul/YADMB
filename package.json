@@ -14,7 +14,7 @@
     "ms": "^2.1.3",
     "oceanic.js": "^1.11.2",
     "opusscript": "^0.1.1",
-    "play-dl": "file:./play-dl-test",
+    "play-dl": "file:./play-dl",
     "randomstring": "^1.3.0",
     "ws": "^8.16.0"
   },
