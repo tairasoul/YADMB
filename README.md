@@ -95,6 +95,8 @@ changelog has been moved to [changelog.md](https://github.com/tairasoul/YADMB/bl
 
 if you use pnpm or yarn instead of npm, you'll have to change package_manager.install, uninstall and list in config.json to use the respective variant for your package manager
 
+play-dl-test is taken from https://github.com/YuzuZensai/play-dl-test
+
 # features
 
 - you can set the volume to whatever (yes, this means you can destroy your friend's eardrums)
