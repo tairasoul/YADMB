@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import fs from 'fs';
 import * as oceanic from 'oceanic.js';
 import { Client } from 'oceanic.js';

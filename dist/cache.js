@@ -69,7 +69,7 @@ export default class Cache {
     }
     async removeInvalidFromTable(service) {
         const time = Date.now();
-        await this.database(service).where("expires", "<", time).del();
+        const res = await this.database(service).where("expires", "<", time).del();
     }
     async removeInvalidFromAllTables() {
         const tables = await this.getAllTables();
@@ -80,26 +80,6 @@ export default class Cache {
     async getAllTables() {
         const result = await this.database.raw("SELECT name FROM sqlite_master WHERE type='table';");
         return result.map(row => row.name);
-    }
-    async get(service, id) {
-        await this.createTableIfNotExists(service);
-        const cached = await this.isCached(service, id);
-        if (cached) {
-            const valid = await this.isValid(service, id);
-            if (valid) {
-                const info = (await this.database(service).where("id", id).first());
-                const newInfo = {
-                    title: info.title,
-                    id: info.id,
-                    extra: JSON.parse(info.extra)
-                };
-                return newInfo;
-            }
-            else {
-                await this.uncache(service, id);
-            }
-        }
-        return null;
     }
     async getRaw(service, id) {
         await this.createTableIfNotExists(service);
@@ -113,6 +93,18 @@ export default class Cache {
             else {
                 await this.uncache(service, id);
             }
+        }
+        return null;
+    }
+    async get(service, id) {
+        const info = await this.getRaw(service, id);
+        if (info) {
+            const newInfo = {
+                title: info.title,
+                id: info.id,
+                extra: JSON.parse(info.extra)
+            };
+            return newInfo;
         }
         return null;
     }

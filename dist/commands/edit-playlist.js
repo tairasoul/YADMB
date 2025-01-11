@@ -41,7 +41,7 @@ export default {
             paged.push(pagedtrack);
         }
         let currentTrack = 0;
-        await interaction.editOriginal({ embeds: [embedMessage("Creating component ids.")], flags: 1 << 6 });
+        await interaction.editOriginal({ embeds: [embedMessage("Creating component ids.")] });
         // create component ids
         debugLog("creating component ids");
         const backId = rstring.generate();
@@ -53,7 +53,7 @@ export default {
         const exportId = rstring.generate();
         const modalId = rstring.generate();
         // create components
-        await interaction.editOriginal({ embeds: [embedMessage("Creating components.")], flags: 1 << 6 });
+        await interaction.editOriginal({ embeds: [embedMessage("Creating components.")] });
         const back = new builders.Button(oceanic.ButtonStyles.PRIMARY, backId);
         const next = new builders.Button(oceanic.ButtonStyles.PRIMARY, nextId);
         const add = new builders.Button(oceanic.ButtonStyles.PRIMARY, addId);
@@ -245,7 +245,7 @@ export default {
                 }
             }
             if (provider == undefined) {
-                return int.editOriginal({ embeds: [embedMessage("Invalid song link.")], flags: 1 << 6 });
+                return int.editOriginal({ embeds: [embedMessage("Invalid song link.")] });
             }
             const dataResolvers = await info.resolvers.getSongResolvers(video);
             let dataResolver;
@@ -276,7 +276,7 @@ export default {
                     paged.push(pager);
                     const embed = new builders.EmbedBuilder();
                     embed.setDescription(`Added **${dataResolver.title}** to custom playlist.`);
-                    await int.editOriginal({ embeds: [embed.toJSON()], flags: 1 << 6 });
+                    await int.editOriginal({ embeds: [embed.toJSON()] });
                     resolve();
                 }
             }

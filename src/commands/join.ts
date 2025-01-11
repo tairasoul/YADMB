@@ -28,8 +28,8 @@ export default {
                 voiceAdapterCreator: interaction.guild?.voiceAdapterCreator as voice.DiscordGatewayAdapterCreator
             })
             info.guild.voiceChannel = interaction.member.voiceState.channel as oceanic.VoiceChannel;
-            info.guild.connection.subscribe(info.guild.audioPlayer)
-            info.guild.connection.on("error", (error: string | Error) => {
+            info.guild.connection?.subscribe(info.guild.audioPlayer)
+            info.guild.connection?.on("error", (error: string | Error) => {
                 const id = interaction.channelID;
                 const ig = interaction.guild;
                 if (ig) {

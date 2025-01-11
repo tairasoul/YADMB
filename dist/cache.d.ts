@@ -27,7 +27,7 @@ export default class Cache {
     removeInvalidFromTable(service: string): Promise<void>;
     removeInvalidFromAllTables(): Promise<void>;
     private getAllTables;
-    get(service: string, id: string): Promise<CacheInfo | null>;
     getRaw(service: string, id: string): Promise<PreprocessCached | null>;
+    get(service: string, id: string): Promise<CacheInfo | null>;
 }
 export {};

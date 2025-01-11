@@ -1,0 +1,3 @@
+[submodule "play-dl-test"]
+	path = play-dl-test
+	url = https://github.com/YuzuZensai/play-dl-test
