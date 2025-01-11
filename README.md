@@ -57,7 +57,7 @@ the template config looks like this:
 
 token - the token for the bot. replace your-token with your bot's token.
 
-web_features - should web features be enabled? this isn't needed unless you're planning to forward the web interface for users.
+web_features - whether or not web features should be enabled. this isn't needed unless you're planning to forward the web interface for users.
 
 web_editor_port - the port for the web features.
 
@@ -67,9 +67,9 @@ package_manager - for addons. install is the install command for your package ma
 
 cache_path - the path to the cache database. :memory: means it's in-memory, but if you want to set it to, say, cache.db in the root directory (where this file is), set it to ./cache.db (this is relative to where you run bot.js from, so if you're one directory above it'll put cache.db one directory above)
 
-expiry_time - how long should cached info be valid for?
+expiry_time - how long cached info should be valid for
 
-check_interval - how often should the bot try to remove invalidated cached data?
+check_interval - how often the bot checks if cached info is valid
 
 # installing addons
 
