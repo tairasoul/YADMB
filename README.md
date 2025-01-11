@@ -81,7 +81,7 @@ addon docs can be found [here](https://github.com/tairasoul/YADMB/blob/main/addo
 
 # how to use
 
-simply install all the required packages, change your-token to your bot's token in config.json, and run node dist/bot
+change your-token to your bot's token in config.json, run `npm run setup-npm` or `pnpm setup-pnpm` (depending on your package manager), wait for it to finish and then run dist node/bot.js
 
 # debugging
 

@@ -9,4 +9,3 @@ enableDebugging
 modules.json
 */*.db
 *.db
-play-dl-test/dist
