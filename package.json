@@ -28,8 +28,8 @@
     "build_web_base": "cd web-editor/code && rm -r dist && tsc",
     "build_web_addons": "cd web-editor/addons/base && tsc",
     "run_debug": "echo > enableDebugging && node dist/bot",
-    "setup-npm": "npm i && cd play-dl-test && npm i",
-    "setup-pnpm": "pnpm i && cd play-dl-test && pnpm i"
+    "setup-npm": "npm i && cd play-dl && npm i",
+    "setup-pnpm": "pnpm i && cd play-dl && pnpm i"
   },
   "devDependencies": {
     "@types/base-64": "^1.0.2",
