@@ -1,5 +1,9 @@
 # todo 
 
+- fully rework web editor
+  - currently is pretty bad and was made in like. an hour with some barebones ass code from chatgpt
+  - so when remade ill actually do all the coding myself
+
 - add capability to filter with regex to add-playlist and add-search
   - won't be too hard as then i just have to add an optional argument
 
