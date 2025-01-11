@@ -9,7 +9,6 @@ import * as voice from "@discordjs/voice";
 import { startWebFunctions } from "./web.fsapi.js";
 import web from "./web.command.js";
 import { managerDefs } from "./package.manager.js";
-import Cache from "./cache.js";
 let debug = false;
 if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
 

@@ -48,7 +48,7 @@ export default {
                         name: `${interaction.member.username}.playlist.${oldData.name}.export.txt`,
                         contents: Buffer.from(newData)
                     }
-                ], flags: 1 << 6 });
+                ] });
         }
         else {
             await interaction.editOriginal({ embeds: [embedMessage("Your current playlist is up to date.")] });

@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import * as oceanic from "oceanic.js";
 import ResolverUtils from "./resolverUtils.js";
 import { Client, Collection, ClientOptions } from "oceanic.js";

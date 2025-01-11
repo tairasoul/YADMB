@@ -4,7 +4,7 @@ import { youtube as yPager, soundcloud as sPager } from "./resolvers/pagers.js";
 import { base as playlist } from "./resolvers/playlist.js";
 import { base as song } from "./resolvers/song.js";
 const addon = {
-    name: "Base",
+    name: "Built-in resolvers",
     description: "Base addon for YADMB.",
     version: "1.0.0",
     credits: "tairasoul",

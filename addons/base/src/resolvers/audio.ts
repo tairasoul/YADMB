@@ -10,7 +10,7 @@ export const youtube = {
     },
     async resolve(url: string) {
         const info = await playdl.video_info(url);
-        const stream = await playdl.stream_from_info(info);
+        const stream = await playdl.stream_from_info(info, { discordPlayerCompatibility: true });
         const resource = createAudioResource<any>(stream.stream, {
             inlineVolume: true,
             inputType: stream.type

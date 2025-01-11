@@ -12,7 +12,7 @@ export default {
         let fileData = "";
         for (const addon of info.client.addons) {
             if (addon.private) continue;
-            fileData += `${addon.name} v${addon.version}\n${addon.description}\nCredits: ${addon.credits}${addon.sources ? "\nSources:\n" + addon.sources.join("\n") : ""}\n\n`;
+            fileData += `${addon.name} v${addon.version}\n  ${addon.description}\n  Credits: ${addon.credits}${addon.sources ? "\n  Sources:\n  " + addon.sources.join("\n  ") : ""}\n\n`;
         }
         await interaction.editOriginal({files: [
             {

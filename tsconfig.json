@@ -17,6 +17,7 @@
     "addons/*",
     "dist/*.d.ts",
     "web-editor/*",
-    "dist/*/*.d.ts"
+    "dist/*/*.d.ts",
+    "play-dl-test/*"
   ]
 }

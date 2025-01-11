@@ -18,8 +18,8 @@ export default {
                 voiceAdapterCreator: interaction.guild?.voiceAdapterCreator
             });
             info.guild.voiceChannel = interaction.member.voiceState.channel;
-            info.guild.connection.subscribe(info.guild.audioPlayer);
-            info.guild.connection.on("error", (error) => {
+            info.guild.connection?.subscribe(info.guild.audioPlayer);
+            info.guild.connection?.on("error", (error) => {
                 const id = interaction.channelID;
                 const ig = interaction.guild;
                 if (ig) {

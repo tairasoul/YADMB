@@ -2,7 +2,6 @@ import pkg from "knex";
 const { knex } = pkg;
 import { debugLog } from "./bot.js";
 import ms from "ms";
-import { readFileSync } from "node:fs";
 import path from "node:path";
 
 type CacheInfo = {
@@ -103,7 +102,8 @@ export default class Cache {
 
     async removeInvalidFromTable(service: string) {
         const time = Date.now();
-        await this.database<CacheInfo>(service).where("expires", "<", time).del();
+        const res = await this.database<CacheInfo>(service).where("expires", "<", time).del();
+        console.log(res)
     }
 
     async removeInvalidFromAllTables() {
@@ -118,27 +118,6 @@ export default class Cache {
         return result.map(row => row.name);
     }
 
-    async get(service: string, id: string) {
-        await this.createTableIfNotExists(service);
-        const cached = await this.isCached(service, id);
-        if (cached) {
-            const valid = await this.isValid(service, id);
-            if (valid) {
-                const info = (await this.database<PreprocessCached>(service).where("id", id).first()) as PreprocessCached;
-                const newInfo: CacheInfo = {
-                    title: info.title,
-                    id: info.id,
-                    extra: JSON.parse(info.extra)
-                }
-                return newInfo;
-            }
-            else {
-                await this.uncache(service, id);
-            }
-        }
-        return null;
-    }
-
     async getRaw(service: string, id: string) {
         await this.createTableIfNotExists(service);
         const cached = await this.isCached(service, id);
@@ -151,6 +130,19 @@ export default class Cache {
             else {
                 await this.uncache(service, id);
             }
+        }
+        return null;
+    }
+
+    async get(service: string, id: string) {
+        const info = await this.getRaw(service, id);
+        if (info) {
+            const newInfo: CacheInfo = {
+                title: info.title,
+                id: info.id,
+                extra: JSON.parse(info.extra)
+            }
+            return newInfo;
         }
         return null;
     }

@@ -34,11 +34,11 @@ export default {
         cache: Cache
     }) => {
         await interaction.defer(1 << 6)
-        await interaction.editOriginal({embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")], flags: 1 << 6})
+        await interaction.editOriginal({embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")]})
         const invalidation = interaction.data.options.getBoolean("force-invalidation") ?? false;
         const data: {queued: PageHolder, tracks: PageHolder | null} = {
             queued: await utils.queuedTrackPager(info.guild.queue.tracks, async (title) => {
-                await interaction.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6})
+                await interaction.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)]})
             }, info.resolvers, info.cache, invalidation),
             tracks: null
         }
@@ -146,7 +146,7 @@ export default {
                     name: `${(interaction.member as oceanic.Member).id}.${interaction.guildID as string}.${interaction.createdAt.getTime()}.export.txt`,
                     contents: new Buffer(encoded)
                 }
-            ], flags: 1 << 6});
+            ]});
         }
 
         const onInspect = async (i: oceanic.ComponentInteraction) => {
@@ -154,7 +154,7 @@ export default {
             currentInspectPage = 0;
             await i.createMessage({embeds: [embedMessage("Paging tracks for playlist.")], flags: 1 << 6});
             data.tracks = utils.Pager({pages: await utils.trackPager(info.guild.queue.tracks[currentPage].tracks, async (title) => {
-                await i.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)], flags: 1 << 6})
+                await i.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)]})
             }, info.resolvers, info.cache, invalidation)});
             isInspecting = true;
             /** @ts-ignore */

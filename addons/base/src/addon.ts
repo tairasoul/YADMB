@@ -6,7 +6,7 @@ import { base as playlist } from "./resolvers/playlist.js";
 import { base as song } from "./resolvers/song.js";
 
 const addon: AddonInfo = {
-    name: "Base",
+    name: "Built-in resolvers",
     description: "Base addon for YADMB.",
     version: "1.0.0",
     credits: "tairasoul",
