@@ -18,6 +18,6 @@
     "dist/*.d.ts",
     "web-editor/*",
     "dist/*/*.d.ts",
-    "play-dl-test/*"
+    "play-dl/*"
   ]
 }
