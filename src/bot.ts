@@ -6,8 +6,6 @@ import MusicClient from './client.js';
 import addonLoader from "./addonLoader.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 import * as voice from "@discordjs/voice";
-import { startWebFunctions } from "./web.fsapi.js";
-import web from "./web.command.js";
 import { managerDefs } from "./package.manager.js";
 let debug = false;
 if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`)) debug = true;
@@ -18,7 +16,7 @@ export function debugLog(text: any) {
 
 let setup = false;
 
-const { token, web_features, package_manager, cache_path, expiry_time, check_interval } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+const { token, package_manager, cache_path, expiry_time, check_interval } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 
 const defs: managerDefs = {
     install: package_manager.install.trim(),
@@ -49,10 +47,10 @@ const client = new MusicClient({
     database_cleanup_interval: check_interval ?? "1m"
 });
 
-if (web_features) {
+/*if (web_features) {
     startWebFunctions();
     client.addCommand(web.data.name, web.data.description as string, [], web.execute);
-}
+}*/
 
 const loader = new addonLoader(client, defs);
 
