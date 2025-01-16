@@ -36,10 +36,6 @@ Song data resolvers simply resolve a URL of a song into a table, containing the 
 
 The URL should be playable through one of the audio resolvers, otherwise an error will get thrown when the queue system tries to play the song.
 
-### Web data resolvers
-
-Web data resolvers resolve a URL into songArtist, songName, songThumbnail and songUrl. This gets used by the web-ui to create elements the user can rearrange and interact with to create a custom playlist.
-
 ### Pagers
 
 Pagers resolve a URL and an index into usable data for view-queue, and any other potential addon commands.
@@ -111,7 +107,7 @@ await cache.cache("service-name", {
     title: "song-title", // The title of the song.
     extra: {
         // Any extra information you wish to store.
-        // Keep in mind this does get turned into JSON, but does get parsed automatically when doing cache.get();
+        // Keep in mind this does get turned into JSON, but does get parsed automatically back to an object when doing cache.get();
     }
 })
 ```
