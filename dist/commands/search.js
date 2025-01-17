@@ -14,7 +14,8 @@ export default {
             name: "term",
             description: "What to search for.",
             required: true,
-            type: 3
+            type: 3,
+            autocomplete: true
         }
     ],
     callback: async (interaction, info) => {
@@ -53,13 +54,31 @@ export default {
         const accept = new builders.Button(oceanic.ButtonStyles.PRIMARY, `${interaction.user.id}Add${term}`);
         accept.type = oceanic.ComponentTypes.BUTTON;
         accept.setLabel("Add video to queue");
+        const cancel = new builders.Button(oceanic.ButtonStyles.PRIMARY, `${interaction.user.id}Cancel${term}`);
+        cancel.setLabel("Cancel");
+        cancel.type = oceanic.ComponentTypes.BUTTON;
         const acceptnext = new builders.Button(oceanic.ButtonStyles.PRIMARY, `${interaction.user.id}AddNext${term}`);
         acceptnext.setLabel("Play this video next");
         acceptnext.type = oceanic.ComponentTypes.BUTTON;
         const actionRow = utils.SelectMenu(searches, `${interaction.user.id}Search${term}`);
         const actionRow2 = new builders.ActionRow();
         actionRow2.type = oceanic.ComponentTypes.ACTION_ROW;
-        actionRow2.addComponents(accept, acceptnext);
+        actionRow2.addComponents(accept, cancel, acceptnext);
+        // cancel all
+        // @ts-ignore
+        const ca = async (i) => {
+            info.client.off("interactionCreate", pl);
+            info.client.off("interactionCreate", vl);
+            info.client.off("interactionCreate", vla);
+            info.client.off("interactionCreate", ca);
+            actionRow.getComponents().forEach((component) => component.disable());
+            actionRow2.getComponents().forEach((component) => component.disable());
+            // @ts-ignore
+            await i.editParent({ components: [actionRow, actionRow2], embeds: [currentVideo.embed.toJSON()] });
+            setTimeout(async () => {
+                await i.deleteOriginal();
+            }, 3000);
+        };
         // change page
         // @ts-ignore
         const pl = async (i) => {
@@ -155,14 +174,19 @@ export default {
         utils.LFGIC(info.client, interaction.guildID, interaction.user.id, `${interaction.user.id}Search${term}`, pl);
         utils.LFGIC(info.client, interaction.guildID, interaction.user.id, `${interaction.user.id}Add${term}`, vl);
         utils.LFGIC(info.client, interaction.guildID, interaction.user.id, `${interaction.user.id}AddNext${term}`, vla);
+        utils.LFGIC(info.client, interaction.guildID, interaction.user.id, `${interaction.user.id}Cancel${term}`, ca);
         setTimeout(async () => {
             info.client.off("interactionCreate", pl);
             info.client.off("interactionCreate", vl);
             info.client.off("interactionCreate", vla);
+            info.client.off("interactionCreate", ca);
             actionRow.getComponents().forEach((component) => component.disable());
             actionRow2.getComponents().forEach((component) => component.disable());
             // @ts-ignore
             await interaction.editOriginal({ components: [actionRow, actionRow2], embeds: [currentVideo.embed.toJSON()] });
+            setTimeout(async () => {
+                await interaction.deleteOriginal();
+            }, 3000);
         }, 120000);
     }
 };

@@ -1,9 +1,11 @@
 import { exec } from "child_process";
+import path from "path";
+import { __dirname } from "./bot.js";
+import fs from "fs";
 
 export type managerDefs = {
     install: string;
     uninstall: string;
-    list: string;
 }
 
 export default class PackageManager {
@@ -37,8 +39,14 @@ export default class PackageManager {
         });
     }
 
-    async isPackageInstalled(_package: string) {
-        return new Promise<boolean>((resolve, reject) => {
+    isPackageInstalled(_package: string) {
+        const topDir = path.dirname(__dirname);
+        const nodeModules = path.join(topDir, "node_modules");
+        // don't know what yarn adds that isnt in the node_modules directory traditionally
+        const exclude = [".bin", ".pnpm", ".modules.yaml"];
+        const list = fs.readdirSync(nodeModules).filter((v) => !exclude.some((b) => v.endsWith(b)));
+        return list;
+        /*return new Promise<boolean>((resolve, reject) => {
             exec(`${this.managerDefs.list}`, (error, stdout) => {
                 if (error) {
                     reject(error);
@@ -59,6 +67,6 @@ export default class PackageManager {
 
                 resolve(isInstalled);
             });
-        });
+        });*/
     }
 }

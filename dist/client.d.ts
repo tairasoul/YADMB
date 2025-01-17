@@ -43,9 +43,13 @@ export type Command = {
         cache: Cache;
     }) => Promise<any>);
 };
+type Autocomplete = {
+    command: string;
+    execute: (interaction: oceanic.AutocompleteInteraction) => Promise<oceanic.AutocompleteChoice[]>;
+};
 interface MusicEvents extends oceanic.ClientEvents {
     "m_interactionCreate": [
-        interaction: oceanic.CommandInteraction,
+        interaction: oceanic.AnyInteractionGateway,
         info: {
             resolvers: ResolverUtils;
             guild: Guild;
@@ -64,6 +68,7 @@ export default class MusicClient extends Client {
         [id: string]: Guild;
     };
     commands: Collection<string, Command>;
+    autocomplete: Collection<string, (interaction: oceanic.AutocompleteInteraction) => Promise<oceanic.AutocompleteChoice[]>>;
     readonly addons: AddonInfo[];
     private resolvers;
     private addonCommands;
@@ -74,6 +79,8 @@ export default class MusicClient extends Client {
     registerAddons(): void;
     registerAddonCommands(): void;
     loadCommands(): Promise<void>;
+    loadAutocomplete(): Promise<void>;
+    addAutocomplete(autocomplete: Autocomplete): void;
     addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[] | undefined, callback: (interaction: oceanic.CommandInteraction, info: {
         resolvers: ResolverUtils;
         guild: Guild;
@@ -81,7 +88,6 @@ export default class MusicClient extends Client {
         cache: Cache;
     }) => any): void;
     registerCommands(): Promise<void>;
-    removeUnknownCommands(): Promise<void>;
     on<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this;
     off<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this;
     addGuild(guild: oceanic.Guild): void;

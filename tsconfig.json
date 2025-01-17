@@ -19,5 +19,5 @@
     "web-editor/*",
     "dist/*/*.d.ts",
     "play-dl/*"
-  ]
+  ],
 }

@@ -1,3 +1,4 @@
+import * as oceanic from "oceanic.js";
 import fs from "node:fs";
 import ResolverUtils from "./resolverUtils.js";
 import path from 'path';
@@ -14,6 +15,7 @@ import ms from "ms";
 export default class MusicClient extends Client {
     m_guilds;
     commands;
+    autocomplete;
     addons = [];
     resolvers = {
         songResolvers: [],
@@ -31,6 +33,7 @@ export default class MusicClient extends Client {
         super(options);
         this.m_guilds = {};
         this.commands = new Collection();
+        this.autocomplete = new Collection();
         this.rawCommands = [];
         this.cache_database = new Cache(options.database_path, options.database_expiry_time);
         const intervalMs = ms(options.database_cleanup_interval);
@@ -83,10 +86,21 @@ export default class MusicClient extends Client {
         }
     }
     async loadCommands() {
-        for (const command of fs.readdirSync(`${__dirname}/commands`)) {
+        // .filter for safety
+        for (const command of fs.readdirSync(`${__dirname}/commands`).filter((v) => v.endsWith(".js"))) {
             const cmd = await import(`file://${__dirname}/commands/${command}`).then(m => m.default);
             this.addCommand(cmd.name, cmd.description, cmd.options, cmd.callback);
         }
+    }
+    async loadAutocomplete() {
+        // .filter for safety
+        for (const autocom of fs.readdirSync(`${__dirname}/autocomplete`).filter((v) => v.endsWith(".js"))) {
+            const autocomplete = await import(`file://${__dirname}/autocomplete/${autocom}`).then(m => m.default);
+            this.addAutocomplete(autocomplete);
+        }
+    }
+    addAutocomplete(autocomplete) {
+        this.autocomplete.set(autocomplete.command, autocomplete.execute);
     }
     addCommand(name, description, options = [], callback) {
         const command = new builders.ApplicationCommandBuilder(1, name);
@@ -102,33 +116,29 @@ export default class MusicClient extends Client {
         this.rawCommands.push(toPush);
     }
     async registerCommands() {
+        const registered = [];
         for (const command of this.rawCommands) {
-            console.log(`creating global command ${command.data.name}`);
+            console.log(`registering global command ${command.data.name}`);
             this.commands.set(command.data.name, command);
-            try {
+            console.log(`registered global command ${command.data.name}`);
+            registered.push(command.data);
+            /*try {
                 // @ts-ignore
                 await this.application.createGlobalCommand(command.data);
             }
             catch {
                 console.log(`uh oh! encountered an error trying to create global command ${command.data.name}!\nretrying in 5 seconds.`);
-                await new Promise((resolve) => setTimeout(resolve, 5000));
+                await new Promise<void>((resolve) => setTimeout(resolve, 5000));
                 // @ts-ignore
                 await this.application.createGlobalCommand(command.data);
             }
             finally {
-                console.log(`created global command ${command.data.name}`);
-            }
+                console.log(`created global command ${command.data.name}`)
+            }*/
         }
-        this.editStatus("online", [{ name: (this.guilds.size).toString() + ' servers', type: 3 }]);
-    }
-    async removeUnknownCommands() {
-        for (const globalCommand of await this.application.getGlobalCommands()) {
-            if (!this.rawCommands.find((cmd) => cmd.data.name == globalCommand.name)) {
-                console.log(`command ${globalCommand.name} was not found in MusicClient.rawCommands, deleting.`);
-                await globalCommand.delete();
-                console.log(`deleted command ${globalCommand.name}`);
-            }
-        }
+        // @ts-ignore
+        await this.application.bulkEditGlobalCommands(registered);
+        this.editStatus("online", [{ name: `music in ${(this.guilds.size).toString()} servers`, type: oceanic.ActivityTypes.GAME }]);
     }
     on(event, listener) {
         if (event == "m_interactionCreate") {

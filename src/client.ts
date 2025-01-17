@@ -57,8 +57,13 @@ export type Command = {
     }) => Promise<any>)
 }
 
+type Autocomplete = {
+    command: string;
+    execute: (interaction: oceanic.AutocompleteInteraction) => Promise<oceanic.AutocompleteChoice[]>;
+}
+
 interface MusicEvents extends oceanic.ClientEvents {
-    "m_interactionCreate": [interaction: oceanic.CommandInteraction, info: {
+    "m_interactionCreate": [interaction: oceanic.AnyInteractionGateway, info: {
         resolvers: ResolverUtils, 
         guild: Guild, 
         client: MusicClient,
@@ -77,6 +82,7 @@ export default class MusicClient extends Client {
         [id: string]: Guild
     };
     public commands: Collection<string, Command>;
+    public autocomplete: Collection<string, (interaction: oceanic.AutocompleteInteraction) => Promise<oceanic.AutocompleteChoice[]>>;
     public readonly addons: AddonInfo[] = [];
     private resolvers: ResolverInformation = {
         songResolvers: [],
@@ -94,6 +100,7 @@ export default class MusicClient extends Client {
         super(options);
         this.m_guilds = {};
         this.commands = new Collection();
+        this.autocomplete = new Collection();
         this.rawCommands = [];
         this.cache_database = new Cache(options.database_path, options.database_expiry_time);
         
@@ -152,7 +159,8 @@ export default class MusicClient extends Client {
     }
 
     async loadCommands() {
-        for (const command of fs.readdirSync(`${__dirname}/commands`)) {
+        // .filter for safety
+        for (const command of fs.readdirSync(`${__dirname}/commands`).filter((v) => v.endsWith(".js"))) {
             const cmd: {
                 name: string;
                 description: string;
@@ -166,6 +174,18 @@ export default class MusicClient extends Client {
             } = await import(`file://${__dirname}/commands/${command}`).then(m => m.default);
             this.addCommand(cmd.name, cmd.description, cmd.options, cmd.callback);
         }
+    }
+
+    async loadAutocomplete() {
+        // .filter for safety
+        for (const autocom of fs.readdirSync(`${__dirname}/autocomplete`).filter((v) => v.endsWith(".js"))) {
+            const autocomplete: Autocomplete = await import(`file://${__dirname}/autocomplete/${autocom}`).then(m => m.default);
+            this.addAutocomplete(autocomplete);
+        }
+    }
+
+    addAutocomplete(autocomplete: Autocomplete) {
+        this.autocomplete.set(autocomplete.command, autocomplete.execute);
     }
 
     addCommand(name: string, description: string, options: oceanic.ApplicationCommandOptions[] = [], callback: (interaction: oceanic.CommandInteraction, info: {
@@ -188,10 +208,13 @@ export default class MusicClient extends Client {
     }
 
     async registerCommands() {
+        const registered: builders.ApplicationCommandBuilder<oceanic.ApplicationCommandTypes> [] = [];
         for (const command of this.rawCommands) {
-            console.log(`creating global command ${command.data.name}`);
+            console.log(`registering global command ${command.data.name}`);
             this.commands.set(command.data.name, command);
-            try {
+            console.log(`registered global command ${command.data.name}`);
+            registered.push(command.data);
+            /*try {
                 // @ts-ignore
                 await this.application.createGlobalCommand(command.data);
             }
@@ -203,26 +226,18 @@ export default class MusicClient extends Client {
             }
             finally {
                 console.log(`created global command ${command.data.name}`)
-            }
+            }*/
         }
-        this.editStatus("online", [{name: (this.guilds.size).toString() + ' servers', type: 3}]);
-    }
-
-    async removeUnknownCommands() {
-        for (const globalCommand of await this.application.getGlobalCommands()) {
-            if (!this.rawCommands.find((cmd) => cmd.data.name == globalCommand.name)) {
-                console.log(`command ${globalCommand.name} was not found in MusicClient.rawCommands, deleting.`)
-                await globalCommand.delete();
-                console.log(`deleted command ${globalCommand.name}`);
-            }
-        }
+        // @ts-ignore
+        await this.application.bulkEditGlobalCommands(registered);
+        this.editStatus("online", [{name: `music in ${(this.guilds.size).toString()} servers`, type: oceanic.ActivityTypes.GAME}]);
     }
 
     on<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this {
         if (event == "m_interactionCreate") {
             super.on("interactionCreate", (interaction) => 
                 // @ts-ignore
-                listener(interaction as oceanic.CommandInteraction, {
+                listener(interaction, {
                     resolvers: new ResolverUtils(this.resolvers), 
                     guild: this.m_guilds[interaction.guildID as string],
                     client: this,
@@ -241,7 +256,7 @@ export default class MusicClient extends Client {
         if (event == "m_interactionCreate") {
             super.off("interactionCreate", (interaction) => 
                 // @ts-ignore
-                listener(interaction as oceanic.CommandInteraction, {
+                listener(interaction, {
                     resolvers: new ResolverUtils(this.resolvers), 
                     guild: this.m_guilds[interaction.guildID as string],
                     client: this,
