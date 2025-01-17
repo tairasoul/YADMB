@@ -14,7 +14,7 @@ You can use [this template](https://github.com/tairasoul/yadmb-addon-template) a
 
 ## Resolver types
 
-Addons have 7 types of resolvers, those being:
+Addons have 6 types of resolvers, those being:
 
 ### Audio resolvers
 
