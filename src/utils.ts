@@ -57,20 +57,16 @@ export function shuffleArray(array: any[]) {
 }
 
 export function ComponentCallback(id: string, interaction: oceanic.CommandInteraction, callback: (i: oceanic.CommandInteraction) => Promise<void>, client: Client, timeoutOptions: {ms: number, callback: (interaction: oceanic.CommandInteraction) => Promise<void>}) {
-    client.on('interactionCreate', async i => {
+    const func = async (i: oceanic.AnyInteractionGateway) => {
         /** @ts-ignore */
         if (i?.customId === undefined || i?.customId != id) return
         /** @ts-ignore */
         await callback(i)
-    })
+    }
+    client.on('interactionCreate', func)
     if (timeoutOptions && timeoutOptions.ms) {
         setTimeout(async () => {
-            client.removeListener('interactionCreate', async i => {
-                /** @ts-ignore */
-                if (i?.customId === undefined || i?.customId != id) return
-                /** @ts-ignore */
-                await callback(i)
-            })
+            client.removeListener('interactionCreate', func)
             await timeoutOptions.callback(interaction)
         }, timeoutOptions.ms)
     }

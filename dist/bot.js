@@ -1,11 +1,10 @@
 import fs from "node:fs";
 import path from 'path';
 import { fileURLToPath } from 'url';
+import * as oceanic from 'oceanic.js';
 import MusicClient from './client.js';
 import addonLoader from "./addonLoader.js";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-import { startWebFunctions } from "./web.fsapi.js";
-import web from "./web.command.js";
+export const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`))
     debug = true;
@@ -14,11 +13,10 @@ export function debugLog(text) {
         console.log(text);
 }
 let setup = false;
-const { token, web_features, package_manager, cache_path, expiry_time, check_interval } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+const { token, package_manager, cache_path, expiry_time, check_interval } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 const defs = {
     install: package_manager.install.trim(),
-    uninstall: package_manager.uninstall.trim(),
-    list: package_manager.list.trim()
+    uninstall: package_manager.uninstall.trim()
 };
 const client = new MusicClient({
     auth: token,
@@ -42,10 +40,10 @@ const client = new MusicClient({
     database_expiry_time: expiry_time ?? "3d",
     database_cleanup_interval: check_interval ?? "1m"
 });
-if (web_features) {
+/*if (web_features) {
     startWebFunctions();
-    client.addCommand(web.data.name, web.data.description, [], web.execute);
-}
+    client.addCommand(web.data.name, web.data.description as string, [], web.execute);
+}*/
 const loader = new addonLoader(client, defs);
 client.on('voiceStateUpdate', (oldState, newState) => {
     const guild = client.m_guilds[oldState.guildID];
@@ -84,9 +82,10 @@ client.on('error', (error) => {
 });
 client.on("ready", async () => {
     if (setup)
-        return console.log("why is it emitting ready again?");
+        return console.log("why is it emitting ready again? wtf man");
     await loader.readAddons();
     loader.loadAddons();
+    await client.loadAutocomplete();
     await client.loadCommands();
     loader.registerAddons();
     client.registerAddonCommands();
@@ -96,14 +95,22 @@ client.on("ready", async () => {
     }
     console.log("registering commands");
     await client.registerCommands();
-    console.log("removing commands unknown to this client");
-    await client.removeUnknownCommands();
     console.log("setup done");
     setup = true;
 });
 client.on("guildCreate", (guild) => client.addGuild(guild));
 client.on("guildDelete", (guild) => client.removeGuild(guild));
 client.on("m_interactionCreate", async (interaction, info) => {
+    if (interaction.type == oceanic.InteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE) {
+        const autocomplete = client.autocomplete.get(interaction.data.name);
+        if (!autocomplete)
+            return;
+        const results = await autocomplete(interaction);
+        await interaction.result(results);
+        return;
+    }
+    if (interaction.type != oceanic.InteractionTypes.APPLICATION_COMMAND)
+        return;
     const command = client.commands.get(interaction.data.name);
     if (!command) {
         return;

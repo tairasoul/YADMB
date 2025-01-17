@@ -70,6 +70,7 @@ export default class Cache {
     async removeInvalidFromTable(service) {
         const time = Date.now();
         const res = await this.database(service).where("expires", "<", time).del();
+        console.log(res);
     }
     async removeInvalidFromAllTables() {
         const tables = await this.getAllTables();

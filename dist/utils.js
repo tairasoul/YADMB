@@ -47,22 +47,17 @@ export function shuffleArray(array) {
     }
 }
 export function ComponentCallback(id, interaction, callback, client, timeoutOptions) {
-    client.on('interactionCreate', async (i) => {
+    const func = async (i) => {
         /** @ts-ignore */
         if (i?.customId === undefined || i?.customId != id)
             return;
         /** @ts-ignore */
         await callback(i);
-    });
+    };
+    client.on('interactionCreate', func);
     if (timeoutOptions && timeoutOptions.ms) {
         setTimeout(async () => {
-            client.removeListener('interactionCreate', async (i) => {
-                /** @ts-ignore */
-                if (i?.customId === undefined || i?.customId != id)
-                    return;
-                /** @ts-ignore */
-                await callback(i);
-            });
+            client.removeListener('interactionCreate', func);
             await timeoutOptions.callback(interaction);
         }, timeoutOptions.ms);
     }

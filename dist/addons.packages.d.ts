@@ -11,5 +11,5 @@ export default class AddonPackages {
     saveList(): void;
     checkPackages(): Promise<void>;
     addPackage(dependent: string, pkg: string): Promise<void>;
-    checkPackage(pkg: string): Promise<boolean>;
+    checkPackage(pkg: string): Promise<string[]>;
 }

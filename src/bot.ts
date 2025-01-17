@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import * as oceanic from 'oceanic.js';
 import MusicClient from './client.js';
 import addonLoader from "./addonLoader.js";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
+export const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 import * as voice from "@discordjs/voice";
 import { managerDefs } from "./package.manager.js";
 let debug = false;
@@ -20,8 +20,7 @@ const { token, package_manager, cache_path, expiry_time, check_interval } = JSON
 
 const defs: managerDefs = {
     install: package_manager.install.trim(),
-    uninstall: package_manager.uninstall.trim(),
-    list: package_manager.list.trim()
+    uninstall: package_manager.uninstall.trim()
 }
 
 const client = new MusicClient({
@@ -91,9 +90,10 @@ client.on('error', (error) => {
 })
 
 client.on("ready", async () => {
-    if (setup) return console.log("why is it emitting ready again?");
+    if (setup) return console.log("why is it emitting ready again? wtf man");
     await loader.readAddons();
     loader.loadAddons();
+    await client.loadAutocomplete();
     await client.loadCommands();
     loader.registerAddons();
     client.registerAddonCommands();
@@ -103,8 +103,6 @@ client.on("ready", async () => {
     }
     console.log("registering commands");
     await client.registerCommands();
-    console.log("removing commands unknown to this client");
-    await client.removeUnknownCommands();
     console.log("setup done");
     setup = true;
 })
@@ -114,6 +112,16 @@ client.on("guildCreate", (guild) => client.addGuild(guild))
 client.on("guildDelete", (guild) => client.removeGuild(guild as oceanic.Guild))
 
 client.on("m_interactionCreate", async (interaction, info) => {
+    if (interaction.type == oceanic.InteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE) {
+        const autocomplete = client.autocomplete.get(interaction.data.name);
+        if (!autocomplete)
+            return;
+        const results = await autocomplete(interaction);
+        await interaction.result(results);
+        return;
+    }
+    if (interaction.type != oceanic.InteractionTypes.APPLICATION_COMMAND)
+        return;
     const command = client.commands.get(interaction.data.name);
     if (!command) {
         return;
