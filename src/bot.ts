@@ -90,7 +90,7 @@ client.on('error', (error) => {
 })
 
 client.on("ready", async () => {
-    if (setup) return console.log("why is it emitting ready again? wtf man");
+    if (setup) return;
     await loader.readAddons();
     loader.loadAddons();
     await client.loadAutocomplete();

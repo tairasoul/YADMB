@@ -14,7 +14,7 @@ export default {
         }
         else {
             const embed = new builders.EmbedBuilder();
-            embed.setDescription("I am not in a VC.");
+            embed.setDescription("Not in a VC.");
             await interaction.editOriginal({ embeds: [embed.toJSON()] });
         }
     }

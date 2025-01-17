@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { debugLog } from "./bot.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-const packageExclusions = ["@discordjs/voice", "@distube/ytdl-core", "@oceanicjs/builders", "express", "humanize-duration", "js-base64", "libsodium-wrappers", "lzwcompress", "oceanic.js", "opusscript", "play-dl", "randomstring", "ws", "ytpl"];
+const packageExclusions = ["@discordjs/voice", "@distube/ytdl-core", "@oceanicjs/builders", "express", "humanize-duration", "js-base64", "libsodium-wrappers", "lzwcompress", "oceanic.js", "opusscript", "play-dl", "randomstring", "ytpl"];
 export default class AddonPackages {
     manager;
     installedPath = `${path.join(__dirname, "..")}/modules.json`;
@@ -39,8 +39,8 @@ export default class AddonPackages {
         this.list[pkg].push(dependent);
         await this.manager.getPackage(pkg);
     }
-    async checkPackage(pkg) {
+    checkPackage(pkg) {
         this.checked.push(pkg);
-        return await this.manager.isPackageInstalled(pkg);
+        return this.manager.isPackageInstalled(pkg);
     }
 }

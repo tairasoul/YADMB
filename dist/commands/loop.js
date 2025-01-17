@@ -15,16 +15,16 @@ export default {
             description: "What do you want to loop?",
             choices: [
                 {
-                    name: "none", value: "none"
+                    name: "No looping.", value: "none"
                 },
                 {
-                    name: "song", value: "song"
+                    name: "The current song.", value: "song"
                 },
                 {
-                    name: "playlist", value: "playlist"
+                    name: "The current playlist.", value: "playlist"
                 },
                 {
-                    name: "queue", value: "queue"
+                    name: "The entire queue.", value: "queue"
                 }
             ],
             required: true

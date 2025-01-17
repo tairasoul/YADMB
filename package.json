@@ -15,18 +15,14 @@
     "oceanic.js": "^1.11.2",
     "opusscript": "^0.1.1",
     "play-dl": "file:./play-dl",
-    "randomstring": "^1.3.0",
-    "ws": "^8.16.0"
+    "randomstring": "^1.3.0"
   },
   "type": "module",
   "scripts": {
-    "build": "npm run build_bot && npm run build_base_addons && npm run build_web",
+    "build": "npm run build_bot && npm run build_base_addons",
     "build_base": "npm run build_bot && npm run build_base_addons",
     "build_bot": "rm -r dist && tsc && cd dist/commands  && rm *.d.ts",
     "build_base_addons": "cd addons/base && tsc",
-    "build_web": "npm run build_web_base && npm run build_web_addons",
-    "build_web_base": "cd web-editor/code && rm -r dist && tsc",
-    "build_web_addons": "cd web-editor/addons/base && tsc",
     "run_debug": "echo > enableDebugging && node dist/bot",
     "setup-npm": "npm i && cd play-dl && npm i",
     "setup-pnpm": "pnpm i && cd play-dl && pnpm i"

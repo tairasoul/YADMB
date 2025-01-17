@@ -9,7 +9,7 @@ export type PackageList = {
     [key: string]: string[];
 }
 
-const packageExclusions = ["@discordjs/voice", "@distube/ytdl-core", "@oceanicjs/builders", "express", "humanize-duration", "js-base64", "libsodium-wrappers", "lzwcompress", "oceanic.js", "opusscript", "play-dl", "randomstring", "ws", "ytpl"];
+const packageExclusions = ["@discordjs/voice", "@distube/ytdl-core", "@oceanicjs/builders", "express", "humanize-duration", "js-base64", "libsodium-wrappers", "lzwcompress", "oceanic.js", "opusscript", "play-dl", "randomstring", "ytpl"];
 
 export default class AddonPackages {
     private manager: PackageManager;
@@ -50,8 +50,8 @@ export default class AddonPackages {
         await this.manager.getPackage(pkg);
     }
 
-    async checkPackage(pkg: string) {
+    checkPackage(pkg: string) {
         this.checked.push(pkg);
-        return await this.manager.isPackageInstalled(pkg);
+        return this.manager.isPackageInstalled(pkg);
     }
 }
