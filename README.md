@@ -41,13 +41,9 @@ the template config looks like this:
 ```json
 {
   "token": "Bot your-token",
-  "web_features": false,
-  "web_editor_port": 5500,
-  "web_editor_link": "url-anyone-can-access",
   "package_manager": {
     "install": "npm install",
-    "uninstall": "npm uninstall",
-    "list": "npm list"
+    "uninstall": "npm uninstall"
   },
   "cache_path": ":memory:",
   "expiry_time": "3d",
