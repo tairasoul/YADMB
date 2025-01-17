@@ -111,10 +111,10 @@ export default class MusicClient extends Client {
 
         this.setMaxListeners(0);
         this.on("guildCreate", () => {
-            this.editStatus("online", [{name: (this.guilds.size).toString() + ' servers', type: 3}]);
+            this.editStatus("online", [{name: `music in ${(this.guilds.size).toString()} servers.`, type: oceanic.ActivityTypes.GAME}]);
         })
         this.on("guildDelete", () => {
-            this.editStatus("online", [{name: (this.guilds.size).toString() + ' servers', type: 3}]);
+            this.editStatus("online", [{name: `music in ${(this.guilds.size).toString()} servers.`, type: oceanic.ActivityTypes.GAME}]);
         })
     }
 
@@ -230,7 +230,7 @@ export default class MusicClient extends Client {
         }
         // @ts-ignore
         await this.application.bulkEditGlobalCommands(registered);
-        this.editStatus("online", [{name: `music in ${(this.guilds.size).toString()} servers`, type: oceanic.ActivityTypes.GAME}]);
+        this.editStatus("online", [{name: `music in ${(this.guilds.size).toString()} servers.`, type: oceanic.ActivityTypes.GAME}]);
     }
 
     on<K extends keyof MusicEvents>(event: K, listener: (...args: MusicEvents[K]) => void): this {
