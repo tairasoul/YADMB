@@ -30,7 +30,6 @@ export default class MusicClient extends Client {
     addonCommands = [];
     rawCommands;
     cache_database;
-    // use for this property has yet to be determined, class acts on its own as of now
     proxyCycle;
     constructor(options) {
         super(options);
@@ -152,7 +151,8 @@ export default class MusicClient extends Client {
                 resolvers: new ResolverUtils(this.resolvers),
                 guild: this.m_guilds.get(interaction.guildID),
                 client: this,
-                cache: this.cache_database
+                cache: this.cache_database,
+                proxyInfo: this.proxyCycle?.activeProxy
             }));
         }
         else {
@@ -169,7 +169,8 @@ export default class MusicClient extends Client {
                 resolvers: new ResolverUtils(this.resolvers),
                 guild: this.m_guilds.get(interaction.guildID),
                 client: this,
-                cache: this.cache_database
+                cache: this.cache_database,
+                proxyInfo: this.proxyCycle?.activeProxy
             }));
         }
         else {
@@ -204,7 +205,7 @@ export default class MusicClient extends Client {
                     debugLog("logging queue's next track & index");
                     debugLog(util.inspect(cg.queue.tracks, false, 3, true));
                     debugLog(cg.queue.internalCurrentIndex);
-                    cg.queue.play(new ResolverUtils(this.resolvers));
+                    cg.queue.play(new ResolverUtils(this.resolvers), this.proxyCycle?.activeProxy);
                 }
                 else {
                     cg.queue.currentInfo = null;

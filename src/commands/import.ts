@@ -5,6 +5,7 @@ import * as builders from "@oceanicjs/builders";
 import * as voice from "@discordjs/voice";
 import ResolverUtils from "../classes/resolverUtils.js";
 import { debugLog } from "../bot.js";
+import { Proxy } from "../types/proxyTypes.js";
 
 export default {
     name: "import",
@@ -20,7 +21,8 @@ export default {
     callback: async (interaction: oceanic.CommandInteraction, info: {
         resolvers: ResolverUtils, 
         guild: Guild, 
-        cache: Cache
+        cache: Cache,
+        proxyInfo: Proxy |  undefined
     }) => {
         await interaction.defer()
         const queue = info.guild.queue;
@@ -45,6 +47,6 @@ export default {
         const embed = new builders.EmbedBuilder();
         embed.setDescription(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"} from ${encoded.filename}`);
         await interaction.editOriginal({embeds: [embed.toJSON()]});
-        if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers);
+        if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers, info.proxyInfo);
     }
 }

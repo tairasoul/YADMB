@@ -14,6 +14,7 @@ import { debugLog } from "../bot.js";
 import Cache from "./cache.js";
 import ms from "ms";
 import ProxyHandler from "./proxyCycle.js";
+import { Proxy } from "../types/proxyTypes.js";
 
 export type track = {
     name: string;
@@ -54,7 +55,8 @@ export type Command = {
         resolvers: ResolverUtils, 
         guild: Guild, 
         client: MusicClient,
-        cache: Cache
+        cache: Cache,
+        proxyInfo: Proxy | undefined
     }) => Promise<any>)
 }
 
@@ -68,7 +70,8 @@ interface MusicEvents extends oceanic.ClientEvents {
         resolvers: ResolverUtils, 
         guild: Guild, 
         client: MusicClient,
-        cache: Cache
+        cache: Cache,
+        proxyInfo: Proxy | undefined
     }];
 }
 
@@ -98,7 +101,6 @@ export default class MusicClient extends Client {
     private addonCommands: command[] = [];
     private rawCommands: Command[];
     private cache_database: Cache;
-    // use for this property has yet to be determined, class acts on its own as of now
     private proxyCycle: ProxyHandler | undefined;
     constructor(options: MClientOptions) {
         super(options);
@@ -246,7 +248,8 @@ export default class MusicClient extends Client {
                     resolvers: new ResolverUtils(this.resolvers), 
                     guild: this.m_guilds.get(interaction.guildID as string),
                     client: this,
-                    cache: this.cache_database
+                    cache: this.cache_database,
+                    proxyInfo: this.proxyCycle?.activeProxy
                 })
             )
         }
@@ -265,7 +268,8 @@ export default class MusicClient extends Client {
                     resolvers: new ResolverUtils(this.resolvers), 
                     guild: this.m_guilds.get(interaction.guildID as string),
                     client: this,
-                    cache: this.cache_database
+                    cache: this.cache_database,
+                    proxyInfo: this.proxyCycle?.activeProxy
                 })
             )
         }
@@ -305,7 +309,7 @@ export default class MusicClient extends Client {
                     debugLog("logging queue's next track & index");
                     debugLog(util.inspect(cg.queue.tracks, false, 3, true))
                     debugLog(cg.queue.internalCurrentIndex)
-                    cg.queue.play(new ResolverUtils(this.resolvers));
+                    cg.queue.play(new ResolverUtils(this.resolvers), this.proxyCycle?.activeProxy);
                 }
                 else {
                     cg.queue.currentInfo = null;

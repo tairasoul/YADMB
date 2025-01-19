@@ -9,6 +9,7 @@ import util from "util";
 import ResolverUtils from "../classes/resolverUtils.js";
 import { debugLog } from "../bot.js";
 import Cache from "../classes/cache.js";
+import { Proxy } from "../types/proxyTypes.js";
 
 export default {
     name: "search",
@@ -26,7 +27,8 @@ export default {
         resolvers: ResolverUtils, 
         guild: Guild, 
         client: MusicClient,
-        cache: Cache
+        cache: Cache,
+        proxyInfo: Proxy |  undefined
     }) => {
         await interaction.defer();
         const term = interaction.data.options.getString('term', true);
@@ -129,7 +131,7 @@ export default {
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].trackNumber: ${cst}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].tracks[cst]: ${util.inspect(st, false, 5, true)}`)
-            if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers);
+            if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers, info.proxyInfo);
         }
         // play video next
         //@ts-ignore

@@ -6,6 +6,7 @@ import voice from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
 import { AddonInfo, AudioResolver, PagerResolver, dataResolver, playlistResolver, resolver, thumbnailResolver } from "../types/addonTypes.js";
 import Cache from "./cache.js";
+import { Proxy } from "../types/proxyTypes.js";
 export type track = {
     name: string;
     url: string;
@@ -41,6 +42,7 @@ export type Command = {
         guild: Guild;
         client: MusicClient;
         cache: Cache;
+        proxyInfo: Proxy | undefined;
     }) => Promise<any>);
 };
 type Autocomplete = {
@@ -55,6 +57,7 @@ interface MusicEvents extends oceanic.ClientEvents {
             guild: Guild;
             client: MusicClient;
             cache: Cache;
+            proxyInfo: Proxy | undefined;
         }
     ];
 }

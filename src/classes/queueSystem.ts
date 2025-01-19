@@ -5,6 +5,8 @@ import { queuedTrack, loopType } from "./client.js";
 import { infoData } from "../types/addonTypes.js";
 import ResolverUtils from "./resolverUtils.js";
 import { debugLog } from "../bot.js";
+import { Proxy } from "../types/proxyTypes.js";
+
 export default class QueueHandler {
     public tracks: queuedTrack[] = [];
     private internalLoop: loopType = "none";
@@ -108,7 +110,7 @@ export default class QueueHandler {
         return this.audioPlayer.unpause();
     }
 
-    async play(resolvers: ResolverUtils) {
+    async play(resolvers: ResolverUtils, proxyInfo: Proxy | undefined) {
         const currentInternal = this.tracks[this.internalCurrentIndex];
         debugLog("logging queue.play() debug info");
         debugLog(util.inspect(currentInternal, false, 5, true));
@@ -119,7 +121,7 @@ export default class QueueHandler {
         const audioResolvers = await resolvers.getAudioResolvers(currentURL);
         let audioResource;
         for (const resolver of audioResolvers) {
-            const output = await resolver.resolve(currentURL);
+            const output = await resolver.resolve(currentURL, proxyInfo);
             if (output) {
                 audioResource = output;
                 break;
