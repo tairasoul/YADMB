@@ -19,13 +19,11 @@ export const base = {
     },
     priority: 0,
     async resolve(url, cache, proxyInfo, forceInvalidation) {
+        console.log(proxyInfo?.url);
         const provider = getProvider(url);
         return new Promise(async (resolve) => {
             switch (provider) {
                 case "youtube":
-                    let agent;
-                    if (proxyInfo)
-                        agent = ytdl.createProxyAgent({ uri: proxyInfo.url, token: proxyInfo.auth });
                     if (!ytdl.validateURL(url)) {
                         resolve("Invalid URL!");
                     }
@@ -41,7 +39,7 @@ export const base = {
                         });
                         break;
                     }
-                    const info = await ytdl.getBasicInfo(url, { agent });
+                    const info = await ytdl.getBasicInfo(url);
                     const title = info.videoDetails.title;
                     await cache.cache("youtube-song-data", {
                         title: info.videoDetails.title,

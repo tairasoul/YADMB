@@ -11,12 +11,9 @@ export const youtube = {
         return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/,/https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined;
     },
     async resolve(url: string, proxyInfo: Proxy | undefined) {
-        let agent;
-        if (proxyInfo)
-            agent = ytdl.createProxyAgent({ uri: proxyInfo.url, token: proxyInfo.auth})
-        const info = await ytdl.getInfo(url, { agent });
+        const info = await ytdl.getInfo(url);
         console.log("info available");
-        const stream = ytdl(url, { agent });
+        const stream = ytdl(url);
         stream.on("data", () => console.log("stream received data"));
         console.log("waiting for stream to be readable");
         await new Promise<void>((resolve) => stream.on("readable", resolve))
