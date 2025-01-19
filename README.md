@@ -70,6 +70,12 @@ proxy - for the proxying system. enableProxies determines if we use a proxy, cyc
 
 # proxies
 
+## !! WARNING
+
+## Proxies should be functional, but are untested.
+
+## SOCKS5/4 proxies are unsupported, only use HTTPS proxies.
+
 proxies are formatted as follows
 
 ```json

@@ -4,6 +4,6 @@ export default class ProxyHandler {
     private proxyIndex;
     activeProxy: Proxy;
     constructor(cycleInterval: number, cycle: boolean);
-    cycleProxy(): Promise<void>;
+    cycleProxy(): void;
     ReadProxies(): void;
 }
