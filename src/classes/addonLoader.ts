@@ -5,7 +5,8 @@ import { AddonInfo } from "../types/addonTypes.js";
 import { managerDefs } from "./package.manager.js";
 import AddonPackages from "./addons.packages.js";
 import path from "path";
-import { __dirname } from "../bot.js";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 
 function isExcluded(filePath: string, exclusionList: string[]) {
     return exclusionList.some(exclusion => {
@@ -20,7 +21,7 @@ function isExcluded(filePath: string, exclusionList: string[]) {
     });
 }
 
-const addonDir = path.join(`${__dirname}`, "..", "addons");
+const addonDir = path.join(`${__dirname}`, "..", "..", "addons");
 
 export default class addonLoader {
     private _client: MusicClient;

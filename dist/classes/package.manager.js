@@ -1,7 +1,8 @@
 import { exec } from "child_process";
 import path from "path";
-import { __dirname } from "../bot.js";
 import fs from "fs";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 export default class PackageManager {
     managerDefs;
     constructor(defs) {
@@ -31,7 +32,7 @@ export default class PackageManager {
     }
     isPackageInstalled(_package) {
         const topDir = path.dirname(__dirname);
-        const nodeModules = path.join(topDir, "node_modules");
+        const nodeModules = path.join(topDir, "..", "node_modules");
         // don't know what yarn adds that isnt in the node_modules directory traditionally
         const exclude = [".bin", ".pnpm", ".modules.yaml"];
         const list = fs.readdirSync(nodeModules).filter((v) => !exclude.some((b) => v.endsWith(b)));
