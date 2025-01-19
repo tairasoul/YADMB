@@ -15,7 +15,7 @@ export const youtube: PagerResolver = {
     async queuedPager(track, index, cache, proxyInfo, forceInvalidation) {
         let agent;
         if (proxyInfo)
-            agent = ytdl.createProxyAgent({ uri: proxyInfo.url, token: proxyInfo.auth})
+            agent = ytdl.createProxyAgent({ uri: `http://${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}`})
         const embed = new builders.EmbedBuilder();
         embed.setTitle(track.name);
         const url = new URL(track.tracks[0].url);
@@ -68,7 +68,7 @@ export const youtube: PagerResolver = {
     async trackPager(track, index, cache, proxyInfo, forceInvalidation) {
         let agent;
         if (proxyInfo)
-            agent = ytdl.createProxyAgent({ uri: proxyInfo.url, token: proxyInfo.auth})
+            agent = ytdl.createProxyAgent({ uri: `http://${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}`})
         const embed = new builders.EmbedBuilder();
         embed.setTitle(track.name);
         const url = new URL(track.url);
