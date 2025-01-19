@@ -284,6 +284,19 @@ export type infoData = {
     durationInMs: number;
 }
 
+const convertSameSite = (sameSite: any) => {
+    switch (sameSite) {
+      case "strict":
+        return "strict";
+      case "lax":
+        return "lax";
+      case "no_restriction":
+      case "unspecified":
+      default:
+        return "none";
+    }
+};
+
 const convertCookie = (cookie: any) =>
     cookie instanceof Cookie
       ? cookie
@@ -342,7 +355,4 @@ export function createSocksProxy(options: ProxyAgent.Options, cookies = []) {
   
     return { dispatcher, agent, jar, localAddress: options.localAddress };
 };
-function convertSameSite(sameSite: any): string | undefined {
-    throw new Error("Function not implemented.");
-}
 
