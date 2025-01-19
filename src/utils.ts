@@ -3,15 +3,15 @@ import * as oceanic from 'oceanic.js';
 import { Client } from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 import { Base64 as base64 } from "js-base64";
-import { InfoData } from "play-dl";
 import { queuedTrack, track } from './classes/client.js';
 import { debugLog } from './bot.js';
 import ResolverUtils from './classes/resolverUtils.js';
 import { PageData } from './types/addonTypes.js';
 import Cache from './classes/cache.js';
+import ytdl from '@distube/ytdl-core';
 
-export function getHighestResUrl(data: InfoData) {
-    const thumbnails = data.video_details.thumbnails;
+export function getHighestResUrl(data: ytdl.videoInfo) {
+    const thumbnails = data.videoDetails.thumbnails;
     let highestX = 0;
     let highestY = 0;
     let currentHighestUrl = "";

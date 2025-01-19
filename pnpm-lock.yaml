@@ -12,7 +12,7 @@ importers:
         specifier: ^0.17.0
         version: 0.17.0(opusscript@0.1.1)
       '@distube/ytdl-core':
-        specifier: ^4.13.3
+        specifier: ^4.15.8
         version: 4.15.8
       '@distube/ytpl':
         specifier: ^1.2.1
@@ -20,9 +20,6 @@ importers:
       '@oceanicjs/builders':
         specifier: ^1.1.11
         version: 1.1.11(oceanic.js@1.11.2(opusscript@0.1.1))
-      '@types/global-tunnel-ng':
-        specifier: ^2.1.4
-        version: 2.1.4
       better-sqlite3:
         specifier: ^11.7.2
         version: 11.7.2
@@ -69,6 +66,9 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
+      '@types/global-tunnel-ng':
+        specifier: ^2.1.4
+        version: 2.1.4
       '@types/humanize-duration':
         specifier: ^3.27.4
         version: 3.27.4

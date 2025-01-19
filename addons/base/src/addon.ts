@@ -1,4 +1,4 @@
-import { AddonInfo } from "../../../dist/addonTypes.js";
+import { AddonInfo } from "../../../dist/types/addonTypes.js";
 import { youtube as yAudio, soundcloud as sAudio } from "./resolvers/audio.js";
 import { youtube as yName, soundcloud as sName, deezer as dName} from "./resolvers/name.js";
 import { youtube as yPager, soundcloud as sPager } from "./resolvers/pagers.js";
