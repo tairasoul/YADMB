@@ -8,13 +8,13 @@ import ResolverUtils from "../classes/resolverUtils.js";
 import { debugLog } from "../bot.js";
 import Cache from "../classes/cache.js";
 
-playdl.getFreeClientID().then((val) => 
+/*playdl.getFreeClientID().then((val) => 
     playdl.setToken({
         soundcloud: {
             client_id: val
         }
     })
-)
+)*/
 
 export default {
     name: "add-url",
