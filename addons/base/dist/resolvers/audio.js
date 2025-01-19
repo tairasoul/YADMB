@@ -11,6 +11,7 @@ export const youtube = {
     async resolve(url) {
         const info = await ytdl.getInfo(url);
         const stream = ytdl(url);
+        await new Promise((resolve) => stream.on("end", resolve));
         //const info = await playdl.video_info(url);
         //const stream = await playdl.stream_from_info(info, { discordPlayerCompatibility: true });
         const resource = createAudioResource(stream, {
