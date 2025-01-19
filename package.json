@@ -25,8 +25,8 @@
     "build_bot": "rm -r dist && tsc && cd dist/commands  && rm *.d.ts",
     "build_base_addons": "cd addons/base && tsc",
     "run_debug": "echo > enableDebugging && node dist/bot",
-    "setup-npm": "npm i && cd play-dl && npm i",
-    "setup-pnpm": "pnpm i && cd play-dl && pnpm i"
+    "setup-npm": "npm i && cd play-dl && npm i --force && npm run build",
+    "setup-pnpm": "pnpm i && cd play-dl && pnpm i --force && npm run build"
   },
   "devDependencies": {
     "@types/base-64": "^1.0.2",
