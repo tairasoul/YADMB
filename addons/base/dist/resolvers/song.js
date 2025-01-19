@@ -1,3 +1,4 @@
+import { createSocksProxy } from "../../../../dist/types/addonTypes.js";
 import playdl from "play-dl";
 import ytdl from "@distube/ytdl-core";
 function getProvider(url) {
@@ -25,7 +26,7 @@ export const base = {
                 case "youtube":
                     let agent;
                     if (proxyInfo)
-                        agent = ytdl.createProxyAgent({ uri: `http://${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}` });
+                        agent = createSocksProxy({ uri: `socks4://${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}` });
                     if (!ytdl.validateURL(url)) {
                         resolve("Invalid URL!");
                     }
