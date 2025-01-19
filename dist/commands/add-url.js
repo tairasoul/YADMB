@@ -1,14 +1,15 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import playdl from "play-dl";
 import util from "util";
 import * as voice from "@discordjs/voice";
 import { debugLog } from "../bot.js";
-playdl.getFreeClientID().then((val) => playdl.setToken({
-    soundcloud: {
-        client_id: val
-    }
-}));
+/*playdl.getFreeClientID().then((val) =>
+    playdl.setToken({
+        soundcloud: {
+            client_id: val
+        }
+    })
+)*/
 export default {
     name: "add-url",
     description: "Add a link to the queue.",
