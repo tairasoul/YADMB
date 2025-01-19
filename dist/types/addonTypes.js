@@ -2,6 +2,18 @@ import { ProxyAgent } from "undici";
 import { canonicalDomain, Cookie, CookieJar } from "tough-cookie";
 import { CookieClient } from "http-cookie-agent/undici";
 import { SocksProxyAgent } from "socks-proxy-agent";
+const convertSameSite = (sameSite) => {
+    switch (sameSite) {
+        case "strict":
+            return "strict";
+        case "lax":
+            return "lax";
+        case "no_restriction":
+        case "unspecified":
+        default:
+            return "none";
+    }
+};
 const convertCookie = (cookie) => cookie instanceof Cookie
     ? cookie
     : new Cookie({
@@ -56,6 +68,3 @@ export function createSocksProxy(options, cookies = []) {
     return { dispatcher, agent, jar, localAddress: options.localAddress };
 }
 ;
-function convertSameSite(sameSite) {
-    throw new Error("Function not implemented.");
-}
