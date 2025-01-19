@@ -10,9 +10,11 @@ export const youtube = {
     },
     async resolve(url, proxyInfo) {
         let agent;
+        console.log("creating agent");
         if (proxyInfo)
             agent = ytdl.createProxyAgent({ uri: `http://${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}` });
-        const info = await ytdl.getInfo(url, { agent });
+        console.log("created agent, getting info");
+        const info = await ytdl.getBasicInfo(url, { agent });
         console.log("info available");
         const stream = ytdl(url, { agent });
         stream.on("data", () => console.log("stream received data"));
