@@ -41,7 +41,7 @@ export default {
             embed.setDescription(string);
             await interaction.editOriginal({ embeds: [embed.toJSON()] });
             if (qt.length > 0) {
-                await queue.play(info.resolvers);
+                await queue.play(info.resolvers, info.proxyInfo);
             }
         }
     }

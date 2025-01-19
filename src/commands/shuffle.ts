@@ -3,6 +3,7 @@ import * as builders from "@oceanicjs/builders";
 import { Guild } from "../classes/client.js";
 import utils from "../utils.js";
 import ResolverUtils from "../classes/resolverUtils.js";
+import { Proxy } from "../types/proxyTypes.js";
 
 export default {
     name: "shuffle",
@@ -31,7 +32,8 @@ export default {
     ],
     callback: async (interaction: oceanic.CommandInteraction, info: {
         resolvers: ResolverUtils, 
-        guild: Guild
+        guild: Guild,
+        proxyInfo: Proxy |  undefined
     }) => {
         await interaction.defer();
         const shuffleType = interaction.data.options.getString("type", true);
@@ -72,6 +74,6 @@ export default {
         const embed = new builders.EmbedBuilder();
         embed.setDescription(`Shuffled queue, now playing ${queue.tracks[queue.internalCurrentIndex].tracks[0].name}.`);
         await interaction.editOriginal({embeds: [embed.toJSON()]});
-        await queue.play(info.resolvers);
+        await queue.play(info.resolvers, info.proxyInfo);
     }
 }

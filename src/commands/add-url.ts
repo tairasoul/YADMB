@@ -7,6 +7,7 @@ import * as voice from "@discordjs/voice";
 import ResolverUtils from "../classes/resolverUtils.js";
 import { debugLog } from "../bot.js";
 import Cache from "../classes/cache.js";
+import { Proxy } from "../types/proxyTypes.js";
 
 /*playdl.getFreeClientID().then((val) => 
     playdl.setToken({
@@ -43,7 +44,8 @@ export default {
         resolvers: ResolverUtils, 
         guild: Guild, 
         client: MusicClient,
-        cache: Cache
+        cache: Cache,
+        proxyInfo: Proxy |  undefined
     }) => {
         await interaction.defer();
         const video = interaction.data.options.getString("link", true);
@@ -70,7 +72,7 @@ export default {
             const s_resolvers = await info.resolvers.getSongResolvers(video);
             let resolver;
             for (const s_res of s_resolvers) {
-                const output = await s_res.resolve(video, info.cache, forceInvalidation);
+                const output = await s_res.resolve(video, info.cache, info.proxyInfo, forceInvalidation);
                 if (output && typeof output != "string") {
                     resolver = output;
                     break;
@@ -122,7 +124,7 @@ export default {
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].trackNumber: ${cst}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].tracks[cst]: ${util.inspect(st, false, 5, true)}`)
-            if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers);
+            if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers, info.proxyInfo);
         }
     }
 }

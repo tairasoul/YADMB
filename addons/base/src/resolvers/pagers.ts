@@ -12,7 +12,10 @@ export const youtube: PagerResolver = {
     async available(url) {
         return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/,/https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined;
     },
-    async queuedPager(track, index, cache, forceInvalidation) {
+    async queuedPager(track, index, cache, proxyInfo, forceInvalidation) {
+        let agent;
+        if (proxyInfo)
+            agent = ytdl.createProxyAgent({ uri: `${proxyInfo.url}:${proxyInfo.port}`, token: proxyInfo.auth})
         const embed = new builders.EmbedBuilder();
         embed.setTitle(track.name);
         const url = new URL(track.tracks[0].url);
@@ -33,7 +36,7 @@ export const youtube: PagerResolver = {
             embed.addField("Uploaded", new Date(cachedata.extra.uploadedAt as string).toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"}));
         }
         else {
-            const info = await ytdl.getInfo(track.tracks[0].url)
+            const info = await ytdl.getInfo(track.tracks[0].url, {agent})
             const thumbnail = getHighestResUrl(info);
             embed.setImage(thumbnail);
             embed.addField("Author", info.videoDetails.ownerChannelName);
@@ -62,7 +65,10 @@ export const youtube: PagerResolver = {
         };
         return data;
     },
-    async trackPager(track, index, cache, forceInvalidation) {
+    async trackPager(track, index, cache, proxyInfo, forceInvalidation) {
+        let agent;
+        if (proxyInfo)
+            agent = ytdl.createProxyAgent({ uri: `${proxyInfo.url}:${proxyInfo.port}`, token: proxyInfo.auth})
         const embed = new builders.EmbedBuilder();
         embed.setTitle(track.name);
         const url = new URL(track.url);
@@ -80,7 +86,7 @@ export const youtube: PagerResolver = {
             embed.addField("Uploaded", new Date(data.extra.uploadedAt as string).toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"}));
         }
         else {
-            const info = await ytdl.getInfo(track.url)
+            const info = await ytdl.getInfo(track.url, {agent})
             const thumbnail = getHighestResUrl(info);
             cache.cache("youtube-track-pager-data", {
                 id,

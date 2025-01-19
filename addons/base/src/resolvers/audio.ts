@@ -2,6 +2,7 @@ import playdl, { SoundCloudStream, SoundCloudTrack } from "play-dl";
 import { createAudioResource } from "@discordjs/voice";
 import ytdl from "@distube/ytdl-core";
 import utils from "../../../../dist/utils.js";
+import { Proxy } from "../../../../dist/types/addonTypes.js"
 
 export const youtube = {
     name: "youtube-resolver",
@@ -9,10 +10,13 @@ export const youtube = {
     async available(url: string) {
         return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/,/https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined;
     },
-    async resolve(url: string) {
-        const info = await ytdl.getInfo(url);
+    async resolve(url: string, proxyInfo: Proxy | undefined) {
+        let agent;
+        if (proxyInfo)
+            agent = ytdl.createProxyAgent({ uri: `${proxyInfo.url}:${proxyInfo.port}`, token: proxyInfo.auth})
+        const info = await ytdl.getInfo(url, { agent });
         console.log("info available");
-        const stream = ytdl(url);
+        const stream = ytdl(url, { agent });
         stream.on("data", () => console.log("stream received data"));
         console.log("waiting for stream to be readable");
         await new Promise<void>((resolve) => stream.on("readable", resolve))
@@ -27,7 +31,7 @@ export const youtube = {
                 channelName: info.videoDetails.ownerChannelName || "Could not get channel name.",
                 durationInMs: parseInt(info.videoDetails.lengthSeconds) * 1000,
                 fields: [
-                    {name: "Likes", value: info.videoDetails.likes ?? "Could not retrieve likes"},
+                    {name: "Likes", value: info.videoDetails.likes?.toString() ?? "Could not retrieve likes"},
                     {name: "Views", value: info.videoDetails.viewCount}
                 ],
                 highestResUrl: utils.getHighestResUrl(info)

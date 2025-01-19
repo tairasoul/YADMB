@@ -124,7 +124,7 @@ export default {
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].trackNumber: ${cst}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].tracks[cst]: ${util.inspect(st, false, 5, true)}`);
             if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection)
-                await queue.play(info.resolvers);
+                await queue.play(info.resolvers, info.proxyInfo);
         };
         // play video next
         //@ts-ignore

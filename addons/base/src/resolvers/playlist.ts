@@ -1,6 +1,7 @@
 import ytpl from "@distube/ytpl";
 import { playlistData, playlistResolver } from "../../../../dist/types/addonTypes.js";
 import playdl, { DeezerAlbum, DeezerPlaylist, SoundCloudPlaylist, SoundCloudTrack, YouTubeVideo } from "play-dl";
+import ytdl from "@distube/ytdl-core";
 
 function getProvider(url: string) {
     // no clue if these are all, please open an issue if they are not

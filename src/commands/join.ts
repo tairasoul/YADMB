@@ -3,6 +3,7 @@ import * as builders from "@oceanicjs/builders";
 import MusicClient, { Guild } from "../classes/client.js";
 import * as voice from "@discordjs/voice";
 import ResolverUtils from "../classes/resolverUtils.js";
+import { Proxy } from "../types/proxyTypes.js";
 
 export default {
     name: "join",
@@ -11,7 +12,8 @@ export default {
         resolvers: ResolverUtils, 
         guild: Guild, 
         client: MusicClient,
-        cache: Cache
+        cache: Cache,
+        proxyInfo: Proxy | undefined
     }) => {
         await interaction.defer();
         if (interaction.member?.voiceState?.channelID) {
@@ -51,7 +53,7 @@ export default {
             embed.setDescription(string);
             await interaction.editOriginal({embeds: [embed.toJSON()]});
             if (qt.length > 0) {
-                await queue.play(info.resolvers);
+                await queue.play(info.resolvers, info.proxyInfo);
             }
         }
     }
