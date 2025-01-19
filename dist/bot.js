@@ -13,7 +13,7 @@ export function debugLog(text) {
         console.log(text);
 }
 let setup = false;
-const { token, package_manager, cache_path, expiry_time, check_interval, proxy } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+const { token, package_manager, cache_path, expiry_time, check_interval, proxy, cookies } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 const defs = {
     install: package_manager.install.trim(),
     uninstall: package_manager.uninstall.trim()
@@ -41,7 +41,8 @@ const client = new MusicClient({
     database_cleanup_interval: check_interval ?? "1m",
     proxy_cycle_interval: proxy.cycleInterval ?? "1h",
     should_cycle_proxies: proxy.cycling ?? false,
-    should_proxy: proxy.enableProxies ?? false
+    should_proxy: proxy.enableProxies ?? false,
+    use_cookies: cookies ?? false
 });
 /*if (web_features) {
     startWebFunctions();

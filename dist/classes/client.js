@@ -13,6 +13,7 @@ import { debugLog } from "../bot.js";
 import Cache from "./cache.js";
 import ms from "ms";
 import ProxyHandler from "./proxyCycle.js";
+import ytdl from "@distube/ytdl-core";
 export default class MusicClient extends Client {
     m_guilds;
     commands;
@@ -31,6 +32,7 @@ export default class MusicClient extends Client {
     rawCommands;
     cache_database;
     proxyCycle;
+    authenticatedAgent;
     constructor(options) {
         super(options);
         this.m_guilds = new Collection();
@@ -40,6 +42,11 @@ export default class MusicClient extends Client {
         this.cache_database = new Cache(options.database_path, options.database_expiry_time);
         if (options.should_proxy)
             this.proxyCycle = new ProxyHandler(ms(options.proxy_cycle_interval), options.should_cycle_proxies);
+        if (options.use_cookies) {
+            const cookieFile = path.join(__dirname, "..", "cookies.json");
+            const agent = ytdl.createAgent(JSON.parse(fs.readFileSync(cookieFile, 'utf8')));
+            this.authenticatedAgent = agent;
+        }
         const intervalMs = ms(options.database_cleanup_interval);
         setInterval(() => {
             this.cache_database.removeInvalidFromAllTables();
@@ -152,7 +159,8 @@ export default class MusicClient extends Client {
                 guild: this.m_guilds.get(interaction.guildID),
                 client: this,
                 cache: this.cache_database,
-                proxyInfo: this.proxyCycle?.activeProxy
+                proxyInfo: this.proxyCycle?.activeProxy,
+                authenticatedAgent: this.authenticatedAgent
             }));
         }
         else {
@@ -170,7 +178,8 @@ export default class MusicClient extends Client {
                 guild: this.m_guilds.get(interaction.guildID),
                 client: this,
                 cache: this.cache_database,
-                proxyInfo: this.proxyCycle?.activeProxy
+                proxyInfo: this.proxyCycle?.activeProxy,
+                authenticatedAgent: this.authenticatedAgent
             }));
         }
         else {
@@ -205,7 +214,7 @@ export default class MusicClient extends Client {
                     debugLog("logging queue's next track & index");
                     debugLog(util.inspect(cg.queue.tracks, false, 3, true));
                     debugLog(cg.queue.internalCurrentIndex);
-                    cg.queue.play(new ResolverUtils(this.resolvers), this.proxyCycle?.activeProxy);
+                    cg.queue.play(new ResolverUtils(this.resolvers), this.proxyCycle?.activeProxy, this.authenticatedAgent);
                 }
                 else {
                     cg.queue.currentInfo = null;

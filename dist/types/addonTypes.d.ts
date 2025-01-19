@@ -5,6 +5,7 @@ import { EmbedBuilder } from "@oceanicjs/builders";
 import { track } from "../classes/client";
 import ResolverUtils from "../classes/resolverUtils.js";
 import Cache from "../classes/cache.js";
+import ytdl from "@distube/ytdl-core";
 export type Proxy = {
     url: string;
     port: number;
@@ -57,7 +58,7 @@ export type PagerResolver = {
      * @param proxyInfo The active proxy (if any.)
      * @param forceInvalidation Is cache invalidation being forced for this? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    queuedPager: (track: queuedTrack, index: number, cache: Cache, proxyInfo: Proxy | undefined, forceInvalidation: boolean) => Promise<PageData>;
+    queuedPager: (track: queuedTrack, index: number, cache: Cache, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, forceInvalidation: boolean) => Promise<PageData>;
     /**
      * Pager for a track within a playlist.
      * @param track The track being paged.
@@ -66,7 +67,7 @@ export type PagerResolver = {
      * @param proxyInfo The active proxy (if any.)
      * @param forceInvalidation Is cache invalidation being forced for this? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    trackPager: (track: track, index: number, cache: Cache, proxyInfo: Proxy | undefined, forceInvalidation: boolean) => Promise<PageData>;
+    trackPager: (track: track, index: number, cache: Cache, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, forceInvalidation: boolean) => Promise<PageData>;
 };
 export type AudioResolver = {
     /**
@@ -87,7 +88,7 @@ export type AudioResolver = {
      * @param url The song URL.
      * @param proxyInfo The active proxy (if any.)
      */
-    resolve: (url: string, proxyInfo: Proxy | undefined) => Promise<{
+    resolve: (url: string, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined) => Promise<{
         resource: AudioResource<any>;
         info: infoData;
     } | undefined>;
@@ -137,7 +138,7 @@ export type dataResolver = {
      * @param proxyInfo The active proxy (if any.)
      * @param forceInvalidation Is cache invalidation being forced for this call? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    resolve: (url: string, cache: Cache, proxyInfo: Proxy | undefined, forceInvalidation: boolean) => Promise<songData | string | undefined>;
+    resolve: (url: string, cache: Cache, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, forceInvalidation: boolean) => Promise<songData | string | undefined>;
 };
 export type playlistResolver = {
     /**
@@ -160,7 +161,7 @@ export type playlistResolver = {
      * @param proxyInfo The active proxy (if any.)
      * @param forceInvalidation Is cache invalidation being forced for this call? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    resolve: (url: string, cache: Cache, proxyInfo: Proxy | undefined, forceInvalidation: boolean) => Promise<playlistData | string | undefined>;
+    resolve: (url: string, cache: Cache, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, forceInvalidation: boolean) => Promise<playlistData | string | undefined>;
 };
 export type thumbnailResolver = {
     /**
@@ -177,7 +178,7 @@ export type thumbnailResolver = {
      * @param cache The global cache. Use this to cache and retrieve data for the URL.
      * @param forceInvalidation Is cache invalidation being forced for this call? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    resolve: (url: string, cache: Cache, forceInvalidation: boolean) => Promise<string | undefined>;
+    resolve: (url: string, cache: Cache, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, forceInvalidation: boolean) => Promise<string | undefined>;
 };
 export type command = {
     /**
@@ -200,6 +201,7 @@ export type command = {
         guild: Guild;
         client: MusicClient;
         cache: Cache;
+        proxyInfo: Proxy | undefined;
     }) => any;
 };
 export type data_resolvers = {

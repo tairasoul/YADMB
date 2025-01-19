@@ -18,7 +18,7 @@ export const base = {
         return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/, /https:\/\/youtu\.be\/.*/, /https:\/\/soundcloud\.com\/.*/, /https:\/\/on\.soundcloud\.com\/.*/, /https:\/\/deezer\.(?:com|page\.link)\/.*/].find((reg) => reg.test(url)) != undefined;
     },
     priority: 0,
-    async resolve(url, cache, proxyInfo, forceInvalidation) {
+    async resolve(url, cache, proxyInfo, authenticatedAgent, forceInvalidation) {
         const provider = getProvider(url);
         return new Promise(async (resolve) => {
             switch (provider) {
@@ -41,7 +41,7 @@ export const base = {
                         });
                         break;
                     }
-                    const info = await ytdl.getBasicInfo(url, { agent });
+                    const info = await ytdl.getBasicInfo(url, { agent: agent ?? authenticatedAgent });
                     const title = info.videoDetails.title;
                     await cache.cache("youtube-song-data", {
                         title: info.videoDetails.title,

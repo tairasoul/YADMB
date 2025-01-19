@@ -15,6 +15,7 @@ import Cache from "./cache.js";
 import ms from "ms";
 import ProxyHandler from "./proxyCycle.js";
 import { Proxy } from "../types/proxyTypes.js";
+import ytdl from "@distube/ytdl-core";
 
 export type track = {
     name: string;
@@ -56,7 +57,8 @@ export type Command = {
         guild: Guild, 
         client: MusicClient,
         cache: Cache,
-        proxyInfo: Proxy | undefined
+        proxyInfo: Proxy | undefined, 
+        authenticatedAgent: ytdl.Agent | undefined
     }) => Promise<any>)
 }
 
@@ -71,7 +73,8 @@ interface MusicEvents extends oceanic.ClientEvents {
         guild: Guild, 
         client: MusicClient,
         cache: Cache,
-        proxyInfo: Proxy | undefined
+        proxyInfo: Proxy | undefined, 
+        authenticatedAgent: ytdl.Agent | undefined
     }];
 }
 
@@ -82,6 +85,7 @@ interface MClientOptions extends ClientOptions {
     proxy_cycle_interval: string;
     should_proxy: boolean;
     should_cycle_proxies: boolean;
+    use_cookies: boolean;
 }
 
 export default class MusicClient extends Client {
@@ -102,6 +106,7 @@ export default class MusicClient extends Client {
     private rawCommands: Command[];
     private cache_database: Cache;
     private proxyCycle: ProxyHandler | undefined;
+    private authenticatedAgent: ytdl.Agent | undefined;
     constructor(options: MClientOptions) {
         super(options);
         this.m_guilds = new Collection();
@@ -111,6 +116,11 @@ export default class MusicClient extends Client {
         this.cache_database = new Cache(options.database_path, options.database_expiry_time);
         if (options.should_proxy)
             this.proxyCycle = new ProxyHandler(ms(options.proxy_cycle_interval), options.should_cycle_proxies);
+        if (options.use_cookies) {
+            const cookieFile = path.join(__dirname, "..", "cookies.json");
+            const agent = ytdl.createAgent(JSON.parse(fs.readFileSync(cookieFile, 'utf8')));
+            this.authenticatedAgent = agent;
+        }
         
         const intervalMs = ms(options.database_cleanup_interval);
         setInterval(() => {
@@ -249,7 +259,8 @@ export default class MusicClient extends Client {
                     guild: this.m_guilds.get(interaction.guildID as string),
                     client: this,
                     cache: this.cache_database,
-                    proxyInfo: this.proxyCycle?.activeProxy
+                    proxyInfo: this.proxyCycle?.activeProxy, 
+                    authenticatedAgent: this.authenticatedAgent
                 })
             )
         }
@@ -269,7 +280,8 @@ export default class MusicClient extends Client {
                     guild: this.m_guilds.get(interaction.guildID as string),
                     client: this,
                     cache: this.cache_database,
-                    proxyInfo: this.proxyCycle?.activeProxy
+                    proxyInfo: this.proxyCycle?.activeProxy, 
+                    authenticatedAgent: this.authenticatedAgent
                 })
             )
         }
@@ -309,7 +321,7 @@ export default class MusicClient extends Client {
                     debugLog("logging queue's next track & index");
                     debugLog(util.inspect(cg.queue.tracks, false, 3, true))
                     debugLog(cg.queue.internalCurrentIndex)
-                    cg.queue.play(new ResolverUtils(this.resolvers), this.proxyCycle?.activeProxy);
+                    cg.queue.play(new ResolverUtils(this.resolvers), this.proxyCycle?.activeProxy, this.authenticatedAgent);
                 }
                 else {
                     cg.queue.currentInfo = null;

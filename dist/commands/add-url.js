@@ -1,15 +1,14 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
+import playdl from "play-dl";
 import util from "util";
 import * as voice from "@discordjs/voice";
 import { debugLog } from "../bot.js";
-/*playdl.getFreeClientID().then((val) =>
-    playdl.setToken({
-        soundcloud: {
-            client_id: val
-        }
-    })
-)*/
+playdl.getFreeClientID().then((val) => playdl.setToken({
+    soundcloud: {
+        client_id: val
+    }
+}));
 export default {
     name: "add-url",
     description: "Add a link to the queue.",
@@ -59,7 +58,7 @@ export default {
             const s_resolvers = await info.resolvers.getSongResolvers(video);
             let resolver;
             for (const s_res of s_resolvers) {
-                const output = await s_res.resolve(video, info.cache, info.proxyInfo, forceInvalidation);
+                const output = await s_res.resolve(video, info.cache, info.proxyInfo, info.authenticatedAgent, forceInvalidation);
                 if (output && typeof output != "string") {
                     resolver = output;
                     break;
@@ -110,7 +109,7 @@ export default {
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].trackNumber: ${cst}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].tracks[cst]: ${util.inspect(st, false, 5, true)}`);
             if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection)
-                await queue.play(info.resolvers, info.proxyInfo);
+                await queue.play(info.resolvers, info.proxyInfo, info.authenticatedAgent);
         }
     }
 };

@@ -38,7 +38,7 @@ export default {
         }
         else {
             for (const resolver of p_resolvers) {
-                const resolved = await resolver.resolve(playlist, info.cache, info.proxyInfo, forceInvalidation);
+                const resolved = await resolver.resolve(playlist, info.cache, info.proxyInfo, info.authenticatedAgent, forceInvalidation);
                 if (typeof resolved == "string") {
                     const embed = new builders.EmbedBuilder();
                     embed.setDescription(resolved);
@@ -76,7 +76,7 @@ export default {
             const queue = info.guild.queue;
             queue.tracks.push(added_playlist);
             if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection)
-                await queue.play(info.resolvers, info.proxyInfo);
+                await queue.play(info.resolvers, info.proxyInfo, info.authenticatedAgent);
             await interaction.editOriginal({ embeds: [embed.toJSON()] });
         }
     }

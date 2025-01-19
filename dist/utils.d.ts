@@ -44,10 +44,10 @@ export interface PageHolderData {
     pages: PageData[];
 }
 export declare function Pager(pages: PageHolderData): PageHolder;
-export declare function queuedTrackPager(array: queuedTrack[], proxyInfo: Proxy | undefined, callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils, cache: Cache, forceInvalidation?: boolean): Promise<PageHolder>;
+export declare function queuedTrackPager(array: queuedTrack[], proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils, cache: Cache, forceInvalidation?: boolean): Promise<PageHolder>;
 export type volumeMode = "percent" | "whole number";
 export declare function parseVolumeString(volume: string): number;
-export declare function trackPager(array: track[], proxyInfo: Proxy | undefined, callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean): Promise<PageData[]>;
+export declare function trackPager(array: track[], proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean): Promise<PageData[]>;
 declare const _default: {
     SelectMenu: typeof SelectMenu;
     mkdsf: typeof mkdsf;

@@ -4,6 +4,7 @@ import MusicClient, { Guild } from "../classes/client.js";
 import * as voice from "@discordjs/voice";
 import ResolverUtils from "../classes/resolverUtils.js";
 import { Proxy } from "../types/proxyTypes.js";
+import ytdl from "@distube/ytdl-core";
 
 export default {
     name: "join",
@@ -13,7 +14,8 @@ export default {
         guild: Guild, 
         client: MusicClient,
         cache: Cache,
-        proxyInfo: Proxy | undefined
+        proxyInfo: Proxy | undefined, 
+        authenticatedAgent: ytdl.Agent | undefined
     }) => {
         await interaction.defer();
         if (interaction.member?.voiceState?.channelID) {
@@ -53,7 +55,7 @@ export default {
             embed.setDescription(string);
             await interaction.editOriginal({embeds: [embed.toJSON()]});
             if (qt.length > 0) {
-                await queue.play(info.resolvers, info.proxyInfo);
+                await queue.play(info.resolvers, info.proxyInfo, info.authenticatedAgent);
             }
         }
     }

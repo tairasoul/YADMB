@@ -6,6 +6,7 @@ import { infoData } from "../types/addonTypes.js";
 import ResolverUtils from "./resolverUtils.js";
 import { debugLog } from "../bot.js";
 import { Proxy } from "../types/proxyTypes.js";
+import ytdl from "@distube/ytdl-core";
 
 export default class QueueHandler {
     public tracks: queuedTrack[] = [];
@@ -110,7 +111,7 @@ export default class QueueHandler {
         return this.audioPlayer.unpause();
     }
 
-    async play(resolvers: ResolverUtils, proxyInfo: Proxy | undefined) {
+    async play(resolvers: ResolverUtils, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined) {
         const currentInternal = this.tracks[this.internalCurrentIndex];
         debugLog("logging queue.play() debug info");
         debugLog(util.inspect(currentInternal, false, 5, true));
@@ -121,7 +122,7 @@ export default class QueueHandler {
         const audioResolvers = await resolvers.getAudioResolvers(currentURL);
         let audioResource;
         for (const resolver of audioResolvers) {
-            const output = await resolver.resolve(currentURL, proxyInfo);
+            const output = await resolver.resolve(currentURL, proxyInfo, authenticatedAgent);
             if (output) {
                 audioResource = output;
                 break;

@@ -6,6 +6,7 @@ import * as voice from "@discordjs/voice";
 import ResolverUtils from "../classes/resolverUtils.js";
 import { debugLog } from "../bot.js";
 import { Proxy } from "../types/proxyTypes.js";
+import ytdl from "@distube/ytdl-core";
 
 export default {
     name: "import",
@@ -22,7 +23,8 @@ export default {
         resolvers: ResolverUtils, 
         guild: Guild, 
         cache: Cache,
-        proxyInfo: Proxy |  undefined
+        proxyInfo: Proxy |  undefined, 
+        authenticatedAgent: ytdl.Agent | undefined
     }) => {
         await interaction.defer()
         const queue = info.guild.queue;
@@ -47,6 +49,6 @@ export default {
         const embed = new builders.EmbedBuilder();
         embed.setDescription(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"} from ${encoded.filename}`);
         await interaction.editOriginal({embeds: [embed.toJSON()]});
-        if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers, info.proxyInfo);
+        if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers, info.proxyInfo, info.authenticatedAgent);
     }
 }

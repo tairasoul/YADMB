@@ -8,21 +8,19 @@ export const youtube = {
     async available(url) {
         return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/, /https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined;
     },
-    async resolve(url, proxyInfo) {
+    async resolve(url, proxyInfo, authenticatedAgent) {
         let agent;
-        console.log("creating agent");
+        console.log("creating agent (if needed)");
         if (proxyInfo)
             agent = ytdl.createProxyAgent({ uri: `http://${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}` });
-        console.log("created agent, getting info");
-        const info = await ytdl.getBasicInfo(url, { agent });
+        console.log("getting info");
+        const info = await ytdl.getInfo(url, { agent: agent ?? authenticatedAgent });
         console.log("info available");
-        const stream = ytdl(url, { agent });
-        stream.on("data", () => console.log("stream received data"));
-        console.log("waiting for stream to be readable");
-        await new Promise((resolve) => stream.on("readable", resolve));
+        const stream = info.formats.filter(f => f.hasAudio && (!f.isLive || f.isHLS))
+            .sort((a, b) => Number(b.audioBitrate) - Number(a.audioBitrate) || Number(a.bitrate) - Number(b.bitrate))[0];
         //const info = await playdl.video_info(url);
         //const stream = await playdl.stream_from_info(info, { discordPlayerCompatibility: true });
-        const resource = createAudioResource(stream, {
+        const resource = createAudioResource(stream.url, {
             inlineVolume: true
         });
         return {
