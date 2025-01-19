@@ -10,7 +10,9 @@ export const youtube = {
     },
     async resolve(url) {
         const info = await ytdl.getInfo(url);
+        console.log("info available");
         const stream = ytdl(url);
+        console.log("waiting for stream to be readable");
         await new Promise((resolve) => stream.on("readable", resolve));
         //const info = await playdl.video_info(url);
         //const stream = await playdl.stream_from_info(info, { discordPlayerCompatibility: true });
