@@ -5,9 +5,6 @@ import { EmbedBuilder } from "@oceanicjs/builders";
 import { track } from "../classes/client";
 import ResolverUtils from "../classes/resolverUtils.js";
 import Cache from "../classes/cache.js";
-import { ProxyAgent } from "undici";
-import { CookieJar } from "tough-cookie";
-import { SocksProxyAgent } from "socks-proxy-agent";
 export type Proxy = {
     url: string;
     port: number;
@@ -268,10 +265,4 @@ export type infoData = {
      * Duration in miliseconds.
      */
     durationInMs: number;
-};
-export declare function createSocksProxy(options: ProxyAgent.Options, cookies?: never[]): {
-    dispatcher: ProxyAgent;
-    agent: SocksProxyAgent;
-    jar: CookieJar;
-    localAddress: string | undefined;
 };

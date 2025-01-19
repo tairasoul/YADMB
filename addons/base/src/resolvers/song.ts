@@ -1,4 +1,4 @@
-import { dataResolver, createSocksProxy } from "../../../../dist/types/addonTypes.js";
+import { dataResolver } from "../../../../dist/types/addonTypes.js";
 import playdl from "play-dl";
 import ytdl from "@distube/ytdl-core";
 
@@ -26,7 +26,7 @@ export const base: dataResolver = {
                 case "youtube":
                     let agent;
                     if (proxyInfo)
-                        agent = createSocksProxy({ uri: `${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}`})
+                        agent = ytdl.createProxyAgent({ uri: `http://${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}`})
                     if (!ytdl.validateURL(url)) {
                         resolve("Invalid URL!");
                     }
