@@ -10,9 +10,6 @@ export const youtube = {
         return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/, /https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined;
     },
     async queuedPager(track, index, cache, proxyInfo, forceInvalidation) {
-        let agent;
-        if (proxyInfo)
-            agent = ytdl.createProxyAgent({ uri: proxyInfo.url, token: proxyInfo.auth });
         const embed = new builders.EmbedBuilder();
         embed.setTitle(track.name);
         const url = new URL(track.tracks[0].url);
@@ -33,7 +30,7 @@ export const youtube = {
             embed.addField("Uploaded", new Date(cachedata.extra.uploadedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
         }
         else {
-            const info = await ytdl.getInfo(track.tracks[0].url, { agent });
+            const info = await ytdl.getInfo(track.tracks[0].url);
             const thumbnail = getHighestResUrl(info);
             embed.setImage(thumbnail);
             embed.addField("Author", info.videoDetails.ownerChannelName);
@@ -63,9 +60,6 @@ export const youtube = {
         return data;
     },
     async trackPager(track, index, cache, proxyInfo, forceInvalidation) {
-        let agent;
-        if (proxyInfo)
-            agent = ytdl.createProxyAgent({ uri: proxyInfo.url, token: proxyInfo.auth });
         const embed = new builders.EmbedBuilder();
         embed.setTitle(track.name);
         const url = new URL(track.url);
@@ -83,7 +77,7 @@ export const youtube = {
             embed.addField("Uploaded", new Date(data.extra.uploadedAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
         }
         else {
-            const info = await ytdl.getInfo(track.url, { agent });
+            const info = await ytdl.getInfo(track.url);
             const thumbnail = getHighestResUrl(info);
             cache.cache("youtube-track-pager-data", {
                 id,
