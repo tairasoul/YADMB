@@ -15,10 +15,10 @@ export default class ProxyHandler {
         const proxy = this.proxies[this.proxyIndex];
         this.activeProxy = proxy;
         if (cycle)
-            setInterval(async () => await this.cycleProxy(), cycleInterval);
+            setInterval(() => this.cycleProxy(), cycleInterval);
     }
 
-    async cycleProxy() {
+    cycleProxy() {
         this.proxyIndex += 1;
         if (this.proxyIndex >= this.proxies.length)
             this.proxyIndex = 0;
