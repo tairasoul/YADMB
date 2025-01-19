@@ -71,6 +71,8 @@ addon docs can be found [here](https://github.com/tairasoul/YADMB/blob/main/addo
 
 # how to use
 
+ffmpeg is required, install ffmpeg if you don't have it
+
 change your-token to your bot's token in config.json, run `npm run setup-npm` or `pnpm setup-pnpm` (depending on your package manager), wait for it to finish and then run dist node/bot.js
 
 # debugging
