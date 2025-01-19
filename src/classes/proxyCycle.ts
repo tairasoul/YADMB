@@ -1,9 +1,10 @@
 import tunnel from "global-tunnel-ng";
 import { Proxy } from "../types/proxyTypes";
-import { __dirname } from "../bot.js";
+export const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 import path from "path";
 import { readFileSync } from "fs";
-const proxyPath = path.join(__dirname, "..", "proxies.json");
+import { fileURLToPath } from "url";
+const proxyPath = path.join(__dirname, "..", "..", "proxies.json");
 
 export default class ProxyHandler {
     private proxies: Proxy[] = [];
