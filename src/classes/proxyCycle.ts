@@ -25,7 +25,7 @@ export default class ProxyHandler {
             this.proxyIndex = 0;
         const proxy = this.proxies[this.proxyIndex];
         tunnel.end();
-        await wait(20);
+        await wait(5);
         tunnel.initialize(
             {
                 host: proxy.url,
