@@ -5,10 +5,6 @@ import path from "path";
 import { readFileSync } from "fs";
 const proxyPath = path.join(__dirname, "..", "proxies.json");
 
-function wait(ms: number) {
-    return new Promise<void>((resolve) => setTimeout(resolve, ms));
-}
-
 export default class ProxyHandler {
     private proxies: Proxy[] = [];
     private proxyIndex: number = 0;
@@ -25,7 +21,7 @@ export default class ProxyHandler {
             this.proxyIndex = 0;
         const proxy = this.proxies[this.proxyIndex];
         tunnel.end();
-        await wait(5);
+        await new Promise<void>((resolve) => setTimeout(resolve, 5));;
         tunnel.initialize(
             {
                 host: proxy.url,
