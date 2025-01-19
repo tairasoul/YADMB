@@ -87,7 +87,7 @@ export default class QueueHandler {
     resume() {
         return this.audioPlayer.unpause();
     }
-    async play(resolvers, proxyInfo) {
+    async play(resolvers, proxyInfo, authenticatedAgent) {
         const currentInternal = this.tracks[this.internalCurrentIndex];
         debugLog("logging queue.play() debug info");
         debugLog(util.inspect(currentInternal, false, 5, true));
@@ -98,7 +98,7 @@ export default class QueueHandler {
         const audioResolvers = await resolvers.getAudioResolvers(currentURL);
         let audioResource;
         for (const resolver of audioResolvers) {
-            const output = await resolver.resolve(currentURL, proxyInfo);
+            const output = await resolver.resolve(currentURL, proxyInfo, authenticatedAgent);
             if (output) {
                 audioResource = output;
                 break;

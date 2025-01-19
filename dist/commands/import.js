@@ -39,6 +39,6 @@ export default {
         embed.setDescription(`Imported ${lzd.trackNumber !== undefined ? lzd.tracks.length : lzd.length} ${lzd.trackNumber !== undefined ? lzd.tracks.length > 1 ? "songs" : "song" : lzd.length > 1 ? "songs" : "song"} from ${encoded.filename}`);
         await interaction.editOriginal({ embeds: [embed.toJSON()] });
         if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection)
-            await queue.play(info.resolvers, info.proxyInfo);
+            await queue.play(info.resolvers, info.proxyInfo, info.authenticatedAgent);
     }
 };

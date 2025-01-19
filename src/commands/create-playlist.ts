@@ -8,6 +8,7 @@ import { debugLog } from "../bot.js";
 import { PageData } from "../types/addonTypes.js";
 import Cache from "../classes/cache.js";
 import { Proxy } from "../types/proxyTypes.js";
+import ytdl from "@distube/ytdl-core";
 
 function embedMessage(text: string) {
     const embed = new builders.EmbedBuilder();
@@ -37,7 +38,8 @@ export default {
         guild: Guild, 
         client: MusicClient,
         cache: Cache,
-        proxyInfo: Proxy |  undefined
+        proxyInfo: Proxy |  undefined, 
+        authenticatedAgent: ytdl.Agent | undefined
     }) => {
         await interaction.defer(1 << 6);
         const name = interaction.data.options.getString("playlist-name", true);
@@ -259,7 +261,7 @@ export default {
             const dataResolvers = await info.resolvers.getSongResolvers(video);
             let dataResolver;
             for (const resolver of dataResolvers) {
-                const output = await resolver.resolve(video, info.cache, info.proxyInfo, invalidation);
+                const output = await resolver.resolve(video, info.cache, info.proxyInfo, info.authenticatedAgent, invalidation);
                 if (output && typeof output != "string") {
                     dataResolver = output;
                     break;
@@ -275,7 +277,7 @@ export default {
                 if (pagers) {
                     let pager;
                     for (const page of pagers) {
-                        const output = await page.trackPager(add, paged.length, info.cache, info.proxyInfo, invalidation);
+                        const output = await page.trackPager(add, paged.length, info.cache, info.proxyInfo, info.authenticatedAgent, invalidation);
                         if (output) {
                             pager = output;
                             break;

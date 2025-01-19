@@ -27,7 +27,7 @@ export default {
         await interaction.editOriginal({ embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")] });
         const invalidation = interaction.data.options.getBoolean("force-invalidation") ?? false;
         const data = {
-            queued: await utils.queuedTrackPager(info.guild.queue.tracks, info.proxyInfo, async (title) => {
+            queued: await utils.queuedTrackPager(info.guild.queue.tracks, info.proxyInfo, info.authenticatedAgent, async (title) => {
                 await interaction.editOriginal({ embeds: [embedMessage(`Paging track **${title}**`)] });
             }, info.resolvers, info.cache, invalidation),
             tracks: null
@@ -143,7 +143,7 @@ export default {
                 return;
             currentInspectPage = 0;
             await i.createMessage({ embeds: [embedMessage("Paging tracks for playlist.")], flags: 1 << 6 });
-            data.tracks = utils.Pager({ pages: await utils.trackPager(info.guild.queue.tracks[currentPage].tracks, info.proxyInfo, async (title) => {
+            data.tracks = utils.Pager({ pages: await utils.trackPager(info.guild.queue.tracks[currentPage].tracks, info.proxyInfo, info.authenticatedAgent, async (title) => {
                     await i.editOriginal({ embeds: [embedMessage(`Paging track **${title}**`)] });
                 }, info.resolvers, info.cache, invalidation) });
             isInspecting = true;

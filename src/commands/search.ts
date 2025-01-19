@@ -10,6 +10,7 @@ import ResolverUtils from "../classes/resolverUtils.js";
 import { debugLog } from "../bot.js";
 import Cache from "../classes/cache.js";
 import { Proxy } from "../types/proxyTypes.js";
+import ytdl from "@distube/ytdl-core";
 
 export default {
     name: "search",
@@ -28,7 +29,8 @@ export default {
         guild: Guild, 
         client: MusicClient,
         cache: Cache,
-        proxyInfo: Proxy |  undefined
+        proxyInfo: Proxy |  undefined, 
+        authenticatedAgent: ytdl.Agent | undefined
     }) => {
         await interaction.defer();
         const term = interaction.data.options.getString('term', true);
@@ -131,7 +133,7 @@ export default {
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].trackNumber: ${cst}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].tracks[cst]: ${util.inspect(st, false, 5, true)}`)
-            if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers, info.proxyInfo);
+            if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers, info.proxyInfo, info.authenticatedAgent);
         }
         // play video next
         //@ts-ignore
@@ -144,7 +146,7 @@ export default {
             if (t.type === "playlist") {
                 const cst = t.trackNumber;
                 const track_embed = new builders.EmbedBuilder();
-                const track_thumbnail = await info.resolvers.getSongThumbnail(currentVideo.url, info.cache);
+                const track_thumbnail = await info.resolvers.getSongThumbnail(currentVideo.url, info.cache, info.proxyInfo, info.authenticatedAgent);
                 track_embed.setTitle(currentVideo.title);
                 if (track_thumbnail) track_embed.setThumbnail(track_thumbnail);
                 t.tracks.splice(cst + 1, 0, {
@@ -154,7 +156,7 @@ export default {
             }
             else {
                 const track_embed = new builders.EmbedBuilder();
-                const track_thumbnail = await info.resolvers.getSongThumbnail(currentVideo.url, info.cache);
+                const track_thumbnail = await info.resolvers.getSongThumbnail(currentVideo.url, info.cache, info.proxyInfo, info.authenticatedAgent);
                 track_embed.setTitle(currentVideo.title);
                 if (track_thumbnail) track_embed.setThumbnail(track_thumbnail);
                 queue.tracks.push(

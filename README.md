@@ -52,7 +52,8 @@ the template config looks like this:
     "enableProxies": false,
     "cycling": false,
     "cycleInterval": "1h"
-  }
+  },
+  "cookies": false
 }
 ```
 
@@ -67,6 +68,17 @@ expiry_time - how long cached info should be valid for
 check_interval - how often the bot checks if cached info is valid
 
 proxy - for the proxying system. enableProxies determines if we use a proxy, cycling determines if we cycle through all proxies available in proxies.json, and cycleInterval determines how long it is before we cycle to the next proxy
+
+cookies - use cookies for youtube videos.
+
+# cookies
+
+> [!CAUTION]
+> You should never use your personal google account's cookies for downloading videos. Using disposable accounts is recommended, with no link to your personal account or identity.
+>
+> Use incognito when signing in, and just to be sure, use a VPN or proxy.
+
+To get your cookies, follow [ytdl-core's instructions](https://github.com/distubejs/ytdl-core?tab=readme-ov-file#how-to-get-cookies) and paste the cookies obtained into `cookies.json`
 
 # proxies
 

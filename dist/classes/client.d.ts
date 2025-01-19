@@ -7,6 +7,7 @@ import * as builders from "@oceanicjs/builders";
 import { AddonInfo, AudioResolver, PagerResolver, dataResolver, playlistResolver, resolver, thumbnailResolver } from "../types/addonTypes.js";
 import Cache from "./cache.js";
 import { Proxy } from "../types/proxyTypes.js";
+import ytdl from "@distube/ytdl-core";
 export type track = {
     name: string;
     url: string;
@@ -43,6 +44,7 @@ export type Command = {
         client: MusicClient;
         cache: Cache;
         proxyInfo: Proxy | undefined;
+        authenticatedAgent: ytdl.Agent | undefined;
     }) => Promise<any>);
 };
 type Autocomplete = {
@@ -58,6 +60,7 @@ interface MusicEvents extends oceanic.ClientEvents {
             client: MusicClient;
             cache: Cache;
             proxyInfo: Proxy | undefined;
+            authenticatedAgent: ytdl.Agent | undefined;
         }
     ];
 }
@@ -68,6 +71,7 @@ interface MClientOptions extends ClientOptions {
     proxy_cycle_interval: string;
     should_proxy: boolean;
     should_cycle_proxies: boolean;
+    use_cookies: boolean;
 }
 export default class MusicClient extends Client {
     m_guilds: Collection<string, Guild>;
@@ -79,6 +83,7 @@ export default class MusicClient extends Client {
     private rawCommands;
     private cache_database;
     private proxyCycle;
+    private authenticatedAgent;
     constructor(options: MClientOptions);
     addAddon(addon: AddonInfo): void;
     registerAddons(): void;

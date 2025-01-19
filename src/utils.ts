@@ -156,14 +156,14 @@ export function Pager(pages: PageHolderData) {
     return new PageHolder(PageClasses);
 }
 
-export async function queuedTrackPager(array: queuedTrack[], proxyInfo: Proxy | undefined, callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean = false) {
+export async function queuedTrackPager(array: queuedTrack[], proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean = false) {
     const pages: PageData[] = []
     for (let i = 0; i < array.length; i++) {
         await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].tracks[0].url);
         let output;
         for (const pager of pagers) {
-            output = await pager.queuedPager(array[i], i, cache, proxyInfo, forceInvalidation);
+            output = await pager.queuedPager(array[i], i, cache, proxyInfo, authenticatedAgent, forceInvalidation);
             if (output) {
                 pages.push(output);
                 break;
@@ -192,14 +192,14 @@ export function parseVolumeString(volume: string) {
     return result;
 }
 
-export async function trackPager(array: track[], proxyInfo: Proxy | undefined, callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean) {
+export async function trackPager(array: track[], proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean) {
     const pages: PageData[] = []
     for (let i = 0; i < array.length; i++) {
         await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].url);
         let output;
         for (const pager of pagers) {
-            output = await pager.trackPager(array[i], i, cache, proxyInfo, forceInvalidation);
+            output = await pager.trackPager(array[i], i, cache, proxyInfo, authenticatedAgent, forceInvalidation);
             if (output) {
                 pages.push(output);
                 break;
