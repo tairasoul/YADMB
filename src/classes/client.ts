@@ -298,6 +298,8 @@ export default class MusicClient extends Client {
         })
     
         cg.audioPlayer.on("stateChange", () => {
+            debugLog("stateChange debug log, current state:");
+            debugLog(cg.audioPlayer.state.status);
             if (cg.audioPlayer.state.status === "idle") {
                 if (cg.queue.nextTrack() != null) {
                     debugLog("logging queue's next track & index");
