@@ -2,7 +2,8 @@ import PackageManager, { managerDefs } from "./package.manager.js";
 import fs from "fs";
 import path from 'path';
 import { debugLog } from "../bot.js";
-import { __dirname } from "../bot.js";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 
 export type PackageList = {
     [key: string]: string[];
@@ -12,7 +13,7 @@ const packageExclusions = ["@discordjs/voice", "@distube/ytdl-core", "@oceanicjs
 
 export default class AddonPackages {
     private manager: PackageManager;
-    private installedPath: string = `${path.join(__dirname, "..")}/modules.json`;
+    private installedPath: string = `${path.join(__dirname, "..", "..")}/modules.json`;
     private list: PackageList;
     private checked: string[] = [];
 

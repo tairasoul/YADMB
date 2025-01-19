@@ -8,7 +8,7 @@ import QueueHandler from "./queueSystem.js";
 import { NoSubscriberBehavior, createAudioPlayer } from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
 import util from "node:util";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
+const __dirname = path.join(path.dirname(decodeURIComponent(fileURLToPath(import.meta.url))), "..");
 import { debugLog } from "../bot.js";
 import Cache from "./cache.js";
 import ms from "ms";
