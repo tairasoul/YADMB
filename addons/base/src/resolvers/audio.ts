@@ -13,6 +13,7 @@ export const youtube = {
         const info = await ytdl.getInfo(url);
         console.log("info available");
         const stream = ytdl(url);
+        stream.on("data", () => console.log("stream received data"));
         console.log("waiting for stream to be readable");
         await new Promise<void>((resolve) => stream.on("readable", resolve))
         //const info = await playdl.video_info(url);
