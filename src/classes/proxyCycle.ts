@@ -1,6 +1,6 @@
 import tunnel from "global-tunnel-ng";
 import { Proxy } from "../types/proxyTypes";
-import { __dirname } from "../bot";
+import { __dirname } from "../bot.js";
 import path from "path";
 import { readFileSync } from "fs";
 const proxyPath = path.join(__dirname, "..", "proxies.json");
