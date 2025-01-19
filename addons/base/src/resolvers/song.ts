@@ -26,7 +26,7 @@ export const base: dataResolver = {
                 case "youtube":
                     let agent;
                     if (proxyInfo)
-                        agent = createSocksProxy({ uri: `http://${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}`})
+                        agent = createSocksProxy({ uri: `${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}`})
                     if (!ytdl.validateURL(url)) {
                         resolve("Invalid URL!");
                     }

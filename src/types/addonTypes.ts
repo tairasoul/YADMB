@@ -350,8 +350,8 @@ export function createSocksProxy(options: ProxyAgent.Options, cookies = []) {
       },
       options,
     );
-    const agent = new SocksProxyAgent(options.uri);
-    const dispatcher = new ProxyAgent(proxyOptions);
+    const agent = new SocksProxyAgent(`socks4://${options.uri}`);
+    const dispatcher = new ProxyAgent(`http://${options.uri}`);
   
     return { dispatcher, agent, jar, localAddress: options.localAddress };
 };
