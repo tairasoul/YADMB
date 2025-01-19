@@ -47,7 +47,12 @@ the template config looks like this:
   },
   "cache_path": ":memory:",
   "expiry_time": "3d",
-  "check_interval": "1m"
+  "check_interval": "1m",
+  "proxy": {
+    "enableProxies": false,
+    "cycling": false,
+    "cycleInterval": "1h"
+  }
 }
 ```
 
@@ -60,6 +65,8 @@ cache_path - the path to the cache database. :memory: means it's in-memory, but 
 expiry_time - how long cached info should be valid for
 
 check_interval - how often the bot checks if cached info is valid
+
+proxy - for the proxying system. enableProxies determines if we use a proxy, cycling determines if we cycle through all proxies available in proxies.json, and cycleInterval determines how long it is before we cycle to the next proxy
 
 # installing addons
 

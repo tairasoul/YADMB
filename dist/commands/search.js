@@ -118,6 +118,7 @@ export default {
             const cst = t.trackNumber;
             const st = t.tracks[cst];
             queue.tracks.push(youtubeadd);
+            debugLog("logging search debug info");
             debugLog(`guilds["${interaction.guildID}"].queue.internalCurrentIndex: ${ct}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].trackNumber: ${cst}`);

@@ -103,6 +103,7 @@ export default {
             const t = queue.tracks[ctn];
             const cst = t.trackNumber;
             const st = t.tracks[cst];
+            debugLog("add-url debug info:");
             debugLog(`guilds["${interaction.guildID}"].queue.internalCurrentIndex: ${ctn}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].trackNumber: ${cst}`);

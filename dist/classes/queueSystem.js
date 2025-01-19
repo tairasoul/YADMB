@@ -1,6 +1,6 @@
 import util from "node:util";
-import utils from "./utils.js";
-import { debugLog } from "./bot.js";
+import utils from "../utils.js";
+import { debugLog } from "../bot.js";
 export default class QueueHandler {
     tracks = [];
     internalLoop = "none";
@@ -89,6 +89,7 @@ export default class QueueHandler {
     }
     async play(resolvers) {
         const currentInternal = this.tracks[this.internalCurrentIndex];
+        debugLog("logging queue.play() debug info");
         debugLog(util.inspect(currentInternal, false, 5, true));
         debugLog(this.internalCurrentIndex);
         debugLog(util.inspect(this.tracks, false, 5, true));

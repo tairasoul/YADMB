@@ -1,11 +1,11 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import MusicClient, { Guild, queuedTrack, track } from "../client.js";
+import MusicClient, { Guild, queuedTrack, track } from "../classes/client.js";
 import utils from "../utils.js";
 import * as voice from "@discordjs/voice";
-import { playlistData } from "../addonTypes.js";
-import ResolverUtils from "../resolverUtils.js";
-import Cache from "../cache.js";
+import { playlistData } from "../types/addonTypes.js";
+import ResolverUtils from "../classes/resolverUtils.js";
+import Cache from "../classes/cache.js";
 
 export default {
     name: "add-playlist",

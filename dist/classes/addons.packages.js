@@ -1,10 +1,9 @@
 import PackageManager from "./package.manager.js";
 import fs from "fs";
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { debugLog } from "./bot.js";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-const packageExclusions = ["@discordjs/voice", "@distube/ytdl-core", "@oceanicjs/builders", "express", "humanize-duration", "js-base64", "libsodium-wrappers", "lzwcompress", "oceanic.js", "opusscript", "play-dl", "randomstring", "ytpl"];
+import { debugLog } from "../bot.js";
+import { __dirname } from "../bot.js";
+const packageExclusions = ["@discordjs/voice", "@distube/ytdl-core", "@oceanicjs/builders", "humanize-duration", "js-base64", "libsodium-wrappers", "lzwcompress", "oceanic.js", "opusscript", "play-dl", "randomstring"];
 export default class AddonPackages {
     manager;
     installedPath = `${path.join(__dirname, "..")}/modules.json`;

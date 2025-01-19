@@ -1,8 +1,8 @@
-import { Guild } from "../client.js";
+import { Guild } from "../classes/client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import humanize from "humanize-duration";
-import ResolverUtils from "../resolverUtils.js";
+import ResolverUtils from "../classes/resolverUtils.js";
 
 export default {
     name: "progress",

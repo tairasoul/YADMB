@@ -1,5 +1,5 @@
 import * as oceanic from "oceanic.js";
-import { Guild } from "../client.js";
+import { Guild } from "../classes/client.js";
 import * as builders from "@oceanicjs/builders";
 
 export default {

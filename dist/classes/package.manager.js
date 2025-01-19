@@ -1,6 +1,6 @@
 import { exec } from "child_process";
 import path from "path";
-import { __dirname } from "./bot.js";
+import { __dirname } from "../bot.js";
 import fs from "fs";
 export default class PackageManager {
     managerDefs;

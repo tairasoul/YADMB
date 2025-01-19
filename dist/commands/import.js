@@ -23,6 +23,7 @@ export default {
         });
         const encodedData = await data.text();
         const lzd = utils.decodeStr(encodedData);
+        debugLog("logging import lz decoded for debug info");
         debugLog(lzd);
         if (lzd?.trackNumber !== undefined) {
             debugLog("found track number");

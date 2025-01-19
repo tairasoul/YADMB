@@ -8,11 +8,12 @@ import QueueHandler from "./queueSystem.js";
 import voice, { NoSubscriberBehavior, createAudioPlayer } from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
 import util from "node:util"
-import { AddonInfo, AudioResolver, PagerResolver, command, dataResolver, playlistResolver, resolver, thumbnailResolver } from "./addonTypes.js";
+import { AddonInfo, AudioResolver, PagerResolver, command, dataResolver, playlistResolver, resolver, thumbnailResolver } from "../types/addonTypes.js";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-import { debugLog } from "./bot.js";
+import { debugLog } from "../bot.js";
 import Cache from "./cache.js";
 import ms from "ms";
+import ProxyHandler from "./proxyCycle.js";
 
 export type track = {
     name: string;
@@ -75,12 +76,13 @@ interface MClientOptions extends ClientOptions {
     database_path: string;
     database_expiry_time: string;
     database_cleanup_interval: string;
+    proxy_cycle_interval: string;
+    should_proxy: boolean;
+    should_cycle_proxies: boolean;
 }
 
 export default class MusicClient extends Client {
-    public m_guilds: {
-        [id: string]: Guild
-    };
+    public m_guilds: Collection<string, Guild>;
     public commands: Collection<string, Command>;
     public autocomplete: Collection<string, (interaction: oceanic.AutocompleteInteraction) => Promise<oceanic.AutocompleteChoice[]>>;
     public readonly addons: AddonInfo[] = [];
@@ -96,13 +98,17 @@ export default class MusicClient extends Client {
     private addonCommands: command[] = [];
     private rawCommands: Command[];
     private cache_database: Cache;
+    // use for this property has yet to be determined, class acts on its own as of now
+    private proxyCycle: ProxyHandler | undefined;
     constructor(options: MClientOptions) {
         super(options);
-        this.m_guilds = {};
+        this.m_guilds = new Collection();
         this.commands = new Collection();
         this.autocomplete = new Collection();
         this.rawCommands = [];
         this.cache_database = new Cache(options.database_path, options.database_expiry_time);
+        if (options.should_proxy)
+            this.proxyCycle = new ProxyHandler(ms(options.proxy_cycle_interval), options.should_cycle_proxies);
         
         const intervalMs = ms(options.database_cleanup_interval);
         setInterval(() => {
@@ -212,7 +218,6 @@ export default class MusicClient extends Client {
         for (const command of this.rawCommands) {
             console.log(`registering global command ${command.data.name}`);
             this.commands.set(command.data.name, command);
-            console.log(`registered global command ${command.data.name}`);
             registered.push(command.data);
             /*try {
                 // @ts-ignore
@@ -239,7 +244,7 @@ export default class MusicClient extends Client {
                 // @ts-ignore
                 listener(interaction, {
                     resolvers: new ResolverUtils(this.resolvers), 
-                    guild: this.m_guilds[interaction.guildID as string],
+                    guild: this.m_guilds.get(interaction.guildID as string),
                     client: this,
                     cache: this.cache_database
                 })
@@ -258,7 +263,7 @@ export default class MusicClient extends Client {
                 // @ts-ignore
                 listener(interaction, {
                     resolvers: new ResolverUtils(this.resolvers), 
-                    guild: this.m_guilds[interaction.guildID as string],
+                    guild: this.m_guilds.get(interaction.guildID as string),
                     client: this,
                     cache: this.cache_database
                 })
@@ -277,16 +282,16 @@ export default class MusicClient extends Client {
                 noSubscriber: NoSubscriberBehavior.Pause
             }
         })
-        this.m_guilds[guild.id] = {
+        this.m_guilds.set(guild.id, {
             queue: new QueueHandler(audioPlayer),
             connection: null,
             voiceChannel: null,
             audioPlayer: audioPlayer,
             id: guild.id,
             leaveTimer: null
-        }
+        })
 
-        const cg = this.m_guilds[guild.id]
+        const cg = this.m_guilds.get(guild.id) as Guild;
         
         cg.audioPlayer.on('error', (error: voice.AudioPlayerError) => {
             console.log(`an error occured with the audio player, ${error}`);
@@ -295,6 +300,7 @@ export default class MusicClient extends Client {
         cg.audioPlayer.on("stateChange", () => {
             if (cg.audioPlayer.state.status === "idle") {
                 if (cg.queue.nextTrack() != null) {
+                    debugLog("logging queue's next track & index");
                     debugLog(util.inspect(cg.queue.tracks, false, 3, true))
                     debugLog(cg.queue.internalCurrentIndex)
                     cg.queue.play(new ResolverUtils(this.resolvers));
@@ -307,6 +313,6 @@ export default class MusicClient extends Client {
     }
 
     removeGuild(guild: oceanic.Guild) {
-        delete this.m_guilds[guild.id];
+        this.m_guilds.delete(guild.id);
     }
 }

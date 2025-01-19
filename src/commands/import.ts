@@ -1,9 +1,9 @@
 import * as oceanic from "oceanic.js";
-import { Guild } from "../client.js";
+import { Guild } from "../classes/client.js";
 import utils from "../utils.js";
 import * as builders from "@oceanicjs/builders";
 import * as voice from "@discordjs/voice";
-import ResolverUtils from "../resolverUtils.js";
+import ResolverUtils from "../classes/resolverUtils.js";
 import { debugLog } from "../bot.js";
 
 export default {
@@ -30,6 +30,7 @@ export default {
         });
         const encodedData = await data.text();
         const lzd = utils.decodeStr(encodedData);
+        debugLog("logging import lz decoded for debug info")
         debugLog(lzd);
         if (lzd?.trackNumber !== undefined) {
             debugLog("found track number")

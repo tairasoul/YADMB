@@ -1,5 +1,5 @@
 import * as oceanic from "oceanic.js";
-import MusicClient from "../client.js";
+import MusicClient from "../classes/client.js";
 
 export default {
     name: "view-addons",

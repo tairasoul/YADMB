@@ -1,4 +1,4 @@
-import MusicClient, { Guild, queuedTrack } from "../client.js";
+import MusicClient, { Guild, queuedTrack } from "../classes/client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import rstring from "randomstring";
@@ -6,9 +6,9 @@ import utils, { PageHolder } from "../utils.js";
 // @ts-ignore
 import {default as lzw} from "lzwcompress";
 import { Base64 as base64} from "js-base64";
-import ResolverUtils from "../resolverUtils.js";
+import ResolverUtils from "../classes/resolverUtils.js";
 import { debugLog } from "../bot.js";
-import Cache from "../cache.js";
+import Cache from "../classes/cache.js";
 
 function embedMessage(text: string) {
     const embed = new builders.EmbedBuilder();
@@ -46,7 +46,7 @@ export default {
         let currentPage = 0;
         let currentInspectPage = 0;
         // make ids
-        debugLog("making component ids")
+        debugLog("making component ids (view-queue.ts)")
         const nextEmbedId = rstring.generate();
         const prevEmbedId = rstring.generate();
         const inspectId = rstring.generate();
@@ -57,7 +57,7 @@ export default {
         const exportId = rstring.generate();
         const exitId = rstring.generate();
         // setup buttons
-        debugLog("creating components")
+        debugLog("creating components (view-queue.ts)")
         const nextEmbed = new builders.Button(oceanic.ButtonStyles.PRIMARY, nextEmbedId);
         const prevEmbed = new builders.Button(oceanic.ButtonStyles.PRIMARY, prevEmbedId);
         const inspect = new builders.Button(oceanic.ButtonStyles.PRIMARY, inspectId);
@@ -68,7 +68,7 @@ export default {
         const exportB = new builders.Button(oceanic.ButtonStyles.PRIMARY, exportId);
         const exit = new builders.Button(oceanic.ButtonStyles.PRIMARY, exitId);
         // setup labels
-        debugLog("setting labels")
+        debugLog("setting labels (view-queue.ts)")
         nextEmbed.setLabel("Next");
         prevEmbed.setLabel("Previous");
         inspect.setLabel("Inspect");

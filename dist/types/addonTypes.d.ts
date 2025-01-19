@@ -1,10 +1,10 @@
 import { AudioResource } from "@discordjs/voice";
-import MusicClient, { Guild, queuedTrack } from "./client";
+import MusicClient, { Guild, queuedTrack } from "../classes/client";
 import * as oceanic from "oceanic.js";
 import { EmbedBuilder } from "@oceanicjs/builders";
-import { track } from "./client";
-import ResolverUtils from "./resolverUtils.js";
-import Cache from "./cache.js";
+import { track } from "../classes/client";
+import ResolverUtils from "../classes/resolverUtils.js";
+import Cache from "../classes/cache.js";
 export type resolver = {
     /**
      * Name of the resolver.

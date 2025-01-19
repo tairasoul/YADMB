@@ -1,12 +1,11 @@
 import fs from "fs";
-import { fileURLToPath } from 'url';
 import MusicClient from "./client.js";
-import path from "path";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-import { debugLog } from "./bot.js";
-import { AddonInfo } from "./addonTypes.js";
+import { debugLog } from "../bot.js";
+import { AddonInfo } from "../types/addonTypes.js";
 import { managerDefs } from "./package.manager.js";
 import AddonPackages from "./addons.packages.js";
+import path from "path";
+import { __dirname } from "../bot.js";
 
 function isExcluded(filePath: string, exclusionList: string[]) {
     return exclusionList.some(exclusion => {

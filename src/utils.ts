@@ -4,11 +4,11 @@ import { Client } from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 import { Base64 as base64 } from "js-base64";
 import { InfoData } from "play-dl";
-import { queuedTrack, track } from './client.js';
+import { queuedTrack, track } from './classes/client.js';
 import { debugLog } from './bot.js';
-import ResolverUtils from './resolverUtils.js';
-import { PageData } from './addonTypes.js';
-import Cache from './cache.js';
+import ResolverUtils from './classes/resolverUtils.js';
+import { PageData } from './types/addonTypes.js';
+import Cache from './classes/cache.js';
 
 export function getHighestResUrl(data: InfoData) {
     const thumbnails = data.video_details.thumbnails;
@@ -91,6 +91,7 @@ export function encode(array: any) {
 
 export function decodeStr(str: string) {
     const decoded = base64.decode(str);
+    debugLog("logging decoded base64")
     debugLog(decoded);
     return JSON.parse(decoded);
 }
