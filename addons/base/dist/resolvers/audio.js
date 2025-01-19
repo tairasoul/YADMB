@@ -1,5 +1,6 @@
 import playdl from "play-dl";
 import { createAudioResource } from "@discordjs/voice";
+import ytdl from "@distube/ytdl-core";
 import utils from "../../../../dist/utils.js";
 export const youtube = {
     name: "youtube-resolver",
@@ -8,20 +9,21 @@ export const youtube = {
         return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/, /https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined;
     },
     async resolve(url) {
-        const info = await playdl.video_info(url);
-        const stream = await playdl.stream_from_info(info, { discordPlayerCompatibility: true });
-        const resource = createAudioResource(stream.stream, {
-            inlineVolume: true,
-            inputType: stream.type
+        const info = await ytdl.getInfo(url);
+        const stream = ytdl(url);
+        //const info = await playdl.video_info(url);
+        //const stream = await playdl.stream_from_info(info, { discordPlayerCompatibility: true });
+        const resource = createAudioResource(stream, {
+            inlineVolume: true
         });
         return {
             resource,
             info: {
-                channelName: info.video_details.channel?.name || "Could not get channel name.",
-                durationInMs: info.video_details.durationInSec * 1000,
+                channelName: info.videoDetails.ownerChannelName || "Could not get channel name.",
+                durationInMs: parseInt(info.videoDetails.lengthSeconds) * 1000,
                 fields: [
-                    { name: "Likes", value: info.video_details.likes.toString() },
-                    { name: "Views", value: info.video_details.views.toString() }
+                    { name: "Likes", value: info.videoDetails.likes ?? "Could not retrieve likes" },
+                    { name: "Views", value: info.videoDetails.viewCount }
                 ],
                 highestResUrl: utils.getHighestResUrl(info)
             }

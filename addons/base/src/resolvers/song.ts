@@ -1,4 +1,4 @@
-import { dataResolver } from "../../../../dist/addonTypes.js";
+import { dataResolver } from "../../../../dist/types/addonTypes.js";
 import playdl from "play-dl";
 import ytdl from "@distube/ytdl-core";
 

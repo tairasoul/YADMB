@@ -4,7 +4,7 @@ import * as builders from "@oceanicjs/builders";
 import { Base64 as base64 } from "js-base64";
 import { debugLog } from './bot.js';
 export function getHighestResUrl(data) {
-    const thumbnails = data.video_details.thumbnails;
+    const thumbnails = data.videoDetails.thumbnails;
     let highestX = 0;
     let highestY = 0;
     let currentHighestUrl = "";

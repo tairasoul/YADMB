@@ -1,4 +1,4 @@
-import { playlistData, playlistResolver } from "../../../../dist/addonTypes.js";
+import { playlistData, playlistResolver } from "../../../../dist/types/addonTypes.js";
 import playdl, { DeezerAlbum, DeezerPlaylist, SoundCloudPlaylist, SoundCloudTrack, YouTubeVideo } from "play-dl";
 
 function getProvider(url: string) {
