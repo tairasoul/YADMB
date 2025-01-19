@@ -130,7 +130,6 @@ export default class QueueHandler {
         if (audioResource) {
             audioResource.resource.volume?.setVolume(utils.parseVolumeString(this.volumeString));
             this.audioPlayer.play(audioResource.resource);
-            debugLog(this.audioPlayer.state.status);
             this.currentInfo = {
                 name: track.name,
                 resource: audioResource.resource,
