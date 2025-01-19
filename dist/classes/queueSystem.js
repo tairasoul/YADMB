@@ -104,8 +104,6 @@ export default class QueueHandler {
                 break;
             }
         }
-        debugLog("logging queue.play() audioResource");
-        debugLog(audioResource);
         if (audioResource) {
             audioResource.resource.volume?.setVolume(utils.parseVolumeString(this.volumeString));
             this.audioPlayer.play(audioResource.resource);

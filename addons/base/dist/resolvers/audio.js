@@ -20,11 +20,6 @@ export const youtube = {
         const resource = createAudioResource(stream, {
             inlineVolume: true
         });
-        console.log("audio resolve() debug info");
-        console.log(resource);
-        console.log(resource.readable);
-        console.log(resource.metadata);
-        console.log(resource.encoder);
         return {
             resource,
             info: {
