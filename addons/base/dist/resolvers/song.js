@@ -38,10 +38,10 @@ export const base = {
                         });
                         break;
                     }
-                    const info = await playdl.video_basic_info(url);
-                    const title = info.video_details.title;
+                    const info = await ytdl.getBasicInfo(url);
+                    const title = info.videoDetails.title;
                     await cache.cache("youtube-song-data", {
-                        title: info.video_details.title,
+                        title: info.videoDetails.title,
                         id,
                         extra: {
                             url
