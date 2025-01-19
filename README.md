@@ -68,6 +68,23 @@ check_interval - how often the bot checks if cached info is valid
 
 proxy - for the proxying system. enableProxies determines if we use a proxy, cycling determines if we cycle through all proxies available in proxies.json, and cycleInterval determines how long it is before we cycle to the next proxy
 
+# proxies
+
+proxies are formatted as follows
+
+```json
+{
+  "url": "proxy url",
+  "port": 5050,
+  "auth": "proxyauth"
+}
+```
+
+auth is optional, and only required if the proxy needs authentication. auth string is in format of "userId:password"
+
+url is the url of the proxy, port is the proxy's port you connect to.
+
+
 # installing addons
 
 installing addons is as simple as putting their provided file or folder into the addons folder, and making sure the bot runs correctly!
