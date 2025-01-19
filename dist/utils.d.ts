@@ -3,10 +3,10 @@ import * as oceanic from 'oceanic.js';
 import { Client } from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 import { InfoData } from "play-dl";
-import { queuedTrack, track } from './client.js';
-import ResolverUtils from './resolverUtils.js';
-import { PageData } from './addonTypes.js';
-import Cache from './cache.js';
+import { queuedTrack, track } from './classes/client.js';
+import ResolverUtils from './classes/resolverUtils.js';
+import { PageData } from './types/addonTypes.js';
+import Cache from './classes/cache.js';
 export declare function getHighestResUrl(data: InfoData): string;
 export declare function SelectMenu(options: Array<{
     name: string;

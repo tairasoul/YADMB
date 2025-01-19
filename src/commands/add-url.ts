@@ -1,12 +1,12 @@
 import * as oceanic from "oceanic.js";
-import MusicClient, { Guild, queuedTrack } from "../client.js";
+import MusicClient, { Guild, queuedTrack } from "../classes/client.js";
 import * as builders from "@oceanicjs/builders"
 import playdl from "play-dl";
 import util from "util";
 import * as voice from "@discordjs/voice";
-import ResolverUtils from "../resolverUtils.js";
+import ResolverUtils from "../classes/resolverUtils.js";
 import { debugLog } from "../bot.js";
-import Cache from "../cache.js";
+import Cache from "../classes/cache.js";
 
 playdl.getFreeClientID().then((val) => 
     playdl.setToken({
@@ -117,6 +117,7 @@ export default {
             const t = queue.tracks[ctn];
             const cst = t.trackNumber;
             const st = t.tracks[cst];
+            debugLog("add-url debug info:")
             debugLog(`guilds["${interaction.guildID}"].queue.internalCurrentIndex: ${ctn}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].trackNumber: ${cst}`);

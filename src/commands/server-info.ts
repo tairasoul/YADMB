@@ -1,4 +1,4 @@
-import { Guild } from "../client.js";
+import { Guild } from "../classes/client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import utils from "../utils.js"

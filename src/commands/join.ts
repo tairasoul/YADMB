@@ -1,8 +1,8 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import MusicClient, { Guild } from "../client.js";
+import MusicClient, { Guild } from "../classes/client.js";
 import * as voice from "@discordjs/voice";
-import ResolverUtils from "../resolverUtils.js";
+import ResolverUtils from "../classes/resolverUtils.js";
 
 export default {
     name: "join",

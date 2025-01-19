@@ -1,4 +1,4 @@
-import { AudioResolver, PagerResolver, dataResolver, playlistResolver, resolver } from "./addonTypes";
+import { AudioResolver, PagerResolver, dataResolver, playlistResolver, resolver } from "../types/addonTypes";
 import Cache from "./cache.js";
 import { ResolverInformation } from "./client.js";
 export default class ResolverUtils {

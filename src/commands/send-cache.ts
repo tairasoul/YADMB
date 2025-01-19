@@ -1,5 +1,5 @@
 import * as oceanic from "oceanic.js";
-import Cache from "../cache";
+import Cache from "../classes/cache";
 
 export default {
     name: "send-cache",

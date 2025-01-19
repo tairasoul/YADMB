@@ -1,9 +1,8 @@
 import fs from "fs";
-import { fileURLToPath } from 'url';
-import path from "path";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-import { debugLog } from "./bot.js";
+import { debugLog } from "../bot.js";
 import AddonPackages from "./addons.packages.js";
+import path from "path";
+import { __dirname } from "../bot.js";
 function isExcluded(filePath, exclusionList) {
     return exclusionList.some(exclusion => {
         if (exclusion.endsWith("*")) {

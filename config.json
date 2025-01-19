@@ -6,5 +6,10 @@
   },
   "cache_path": ":memory:",
   "expiry_time": "3d",
-  "check_interval": "1m"
+  "check_interval": "1m",
+  "proxy": {
+    "enableProxies": false,
+    "cycling": false,
+    "cycleInterval": "1h"
+  }
 }

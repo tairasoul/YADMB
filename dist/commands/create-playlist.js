@@ -41,7 +41,7 @@ export default {
         let currentTrack = 0;
         await interaction.editOriginal({ embeds: [embedMessage("Creating component ids.")] });
         // create component ids
-        debugLog("creating component ids");
+        debugLog("creating component ids (create-playlist.ts)");
         const backId = rstring.generate();
         const nextId = rstring.generate();
         const addId = rstring.generate();
@@ -135,6 +135,7 @@ export default {
             currentTrack += 1;
             if (currentTrack == paged.length)
                 currentTrack = 0;
+            debugLog("logging paged for create-playlist debug info");
             debugLog(paged);
             const embed = paged[currentTrack].embed;
             const components = (currentTrack == 0 ? rows.moveBackDisabled : currentTrack == paged.length - 1 ? rows.moveUpDisabled : rows.enabled);
@@ -148,6 +149,7 @@ export default {
                 paged: paged.splice(currentTrack, 1)[0],
                 track: data.tracks.splice(currentTrack, 1)[0]
             };
+            debugLog("logging paged for create-playlist debug info");
             debugLog(paged);
             currentData.paged.index -= 1;
             for (const field of currentData.paged.embed.getFields()) {
@@ -162,6 +164,7 @@ export default {
                 }
             }
             paged.splice(currentTrack - 1, 0, currentData.paged);
+            debugLog("logging paged for create-playlist debug info");
             debugLog(paged);
             data.tracks.splice(currentTrack - 1, 0, currentData.track);
             const embed = paged[currentTrack].embed;
@@ -176,6 +179,7 @@ export default {
                 paged: paged.splice(currentTrack, 1)[0],
                 track: data.tracks.splice(currentTrack, 1)[0]
             };
+            debugLog("logging paged for create-playlist debug info");
             debugLog(paged);
             currentData.paged.index += 1;
             for (const field of currentData.paged.embed.getFields()) {
@@ -190,6 +194,7 @@ export default {
                 }
             }
             paged.splice(currentTrack + 1, 0, currentData.paged);
+            debugLog("logging paged for create-playlist debug info");
             debugLog(paged);
             data.tracks.splice(currentTrack + 1, 0, currentData.track);
             const embed = paged[currentTrack].embed;

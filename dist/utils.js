@@ -82,6 +82,7 @@ export function encode(array) {
 }
 export function decodeStr(str) {
     const decoded = base64.decode(str);
+    debugLog("logging decoded base64");
     debugLog(decoded);
     return JSON.parse(decoded);
 }

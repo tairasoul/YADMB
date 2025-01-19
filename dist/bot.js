@@ -2,8 +2,8 @@ import fs from "node:fs";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import * as oceanic from 'oceanic.js';
-import MusicClient from './client.js';
-import addonLoader from "./addonLoader.js";
+import MusicClient from './classes/client.js';
+import addonLoader from "./classes/addonLoader.js";
 export const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 let debug = false;
 if (fs.existsSync(`${path.join(__dirname, "..")}/enableDebugging`))
@@ -13,7 +13,7 @@ export function debugLog(text) {
         console.log(text);
 }
 let setup = false;
-const { token, package_manager, cache_path, expiry_time, check_interval } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
+const { token, package_manager, cache_path, expiry_time, check_interval, proxy } = JSON.parse(fs.readFileSync(path.join(__dirname, '..') + "/config.json", 'utf8'));
 const defs = {
     install: package_manager.install.trim(),
     uninstall: package_manager.uninstall.trim()
@@ -38,7 +38,10 @@ const client = new MusicClient({
     },
     database_path: cache_path ?? "./cache.db",
     database_expiry_time: expiry_time ?? "3d",
-    database_cleanup_interval: check_interval ?? "1m"
+    database_cleanup_interval: check_interval ?? "1m",
+    proxy_cycle_interval: proxy.cycleInterval ?? "1h",
+    should_cycle_proxies: proxy.cycling ?? false,
+    should_proxy: proxy.enableProxies ?? false
 });
 /*if (web_features) {
     startWebFunctions();
@@ -46,7 +49,7 @@ const client = new MusicClient({
 }*/
 const loader = new addonLoader(client, defs);
 client.on('voiceStateUpdate', (oldState, newState) => {
-    const guild = client.m_guilds[oldState.guildID];
+    const guild = client.m_guilds.get(oldState.guildID);
     if (client.getVoiceConnection(oldState.guildID) === undefined && guild.connection) {
         const connection = guild.connection;
         connection.disconnect();
@@ -57,6 +60,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         if (guild.voiceChannel !== null && guild.connection) {
             const channel = guild.voiceChannel;
             const connection = guild.connection;
+            debugLog("logging amount of members in voice channel");
             debugLog(channel.voiceMembers.size);
             if (channel.voiceMembers.size == 1) {
                 guild.leaveTimer = setTimeout(() => {

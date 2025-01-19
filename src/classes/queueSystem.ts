@@ -1,10 +1,10 @@
 import voice from "@discordjs/voice";
 import util from "node:util";
-import utils from "./utils.js"
+import utils from "../utils.js"
 import { queuedTrack, loopType } from "./client.js";
-import { infoData } from "./addonTypes.js";
+import { infoData } from "../types/addonTypes.js";
 import ResolverUtils from "./resolverUtils.js";
-import { debugLog } from "./bot.js";
+import { debugLog } from "../bot.js";
 export default class QueueHandler {
     public tracks: queuedTrack[] = [];
     private internalLoop: loopType = "none";
@@ -110,6 +110,7 @@ export default class QueueHandler {
 
     async play(resolvers: ResolverUtils) {
         const currentInternal = this.tracks[this.internalCurrentIndex];
+        debugLog("logging queue.play() debug info");
         debugLog(util.inspect(currentInternal, false, 5, true));
         debugLog(this.internalCurrentIndex);
         debugLog(util.inspect(this.tracks, false, 5, true));

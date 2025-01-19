@@ -1,14 +1,14 @@
 import * as oceanic from "oceanic.js";
-import MusicClient, { Guild, queuedTrack } from "../client.js";
+import MusicClient, { Guild, queuedTrack } from "../classes/client.js";
 import playdl from "play-dl";
 import * as builders from "@oceanicjs/builders";
 import humanize from "humanize-duration";
 import utils from "../utils.js";
 import * as voice from "@discordjs/voice";
 import util from "util";
-import ResolverUtils from "../resolverUtils.js";
+import ResolverUtils from "../classes/resolverUtils.js";
 import { debugLog } from "../bot.js";
-import Cache from "../cache.js";
+import Cache from "../classes/cache.js";
 
 export default {
     name: "search",
@@ -124,6 +124,7 @@ export default {
             const cst = t.trackNumber;
             const st = t.tracks[cst];
             queue.tracks.push(youtubeadd);
+            debugLog("logging search debug info")
             debugLog(`guilds["${interaction.guildID}"].queue.internalCurrentIndex: ${ct}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].trackNumber: ${cst}`);

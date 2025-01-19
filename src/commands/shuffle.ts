@@ -1,10 +1,8 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import { Guild } from "../client.js";
+import { Guild } from "../classes/client.js";
 import utils from "../utils.js";
-import ResolverUtils from "../resolverUtils.js";
-import { debugLog } from "../bot.js";
-import { inspect } from "util";
+import ResolverUtils from "../classes/resolverUtils.js";
 
 export default {
     name: "shuffle",
