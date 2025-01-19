@@ -5,6 +5,10 @@ import { EmbedBuilder } from "@oceanicjs/builders";
 import { track } from "../classes/client";
 import ResolverUtils from "../classes/resolverUtils.js";
 import Cache from "../classes/cache.js";
+import { ProxyAgent } from "undici";
+import { canonicalDomain, Cookie, CookieJar } from "tough-cookie";
+import { CookieClient } from "http-cookie-agent/undici"
+import { SocksProxyAgent } from "socks-proxy-agent";
 
 export type Proxy = {
     url: string;
@@ -279,3 +283,66 @@ export type infoData = {
      */
     durationInMs: number;
 }
+
+const convertCookie = (cookie: any) =>
+    cookie instanceof Cookie
+      ? cookie
+      : new Cookie({
+          key: cookie.name,
+          value: cookie.value,
+          expires: typeof cookie.expirationDate === "number" ? new Date(cookie.expirationDate * 1000) : "Infinity",
+          domain: canonicalDomain(cookie.domain),
+          path: cookie.path,
+          secure: cookie.secure,
+          httpOnly: cookie.httpOnly,
+          sameSite: convertSameSite(cookie.sameSite),
+          hostOnly: cookie.hostOnly,
+        });
+
+const addCookies = (jar: CookieJar, cookies: { domain: string; hostOnly: boolean; httpOnly: boolean; name: string; path: string; sameSite: string; secure: boolean; session: boolean; value: string; }[]) => {
+    if (!cookies || !Array.isArray(cookies)) {
+      throw new Error("cookies must be an array");
+    }
+    if (!cookies.some(c => c.name === "SOCS")) {
+      cookies.push({
+        domain: ".youtube.com",
+        hostOnly: false,
+        httpOnly: false,
+        name: "SOCS",
+        path: "/",
+        sameSite: "lax",
+        secure: true,
+        session: false,
+        value: "CAI",
+      });
+    }
+    for (const cookie of cookies) {
+      jar.setCookieSync(convertCookie(cookie), "https://www.youtube.com");
+    }
+  };
+
+
+export function createSocksProxy(options: ProxyAgent.Options, cookies = []) {
+    if (!cookies) cookies = [];
+    if (typeof options === "string") options = { uri: options };
+    if (options.factory) throw new Error("Cannot use factory with createProxyAgent");
+    const jar = new CookieJar();
+    addCookies(jar, cookies);
+    const proxyOptions = Object.assign(
+      {
+        factory: (origin: any, opts: any) => {
+          const o = Object.assign({ cookies: { jar } }, opts);
+          return new CookieClient(origin, o);
+        },
+      },
+      options,
+    );
+    const agent = new SocksProxyAgent(options.uri);
+    const dispatcher = new ProxyAgent(proxyOptions);
+  
+    return { dispatcher, agent, jar, localAddress: options.localAddress };
+};
+function convertSameSite(sameSite: any): string | undefined {
+    throw new Error("Function not implemented.");
+}
+
