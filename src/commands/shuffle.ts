@@ -1,10 +1,10 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import { Guild } from "../client.js";
+import { Guild } from "../classes/client.js";
 import utils from "../utils.js";
-import ResolverUtils from "../resolverUtils.js";
-import { debugLog } from "../bot.js";
-import { inspect } from "util";
+import ResolverUtils from "../classes/resolverUtils.js";
+import { Proxy } from "../types/proxyTypes.js";
+import ytdl from "@distube/ytdl-core";
 
 export default {
     name: "shuffle",
@@ -33,7 +33,9 @@ export default {
     ],
     callback: async (interaction: oceanic.CommandInteraction, info: {
         resolvers: ResolverUtils, 
-        guild: Guild
+        guild: Guild,
+        proxyInfo: Proxy |  undefined, 
+                authenticatedAgent: ytdl.Agent | undefined
     }) => {
         await interaction.defer();
         const shuffleType = interaction.data.options.getString("type", true);
@@ -74,6 +76,6 @@ export default {
         const embed = new builders.EmbedBuilder();
         embed.setDescription(`Shuffled queue, now playing ${queue.tracks[queue.internalCurrentIndex].tracks[0].name}.`);
         await interaction.editOriginal({embeds: [embed.toJSON()]});
-        await queue.play(info.resolvers);
+        await queue.play(info.resolvers, info.proxyInfo, info.authenticatedAgent);
     }
 }

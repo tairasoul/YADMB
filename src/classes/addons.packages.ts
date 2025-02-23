@@ -1,19 +1,19 @@
 import PackageManager, { managerDefs } from "./package.manager.js";
 import fs from "fs";
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { debugLog } from "./bot.js";
+import { debugLog } from "../bot.js";
+import { fileURLToPath } from "url";
 const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 
 export type PackageList = {
     [key: string]: string[];
 }
 
-const packageExclusions = ["@discordjs/voice", "@distube/ytdl-core", "@oceanicjs/builders", "express", "humanize-duration", "js-base64", "libsodium-wrappers", "lzwcompress", "oceanic.js", "opusscript", "play-dl", "randomstring", "ytpl"];
+const packageExclusions = ["@discordjs/voice", "@distube/ytdl-core", "@oceanicjs/builders", "humanize-duration", "js-base64", "libsodium-wrappers", "lzwcompress", "oceanic.js", "opusscript", "play-dl", "randomstring"];
 
 export default class AddonPackages {
     private manager: PackageManager;
-    private installedPath: string = `${path.join(__dirname, "..")}/modules.json`;
+    private installedPath: string = `${path.join(__dirname, "..", "..")}/modules.json`;
     private list: PackageList;
     private checked: string[] = [];
 

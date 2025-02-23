@@ -58,7 +58,7 @@ export default {
             const s_resolvers = await info.resolvers.getSongResolvers(video);
             let resolver;
             for (const s_res of s_resolvers) {
-                const output = await s_res.resolve(video, info.cache, forceInvalidation);
+                const output = await s_res.resolve(video, info.cache, info.proxyInfo, info.authenticatedAgent, forceInvalidation);
                 if (output && typeof output != "string") {
                     resolver = output;
                     break;
@@ -103,12 +103,13 @@ export default {
             const t = queue.tracks[ctn];
             const cst = t.trackNumber;
             const st = t.tracks[cst];
+            debugLog("add-url debug info:");
             debugLog(`guilds["${interaction.guildID}"].queue.internalCurrentIndex: ${ctn}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].trackNumber: ${cst}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ctn].tracks[cst]: ${util.inspect(st, false, 5, true)}`);
             if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection)
-                await queue.play(info.resolvers);
+                await queue.play(info.resolvers, info.proxyInfo, info.authenticatedAgent);
         }
     }
 };

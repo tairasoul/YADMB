@@ -2,12 +2,13 @@ import fs from 'fs';
 import * as oceanic from 'oceanic.js';
 import { Client } from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
-import { InfoData } from "play-dl";
-import { queuedTrack, track } from './client.js';
-import ResolverUtils from './resolverUtils.js';
-import { PageData } from './addonTypes.js';
-import Cache from './cache.js';
-export declare function getHighestResUrl(data: InfoData): string;
+import { queuedTrack, track } from './classes/client.js';
+import ResolverUtils from './classes/resolverUtils.js';
+import { PageData } from './types/addonTypes.js';
+import Cache from './classes/cache.js';
+import ytdl from '@distube/ytdl-core';
+import { Proxy } from './types/proxyTypes.js';
+export declare function getHighestResUrl(data: ytdl.videoInfo): string;
 export declare function SelectMenu(options: Array<{
     name: string;
     value?: string;
@@ -43,10 +44,10 @@ export interface PageHolderData {
     pages: PageData[];
 }
 export declare function Pager(pages: PageHolderData): PageHolder;
-export declare function queuedTrackPager(array: queuedTrack[], callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils, cache: Cache, forceInvalidation?: boolean): Promise<PageHolder>;
+export declare function queuedTrackPager(array: queuedTrack[], proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils, cache: Cache, forceInvalidation?: boolean): Promise<PageHolder>;
 export type volumeMode = "percent" | "whole number";
 export declare function parseVolumeString(volume: string): number;
-export declare function trackPager(array: track[], callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean): Promise<PageData[]>;
+export declare function trackPager(array: track[], proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, callback: ((title: string) => Promise<void>) | undefined, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean): Promise<PageData[]>;
 declare const _default: {
     SelectMenu: typeof SelectMenu;
     mkdsf: typeof mkdsf;

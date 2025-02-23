@@ -1,11 +1,10 @@
 {
   "dependencies": {
     "@discordjs/voice": "^0.17.0",
-    "@distube/ytdl-core": "^4.13.3",
+    "@distube/ytdl-core": "^4.15.8",
     "@distube/ytpl": "^1.2.1",
     "@oceanicjs/builders": "^1.1.11",
     "better-sqlite3": "^11.7.2",
-    "express": "^4.18.2",
     "humanize-duration": "^3.31.0",
     "js-base64": "^3.7.6",
     "knex": "^3.1.0",
@@ -24,12 +23,13 @@
     "build_bot": "rm -r dist && tsc && cd dist/commands  && rm *.d.ts",
     "build_base_addons": "cd addons/base && tsc",
     "run_debug": "echo > enableDebugging && node dist/bot",
-    "setup-npm": "npm i && cd play-dl && npm i",
-    "setup-pnpm": "pnpm i && cd play-dl && pnpm i"
+    "setup-npm": "npm i && cd play-dl && npm i --force && npm run build",
+    "setup-pnpm": "pnpm i && cd play-dl && pnpm i --force && npm run build"
   },
   "devDependencies": {
     "@types/base-64": "^1.0.2",
     "@types/express": "^4.17.21",
+    "@types/global-tunnel-ng": "^2.1.4",
     "@types/humanize-duration": "^3.27.4",
     "@types/ms": "^0.7.34",
     "@types/node": "^22.10.5",

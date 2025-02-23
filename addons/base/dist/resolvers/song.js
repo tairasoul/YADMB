@@ -18,11 +18,14 @@ export const base = {
         return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/, /https:\/\/youtu\.be\/.*/, /https:\/\/soundcloud\.com\/.*/, /https:\/\/on\.soundcloud\.com\/.*/, /https:\/\/deezer\.(?:com|page\.link)\/.*/].find((reg) => reg.test(url)) != undefined;
     },
     priority: 0,
-    async resolve(url, cache, forceInvalidation) {
+    async resolve(url, cache, proxyInfo, authenticatedAgent, forceInvalidation) {
         const provider = getProvider(url);
         return new Promise(async (resolve) => {
             switch (provider) {
                 case "youtube":
+                    let agent;
+                    if (proxyInfo)
+                        agent = ytdl.createProxyAgent({ uri: `http://${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}` });
                     if (!ytdl.validateURL(url)) {
                         resolve("Invalid URL!");
                     }
@@ -38,10 +41,10 @@ export const base = {
                         });
                         break;
                     }
-                    const info = await playdl.video_basic_info(url);
-                    const title = info.video_details.title;
+                    const info = await ytdl.getBasicInfo(url, { agent: agent ?? authenticatedAgent });
+                    const title = info.videoDetails.title;
                     await cache.cache("youtube-song-data", {
-                        title: info.video_details.title,
+                        title: info.videoDetails.title,
                         id,
                         extra: {
                             url

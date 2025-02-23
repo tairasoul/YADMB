@@ -27,7 +27,7 @@ export default {
         await interaction.editOriginal({ embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")] });
         const invalidation = interaction.data.options.getBoolean("force-invalidation") ?? false;
         const data = {
-            queued: await utils.queuedTrackPager(info.guild.queue.tracks, async (title) => {
+            queued: await utils.queuedTrackPager(info.guild.queue.tracks, info.proxyInfo, info.authenticatedAgent, async (title) => {
                 await interaction.editOriginal({ embeds: [embedMessage(`Paging track **${title}**`)] });
             }, info.resolvers, info.cache, invalidation),
             tracks: null
@@ -36,7 +36,7 @@ export default {
         let currentPage = 0;
         let currentInspectPage = 0;
         // make ids
-        debugLog("making component ids");
+        debugLog("making component ids (view-queue.ts)");
         const nextEmbedId = rstring.generate();
         const prevEmbedId = rstring.generate();
         const inspectId = rstring.generate();
@@ -47,7 +47,7 @@ export default {
         const exportId = rstring.generate();
         const exitId = rstring.generate();
         // setup buttons
-        debugLog("creating components");
+        debugLog("creating components (view-queue.ts)");
         const nextEmbed = new builders.Button(oceanic.ButtonStyles.PRIMARY, nextEmbedId);
         const prevEmbed = new builders.Button(oceanic.ButtonStyles.PRIMARY, prevEmbedId);
         const inspect = new builders.Button(oceanic.ButtonStyles.PRIMARY, inspectId);
@@ -58,7 +58,7 @@ export default {
         const exportB = new builders.Button(oceanic.ButtonStyles.PRIMARY, exportId);
         const exit = new builders.Button(oceanic.ButtonStyles.PRIMARY, exitId);
         // setup labels
-        debugLog("setting labels");
+        debugLog("setting labels (view-queue.ts)");
         nextEmbed.setLabel("Next");
         prevEmbed.setLabel("Previous");
         inspect.setLabel("Inspect");
@@ -143,7 +143,7 @@ export default {
                 return;
             currentInspectPage = 0;
             await i.createMessage({ embeds: [embedMessage("Paging tracks for playlist.")], flags: 1 << 6 });
-            data.tracks = utils.Pager({ pages: await utils.trackPager(info.guild.queue.tracks[currentPage].tracks, async (title) => {
+            data.tracks = utils.Pager({ pages: await utils.trackPager(info.guild.queue.tracks[currentPage].tracks, info.proxyInfo, info.authenticatedAgent, async (title) => {
                     await i.editOriginal({ embeds: [embedMessage(`Paging track **${title}**`)] });
                 }, info.resolvers, info.cache, invalidation) });
             isInspecting = true;

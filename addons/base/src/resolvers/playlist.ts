@@ -1,5 +1,7 @@
-import { playlistData, playlistResolver } from "../../../../dist/addonTypes.js";
+import ytpl from "@distube/ytpl";
+import { playlistData, playlistResolver } from "../../../../dist/types/addonTypes.js";
 import playdl, { DeezerAlbum, DeezerPlaylist, SoundCloudPlaylist, SoundCloudTrack, YouTubeVideo } from "play-dl";
+import ytdl from "@distube/ytdl-core";
 
 function getProvider(url: string) {
     // no clue if these are all, please open an issue if they are not
@@ -105,7 +107,7 @@ export const base: playlistResolver = {
                 }
                 return returnVal;
             case "youtube":
-                const y_id = playdl.extractID(url);
+                const y_id = await ytpl.getPlaylistID(url);
                 if (forceInvalidation)
                     await cache.uncache("youtube-playlist-data", y_id);
                 const ycached = await cache.get("youtube-playlist-data", y_id);
@@ -120,9 +122,9 @@ export const base: playlistResolver = {
                     }
                     return returnVal;
                 }
-                const playdl_yt = await playdl.playlist_info(url);
+                const playdl_yt = await ytpl(url);
                 returnVal.title = playdl_yt.title as string;
-                const tracks = await playdl_yt.all_videos();
+                const tracks = playdl_yt.items;
                 for (const track of tracks) {
                     returnVal.items.push({
                         title: track.title as string,

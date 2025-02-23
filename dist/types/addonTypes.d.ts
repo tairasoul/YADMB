@@ -1,10 +1,16 @@
 import { AudioResource } from "@discordjs/voice";
-import MusicClient, { Guild, queuedTrack } from "./client";
+import MusicClient, { Guild, queuedTrack } from "../classes/client";
 import * as oceanic from "oceanic.js";
 import { EmbedBuilder } from "@oceanicjs/builders";
-import { track } from "./client";
-import ResolverUtils from "./resolverUtils.js";
-import Cache from "./cache.js";
+import { track } from "../classes/client";
+import ResolverUtils from "../classes/resolverUtils.js";
+import Cache from "../classes/cache.js";
+import ytdl from "@distube/ytdl-core";
+export type Proxy = {
+    url: string;
+    port: number;
+    auth?: string;
+};
 export type resolver = {
     /**
      * Name of the resolver.
@@ -49,17 +55,19 @@ export type PagerResolver = {
      * @param track The track being paged.
      * @param index The index of the track being paged.
      * @param cache The global cache. Use this to cache and retrieve data for the track.
+     * @param proxyInfo The active proxy (if any.)
      * @param forceInvalidation Is cache invalidation being forced for this? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    queuedPager: (track: queuedTrack, index: number, cache: Cache, forceInvalidation: boolean) => Promise<PageData>;
+    queuedPager: (track: queuedTrack, index: number, cache: Cache, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, forceInvalidation: boolean) => Promise<PageData>;
     /**
      * Pager for a track within a playlist.
      * @param track The track being paged.
      * @param index The index of the track being paged.
      * @param cache The global cache. Use this to cache and retrieve data for the track.
+     * @param proxyInfo The active proxy (if any.)
      * @param forceInvalidation Is cache invalidation being forced for this? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    trackPager: (track: track, index: number, cache: Cache, forceInvalidation: boolean) => Promise<PageData>;
+    trackPager: (track: track, index: number, cache: Cache, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, forceInvalidation: boolean) => Promise<PageData>;
 };
 export type AudioResolver = {
     /**
@@ -77,8 +85,10 @@ export type AudioResolver = {
     available: (url: string) => Promise<boolean>;
     /**
      * Function that turns a song URL into an audio resource from discordjs/voice and into infoData. Returns undefined if it can't.
+     * @param url The song URL.
+     * @param proxyInfo The active proxy (if any.)
      */
-    resolve: (url: string) => Promise<{
+    resolve: (url: string, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined) => Promise<{
         resource: AudioResource<any>;
         info: infoData;
     } | undefined>;
@@ -125,9 +135,10 @@ export type dataResolver = {
      * Function that resolves the URL into song data. Returns undefined if it can't resolve the URL into data.
      * @param url The URL of the song.
      * @param cache The global cache. Use this to cache and retrieve data for the URL.
+     * @param proxyInfo The active proxy (if any.)
      * @param forceInvalidation Is cache invalidation being forced for this call? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    resolve: (url: string, cache: Cache, forceInvalidation: boolean) => Promise<songData | string | undefined>;
+    resolve: (url: string, cache: Cache, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, forceInvalidation: boolean) => Promise<songData | string | undefined>;
 };
 export type playlistResolver = {
     /**
@@ -147,9 +158,10 @@ export type playlistResolver = {
      * Function that resolves the URL into playlist data. Returns undefined if it can't resolve the URL into playlist data.
      * @param url The URL of the playlist.
      * @param cache The global cache. Use this to cache and retrieve data for the URL.
+     * @param proxyInfo The active proxy (if any.)
      * @param forceInvalidation Is cache invalidation being forced for this call? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    resolve: (url: string, cache: Cache, forceInvalidation: boolean) => Promise<playlistData | string | undefined>;
+    resolve: (url: string, cache: Cache, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, forceInvalidation: boolean) => Promise<playlistData | string | undefined>;
 };
 export type thumbnailResolver = {
     /**
@@ -166,7 +178,7 @@ export type thumbnailResolver = {
      * @param cache The global cache. Use this to cache and retrieve data for the URL.
      * @param forceInvalidation Is cache invalidation being forced for this call? The cache doesn't automatically invalidate it, so you'll need to just add this to whatever valid checks you're doing.
      */
-    resolve: (url: string, cache: Cache, forceInvalidation: boolean) => Promise<string | undefined>;
+    resolve: (url: string, cache: Cache, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, forceInvalidation: boolean) => Promise<string | undefined>;
 };
 export type command = {
     /**
@@ -189,6 +201,7 @@ export type command = {
         guild: Guild;
         client: MusicClient;
         cache: Cache;
+        proxyInfo: Proxy | undefined;
     }) => any;
 };
 export type data_resolvers = {

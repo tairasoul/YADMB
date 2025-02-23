@@ -1,5 +1,5 @@
 import * as oceanic from "oceanic.js";
-import { Guild, ResolverInformation, queuedTrack } from "../client.js";
+import { Guild, ResolverInformation, queuedTrack } from "../classes/client.js";
 import * as builders from "@oceanicjs/builders"
 import { Base64 as base64 } from "js-base64";
 

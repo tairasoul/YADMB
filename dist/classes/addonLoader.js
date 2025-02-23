@@ -1,9 +1,9 @@
 import fs from "fs";
-import { fileURLToPath } from 'url';
-import path from "path";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-import { debugLog } from "./bot.js";
+import { debugLog } from "../bot.js";
 import AddonPackages from "./addons.packages.js";
+import path from "path";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
 function isExcluded(filePath, exclusionList) {
     return exclusionList.some(exclusion => {
         if (exclusion.endsWith("*")) {
@@ -17,7 +17,7 @@ function isExcluded(filePath, exclusionList) {
         return filePath === exclusion; // Exact match
     });
 }
-const addonDir = path.join(`${__dirname}`, "..", "addons");
+const addonDir = path.join(`${__dirname}`, "..", "..", "addons");
 export default class addonLoader {
     _client;
     addonPackages;

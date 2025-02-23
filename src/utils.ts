@@ -3,15 +3,16 @@ import * as oceanic from 'oceanic.js';
 import { Client } from 'oceanic.js';
 import * as builders from "@oceanicjs/builders";
 import { Base64 as base64 } from "js-base64";
-import { InfoData } from "play-dl";
-import { queuedTrack, track } from './client.js';
+import { queuedTrack, track } from './classes/client.js';
 import { debugLog } from './bot.js';
-import ResolverUtils from './resolverUtils.js';
-import { PageData } from './addonTypes.js';
-import Cache from './cache.js';
+import ResolverUtils from './classes/resolverUtils.js';
+import { PageData } from './types/addonTypes.js';
+import Cache from './classes/cache.js';
+import ytdl from '@distube/ytdl-core';
+import { Proxy } from './types/proxyTypes.js';
 
-export function getHighestResUrl(data: InfoData) {
-    const thumbnails = data.video_details.thumbnails;
+export function getHighestResUrl(data: ytdl.videoInfo) {
+    const thumbnails = data.videoDetails.thumbnails;
     let highestX = 0;
     let highestY = 0;
     let currentHighestUrl = "";
@@ -91,6 +92,7 @@ export function encode(array: any) {
 
 export function decodeStr(str: string) {
     const decoded = base64.decode(str);
+    debugLog("logging decoded base64")
     debugLog(decoded);
     return JSON.parse(decoded);
 }
@@ -154,14 +156,14 @@ export function Pager(pages: PageHolderData) {
     return new PageHolder(PageClasses);
 }
 
-export async function queuedTrackPager(array: queuedTrack[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean = false) {
+export async function queuedTrackPager(array: queuedTrack[], proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean = false) {
     const pages: PageData[] = []
     for (let i = 0; i < array.length; i++) {
         await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].tracks[0].url);
         let output;
         for (const pager of pagers) {
-            output = await pager.queuedPager(array[i], i, cache, forceInvalidation);
+            output = await pager.queuedPager(array[i], i, cache, proxyInfo, authenticatedAgent, forceInvalidation);
             if (output) {
                 pages.push(output);
                 break;
@@ -190,14 +192,14 @@ export function parseVolumeString(volume: string) {
     return result;
 }
 
-export async function trackPager(array: track[], callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean) {
+export async function trackPager(array: track[], proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined, callback: (title: string) => Promise<void> = () => {return new Promise((resolve) => resolve())}, resolvers: ResolverUtils, cache: Cache, forceInvalidation: boolean) {
     const pages: PageData[] = []
     for (let i = 0; i < array.length; i++) {
         await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].url);
         let output;
         for (const pager of pagers) {
-            output = await pager.trackPager(array[i], i, cache, forceInvalidation);
+            output = await pager.trackPager(array[i], i, cache, proxyInfo, authenticatedAgent, forceInvalidation);
             if (output) {
                 pages.push(output);
                 break;

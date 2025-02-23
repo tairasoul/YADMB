@@ -1,6 +1,6 @@
 import pkg from "knex";
 const { knex } = pkg;
-import { debugLog } from "./bot.js";
+import { debugLog } from "../bot.js";
 import ms from "ms";
 import path from "node:path";
 

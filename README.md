@@ -47,7 +47,13 @@ the template config looks like this:
   },
   "cache_path": ":memory:",
   "expiry_time": "3d",
-  "check_interval": "1m"
+  "check_interval": "1m",
+  "proxy": {
+    "enableProxies": false,
+    "cycling": false,
+    "cycleInterval": "1h"
+  },
+  "cookies": false
 }
 ```
 
@@ -60,6 +66,42 @@ cache_path - the path to the cache database. :memory: means it's in-memory, but 
 expiry_time - how long cached info should be valid for
 
 check_interval - how often the bot checks if cached info is valid
+
+proxy - for the proxying system. enableProxies determines if we use a proxy, cycling determines if we cycle through all proxies available in proxies.json, and cycleInterval determines how long it is before we cycle to the next proxy
+
+cookies - use cookies for youtube videos.
+
+# cookies
+
+> [!CAUTION]
+> You should never use your personal google account's cookies for downloading videos. Using disposable accounts is recommended, with no link to your personal account or identity.
+>
+> Use incognito when signing in, and just to be sure, use a VPN or proxy.
+
+To get your cookies, follow [ytdl-core's instructions](https://github.com/distubejs/ytdl-core?tab=readme-ov-file#how-to-get-cookies) and paste the cookies obtained into `cookies.json`
+
+# proxies
+
+## !! WARNING
+
+## Proxies should be functional, but are untested.
+
+## SOCKS5/4 proxies are unsupported, only use HTTPS proxies.
+
+proxies are formatted as follows
+
+```json
+{
+  "url": "proxy url",
+  "port": 5050,
+  "auth": "proxyauth"
+}
+```
+
+auth is optional, and only required if the proxy needs authentication. auth string is in format of "userId:password"
+
+url is the url of the proxy, port is the proxy's port you connect to.
+
 
 # installing addons
 

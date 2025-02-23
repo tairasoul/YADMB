@@ -118,12 +118,13 @@ export default {
             const cst = t.trackNumber;
             const st = t.tracks[cst];
             queue.tracks.push(youtubeadd);
+            debugLog("logging search debug info");
             debugLog(`guilds["${interaction.guildID}"].queue.internalCurrentIndex: ${ct}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct]: ${util.inspect(t, false, 5, true)}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].trackNumber: ${cst}`);
             debugLog(`guilds["${interaction.guildID}"].queue.tracks[ct].tracks[cst]: ${util.inspect(st, false, 5, true)}`);
             if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection)
-                await queue.play(info.resolvers);
+                await queue.play(info.resolvers, info.proxyInfo, info.authenticatedAgent);
         };
         // play video next
         //@ts-ignore
@@ -136,7 +137,7 @@ export default {
             if (t.type === "playlist") {
                 const cst = t.trackNumber;
                 const track_embed = new builders.EmbedBuilder();
-                const track_thumbnail = await info.resolvers.getSongThumbnail(currentVideo.url, info.cache);
+                const track_thumbnail = await info.resolvers.getSongThumbnail(currentVideo.url, info.cache, info.proxyInfo, info.authenticatedAgent);
                 track_embed.setTitle(currentVideo.title);
                 if (track_thumbnail)
                     track_embed.setThumbnail(track_thumbnail);
@@ -147,7 +148,7 @@ export default {
             }
             else {
                 const track_embed = new builders.EmbedBuilder();
-                const track_thumbnail = await info.resolvers.getSongThumbnail(currentVideo.url, info.cache);
+                const track_thumbnail = await info.resolvers.getSongThumbnail(currentVideo.url, info.cache, info.proxyInfo, info.authenticatedAgent);
                 track_embed.setTitle(currentVideo.title);
                 if (track_thumbnail)
                     track_embed.setThumbnail(track_thumbnail);

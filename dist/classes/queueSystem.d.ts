@@ -1,7 +1,9 @@
 import voice from "@discordjs/voice";
 import { queuedTrack, loopType } from "./client.js";
-import { infoData } from "./addonTypes.js";
+import { infoData } from "../types/addonTypes.js";
 import ResolverUtils from "./resolverUtils.js";
+import { Proxy } from "../types/proxyTypes.js";
+import ytdl from "@distube/ytdl-core";
 export default class QueueHandler {
     tracks: queuedTrack[];
     private internalLoop;
@@ -25,5 +27,5 @@ export default class QueueHandler {
     skip(): Promise<void>;
     pause(): boolean;
     resume(): boolean;
-    play(resolvers: ResolverUtils): Promise<void>;
+    play(resolvers: ResolverUtils, proxyInfo: Proxy | undefined, authenticatedAgent: ytdl.Agent | undefined): Promise<void>;
 }
