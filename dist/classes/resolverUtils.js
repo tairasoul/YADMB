@@ -43,18 +43,18 @@ export default class ResolverUtils {
         }
         return resolvers.sort((a, b) => b.priority - a.priority);
     }
-    async getSongThumbnail(url, cache, forceInvalidation = false) {
+    async getSongThumbnail(url, cache, proxyInfo, authenticatedAgent, forceInvalidation = false) {
         for (const resolver of this.resolvers.songThumbnailResolvers) {
-            const resolved = await resolver.resolve(url, cache, forceInvalidation);
+            const resolved = await resolver.resolve(url, cache, proxyInfo, authenticatedAgent, forceInvalidation);
             if (resolved) {
                 return resolved;
             }
         }
         return;
     }
-    async getPlaylistThumbnail(url, cache, forceInvalidation = false) {
+    async getPlaylistThumbnail(url, cache, proxyInfo, authenticatedAgent, forceInvalidation = false) {
         for (const resolver of this.resolvers.playlistThumbnailResolvers) {
-            const resolved = await resolver.resolve(url, cache, forceInvalidation);
+            const resolved = await resolver.resolve(url, cache, proxyInfo, authenticatedAgent, forceInvalidation);
             if (resolved) {
                 return resolved;
             }

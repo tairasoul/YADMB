@@ -4,8 +4,10 @@ import { Client, Collection, ClientOptions } from "oceanic.js";
 import QueueHandler from "./queueSystem.js";
 import voice from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
-import { AddonInfo, AudioResolver, PagerResolver, dataResolver, playlistResolver, resolver, thumbnailResolver } from "./addonTypes.js";
+import { AddonInfo, AudioResolver, PagerResolver, dataResolver, playlistResolver, resolver, thumbnailResolver } from "../types/addonTypes.js";
 import Cache from "./cache.js";
+import { Proxy } from "../types/proxyTypes.js";
+import ytdl from "@distube/ytdl-core";
 export type track = {
     name: string;
     url: string;
@@ -41,6 +43,8 @@ export type Command = {
         guild: Guild;
         client: MusicClient;
         cache: Cache;
+        proxyInfo: Proxy | undefined;
+        authenticatedAgent: ytdl.Agent | undefined;
     }) => Promise<any>);
 };
 type Autocomplete = {
@@ -55,6 +59,8 @@ interface MusicEvents extends oceanic.ClientEvents {
             guild: Guild;
             client: MusicClient;
             cache: Cache;
+            proxyInfo: Proxy | undefined;
+            authenticatedAgent: ytdl.Agent | undefined;
         }
     ];
 }
@@ -62,11 +68,13 @@ interface MClientOptions extends ClientOptions {
     database_path: string;
     database_expiry_time: string;
     database_cleanup_interval: string;
+    proxy_cycle_interval: string;
+    should_proxy: boolean;
+    should_cycle_proxies: boolean;
+    use_cookies: boolean;
 }
 export default class MusicClient extends Client {
-    m_guilds: {
-        [id: string]: Guild;
-    };
+    m_guilds: Collection<string, Guild>;
     commands: Collection<string, Command>;
     autocomplete: Collection<string, (interaction: oceanic.AutocompleteInteraction) => Promise<oceanic.AutocompleteChoice[]>>;
     readonly addons: AddonInfo[];
@@ -74,6 +82,8 @@ export default class MusicClient extends Client {
     private addonCommands;
     private rawCommands;
     private cache_database;
+    private proxyCycle;
+    private authenticatedAgent;
     constructor(options: MClientOptions);
     addAddon(addon: AddonInfo): void;
     registerAddons(): void;

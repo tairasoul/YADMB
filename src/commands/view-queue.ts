@@ -1,4 +1,4 @@
-import MusicClient, { Guild, queuedTrack } from "../client.js";
+import MusicClient, { Guild, queuedTrack } from "../classes/client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import rstring from "randomstring";
@@ -6,9 +6,11 @@ import utils, { PageHolder } from "../utils.js";
 // @ts-ignore
 import {default as lzw} from "lzwcompress";
 import { Base64 as base64} from "js-base64";
-import ResolverUtils from "../resolverUtils.js";
+import ResolverUtils from "../classes/resolverUtils.js";
 import { debugLog } from "../bot.js";
-import Cache from "../cache.js";
+import Cache from "../classes/cache.js";
+import { Proxy } from "../types/proxyTypes.js";
+import ytdl from "@distube/ytdl-core";
 
 function embedMessage(text: string) {
     const embed = new builders.EmbedBuilder();
@@ -31,13 +33,15 @@ export default {
         resolvers: ResolverUtils, 
         guild: Guild, 
         client: MusicClient,
-        cache: Cache
+        cache: Cache,
+        proxyInfo: Proxy |  undefined, 
+        authenticatedAgent: ytdl.Agent | undefined
     }) => {
         await interaction.defer(1 << 6)
         await interaction.editOriginal({embeds: [embedMessage("Paging queued tracks. Please wait, as the time taken will vary depending on queue length.")]})
         const invalidation = interaction.data.options.getBoolean("force-invalidation") ?? false;
         const data: {queued: PageHolder, tracks: PageHolder | null} = {
-            queued: await utils.queuedTrackPager(info.guild.queue.tracks, async (title) => {
+            queued: await utils.queuedTrackPager(info.guild.queue.tracks, info.proxyInfo, info.authenticatedAgent, async (title) => {
                 await interaction.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)]})
             }, info.resolvers, info.cache, invalidation),
             tracks: null
@@ -46,7 +50,7 @@ export default {
         let currentPage = 0;
         let currentInspectPage = 0;
         // make ids
-        debugLog("making component ids")
+        debugLog("making component ids (view-queue.ts)")
         const nextEmbedId = rstring.generate();
         const prevEmbedId = rstring.generate();
         const inspectId = rstring.generate();
@@ -57,7 +61,7 @@ export default {
         const exportId = rstring.generate();
         const exitId = rstring.generate();
         // setup buttons
-        debugLog("creating components")
+        debugLog("creating components (view-queue.ts)")
         const nextEmbed = new builders.Button(oceanic.ButtonStyles.PRIMARY, nextEmbedId);
         const prevEmbed = new builders.Button(oceanic.ButtonStyles.PRIMARY, prevEmbedId);
         const inspect = new builders.Button(oceanic.ButtonStyles.PRIMARY, inspectId);
@@ -68,7 +72,7 @@ export default {
         const exportB = new builders.Button(oceanic.ButtonStyles.PRIMARY, exportId);
         const exit = new builders.Button(oceanic.ButtonStyles.PRIMARY, exitId);
         // setup labels
-        debugLog("setting labels")
+        debugLog("setting labels (view-queue.ts)")
         nextEmbed.setLabel("Next");
         prevEmbed.setLabel("Previous");
         inspect.setLabel("Inspect");
@@ -153,7 +157,7 @@ export default {
             if (i.data.customID !== inspectId) return;
             currentInspectPage = 0;
             await i.createMessage({embeds: [embedMessage("Paging tracks for playlist.")], flags: 1 << 6});
-            data.tracks = utils.Pager({pages: await utils.trackPager(info.guild.queue.tracks[currentPage].tracks, async (title) => {
+            data.tracks = utils.Pager({pages: await utils.trackPager(info.guild.queue.tracks[currentPage].tracks, info.proxyInfo, info.authenticatedAgent, async (title) => {
                 await i.editOriginal({embeds: [embedMessage(`Paging track **${title}**`)]})
             }, info.resolvers, info.cache, invalidation)});
             isInspecting = true;

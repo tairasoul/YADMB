@@ -1,14 +1,16 @@
-import MusicClient, { Guild, track } from "../client.js";
+import MusicClient, { Guild, track } from "../classes/client.js";
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
 import { Base64 as base64 } from "js-base64";
 import rstring from "randomstring";
 import utils from "../utils.js";
 import util from "util";
-import ResolverUtils from "../resolverUtils.js";
+import ResolverUtils from "../classes/resolverUtils.js";
 import { debugLog } from "../bot.js";
-import { PageData } from "../addonTypes.js";
-import Cache from "../cache.js";
+import { PageData } from "../types/addonTypes.js";
+import Cache from "../classes/cache.js";
+import { Proxy } from "../types/proxyTypes.js";
+import ytdl from "@distube/ytdl-core";
 
 function embedMessage(text: string) {
     const embed = new builders.EmbedBuilder();
@@ -37,7 +39,9 @@ export default {
         resolvers: ResolverUtils, 
         guild: Guild, 
         client: MusicClient,
-        cache: Cache
+        cache: Cache,
+        proxyInfo: Proxy |  undefined, 
+        authenticatedAgent: ytdl.Agent | undefined
     }) => {
         await interaction.defer(1 << 6);
         const attachment = interaction.data.options.getAttachment("playlist", true);
@@ -46,7 +50,7 @@ export default {
         const data = utils.decodeStr(text);
         const paged: PageData[] = []
         for (const queued of data.tracks) {
-            const pagedtrack: PageData = (await utils.trackPager([queued], async () => {}, info.resolvers, info.cache, invalidation))[0];
+            const pagedtrack: PageData = (await utils.trackPager([queued], info.proxyInfo, info.authenticatedAgent, async () => {}, info.resolvers, info.cache, invalidation))[0];
             pagedtrack.index = paged.length;
             pagedtrack.embed.addField("index", pagedtrack.index.toString())
             paged.push(pagedtrack);
@@ -54,7 +58,7 @@ export default {
         let currentTrack = 0;
         await interaction.editOriginal({embeds: [embedMessage("Creating component ids.")]});
         // create component ids
-        debugLog("creating component ids")
+        debugLog("creating component ids (edit-playlist.ts)")
         const backId = rstring.generate();
         const nextId = rstring.generate();
         const addId = rstring.generate();
@@ -110,6 +114,7 @@ export default {
             /** @ts-ignore */
             await i.editParent({embeds: [paged[currentTrack].embed.toJSON()], components: rows.disabled, flags: 1 << 6})
             const encoded = base64.encode(JSON.stringify(data));
+            debugLog("logging data for edit-playlist export debug info")
             debugLog(util.inspect(data, false, 5, true));
             await i.createFollowup({content: `Exported playlist **${data.name}**. Save this as a file:`, files: [
                 {
@@ -147,6 +152,7 @@ export default {
             if (i.data.customID !== nextId) return;
             currentTrack += 1;
             if (currentTrack == paged.length) currentTrack = 0;
+            debugLog("logging paged for edit-playlist debug info")
             debugLog(paged);
             const embed = paged[currentTrack].embed;
             const components = (currentTrack == 0 ? rows.moveBackDisabled : currentTrack == paged.length - 1 ? rows.moveUpDisabled : rows.enabled)
@@ -160,6 +166,7 @@ export default {
                 paged: paged.splice(currentTrack, 1)[0],
                 track: data.tracks.splice(currentTrack, 1)[0]
             }
+            debugLog("logging paged for edit-playlist debug info")
             debugLog(paged);
             currentData.paged.index -= 1
             for (const field of currentData.paged.embed.getFields()) {
@@ -174,6 +181,7 @@ export default {
                 }
             }
             paged.splice(currentTrack - 1, 0, currentData.paged);
+            debugLog("logging paged for edit-playlist debug info")
             debugLog(paged);
             data.tracks.splice(currentTrack - 1, 0, currentData.track);
             const embed = paged[currentTrack].embed;
@@ -188,6 +196,7 @@ export default {
                 paged: paged.splice(currentTrack, 1)[0],
                 track: data.tracks.splice(currentTrack, 1)[0]
             }
+            debugLog("logging paged for edit-playlist debug info")
             debugLog(paged);
             currentData.paged.index += 1
             for (const field of currentData.paged.embed.getFields()) {
@@ -202,6 +211,7 @@ export default {
                 }
             }
             paged.splice(currentTrack + 1, 0, currentData.paged);
+            debugLog("logging paged for edit-playlist debug info")
             debugLog(paged)
             data.tracks.splice(currentTrack + 1, 0, currentData.track);
             const embed = paged[currentTrack].embed;
@@ -255,7 +265,7 @@ export default {
             const dataResolvers = await info.resolvers.getSongResolvers(video);
             let dataResolver;
             for (const resolver of dataResolvers) {
-                const output = await resolver.resolve(video, info.cache, invalidation);
+                const output = await resolver.resolve(video, info.cache, info.proxyInfo, info.authenticatedAgent, invalidation);
                 if (output && typeof output != "string") {
                     dataResolver = output;
                     break;
@@ -270,7 +280,7 @@ export default {
                 if (pagers) {
                     let pager;
                     for (const page of pagers) {
-                        const output = await page.trackPager(add, paged.length, info.cache, invalidation);
+                        const output = await page.trackPager(add, paged.length, info.cache, info.proxyInfo, info.authenticatedAgent, invalidation);
                         if (output) {
                             pager = output;
                             break;

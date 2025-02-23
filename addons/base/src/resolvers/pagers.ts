@@ -1,8 +1,9 @@
-import { PageData, PagerResolver } from "../../../../dist/addonTypes";
+import { PageData, PagerResolver } from "../../../../dist/types/addonTypes";
 import * as builders from "@oceanicjs/builders"
 import playdl, { SoundCloudTrack } from "play-dl";
 import { getHighestResUrl } from "../../../../dist/utils.js";
 import humanizeDuration from "humanize-duration";
+import ytdl from "@distube/ytdl-core";
 
 
 export const youtube: PagerResolver = {
@@ -11,7 +12,10 @@ export const youtube: PagerResolver = {
     async available(url) {
         return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/,/https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined;
     },
-    async queuedPager(track, index, cache, forceInvalidation) {
+    async queuedPager(track, index, cache, proxyInfo, authenticatedAgent, forceInvalidation) {
+        let agent;
+        if (proxyInfo)
+            agent = ytdl.createProxyAgent({ uri: `http://${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}`})
         const embed = new builders.EmbedBuilder();
         embed.setTitle(track.name);
         const url = new URL(track.tracks[0].url);
@@ -32,24 +36,23 @@ export const youtube: PagerResolver = {
             embed.addField("Uploaded", new Date(cachedata.extra.uploadedAt as string).toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"}));
         }
         else {
-            const info = await playdl.video_basic_info(track.tracks[0].url)
+            const info = await ytdl.getInfo(track.tracks[0].url, {agent: agent ?? authenticatedAgent})
             const thumbnail = getHighestResUrl(info);
             embed.setImage(thumbnail);
-            // @ts-ignore
-            embed.addField("Author", info.video_details.channel.name);
-            embed.addField("Likes", info.video_details.likes.toString());
-            embed.addField("Views", info.video_details.views.toString());
-            embed.addField("Duration", humanizeDuration(info.video_details.durationInSec * 1000));
-            embed.addField("Uploaded", new Date(info.video_details.uploadedAt as string).toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"}));
+            embed.addField("Author", info.videoDetails.ownerChannelName);
+            embed.addField("Likes", info.videoDetails.likes?.toString() ?? "Could not retrieve likes.");
+            embed.addField("Views", info.videoDetails.viewCount);
+            embed.addField("Duration", humanizeDuration(parseInt(info.videoDetails.lengthSeconds) * 1000));
+            embed.addField("Uploaded", new Date(info.videoDetails.uploadDate).toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"}));
             await cache.cache("youtube-queued-pager-data", {
                 id,
                 title: track.name,
                 extra: {
-                    channelname: info.video_details.channel?.name,
-                    likes: info.video_details.likes,
-                    views: info.video_details.views,
-                    durationInSec: info.video_details.durationInSec,
-                    uploadedAt: info.video_details.uploadedAt,
+                    channelname: info.videoDetails.ownerChannelName,
+                    likes: info.videoDetails.likes?.toString() ?? "Could not get likes",
+                    views: info.videoDetails.viewCount,
+                    durationInSec: parseInt(info.videoDetails.lengthSeconds),
+                    uploadedAt: info.videoDetails.uploadDate,
                     thumbnail
                 }
             })
@@ -62,7 +65,10 @@ export const youtube: PagerResolver = {
         };
         return data;
     },
-    async trackPager(track, index, cache, forceInvalidation) {
+    async trackPager(track, index, cache, proxyInfo, authenticatedAgent, forceInvalidation) {
+        let agent;
+        if (proxyInfo)
+            agent = ytdl.createProxyAgent({ uri: `http://${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}`})
         const embed = new builders.EmbedBuilder();
         embed.setTitle(track.name);
         const url = new URL(track.url);
@@ -80,27 +86,26 @@ export const youtube: PagerResolver = {
             embed.addField("Uploaded", new Date(data.extra.uploadedAt as string).toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"}));
         }
         else {
-            const info = await playdl.video_basic_info(track.url)
+            const info = await ytdl.getInfo(track.url, {agent: agent ?? authenticatedAgent})
             const thumbnail = getHighestResUrl(info);
             cache.cache("youtube-track-pager-data", {
                 id,
                 title: track.name,
                 extra: {
-                    channelname: info.video_details.channel?.name,
-                    likes: info.video_details.likes,
-                    views: info.video_details.views,
-                    durationInSec: info.video_details.durationInSec,
-                    uploadedAt: info.video_details.uploadedAt,
+                    channelname: info.videoDetails.ownerChannelName,
+                    likes: info.videoDetails.likes?.toString() ?? "Could not get likes",
+                    views: info.videoDetails.viewCount,
+                    durationInSec: parseInt(info.videoDetails.lengthSeconds),
+                    uploadedAt: info.videoDetails.uploadDate,
                     thumbnail
                 }
             })
             embed.setImage(thumbnail);
-            // @ts-ignore
-            embed.addField("Author", info.video_details.channel.name);
-            embed.addField("Likes", info.video_details.likes.toString());
-            embed.addField("Views", info.video_details.views.toString());
-            embed.addField("Duration", humanizeDuration(info.video_details.durationInSec * 1000));
-            embed.addField("Uploaded", new Date(info.video_details.uploadedAt as string).toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"}));
+            embed.addField("Author", info.videoDetails.ownerChannelName);
+            embed.addField("Likes", info.videoDetails.likes?.toString() ?? "Could not retrieve likes.");
+            embed.addField("Views", info.videoDetails.viewCount);
+            embed.addField("Duration", humanizeDuration(parseInt(info.videoDetails.lengthSeconds) * 1000));
+            embed.addField("Uploaded", new Date(info.videoDetails.uploadDate).toLocaleDateString(undefined, {year: "numeric", month: "long", day: "numeric"}));
         }
         return {
             id: track.name,

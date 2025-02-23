@@ -66,6 +66,6 @@ export default {
         const embed = new builders.EmbedBuilder();
         embed.setDescription(`Shuffled queue, now playing ${queue.tracks[queue.internalCurrentIndex].tracks[0].name}.`);
         await interaction.editOriginal({ embeds: [embed.toJSON()] });
-        await queue.play(info.resolvers);
+        await queue.play(info.resolvers, info.proxyInfo, info.authenticatedAgent);
     }
 };

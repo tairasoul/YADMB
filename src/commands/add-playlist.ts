@@ -1,11 +1,13 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import MusicClient, { Guild, queuedTrack, track } from "../client.js";
+import MusicClient, { Guild, queuedTrack, track } from "../classes/client.js";
 import utils from "../utils.js";
 import * as voice from "@discordjs/voice";
-import { playlistData } from "../addonTypes.js";
-import ResolverUtils from "../resolverUtils.js";
-import Cache from "../cache.js";
+import { playlistData } from "../types/addonTypes.js";
+import ResolverUtils from "../classes/resolverUtils.js";
+import Cache from "../classes/cache.js";
+import { Proxy } from "../types/addonTypes.js";
+import ytdl from "@distube/ytdl-core";
 
 export default {
     name: "add-playlist",
@@ -34,7 +36,9 @@ export default {
         resolvers: ResolverUtils, 
         guild: Guild, 
         client: MusicClient,
-        cache: Cache
+        cache: Cache,
+        proxyInfo: Proxy | undefined, 
+        authenticatedAgent: ytdl.Agent | undefined
     }) => {
         await interaction.defer();
         const playlist = interaction.data.options.getString("playlist", true);
@@ -49,7 +53,7 @@ export default {
         }
         else {
             for (const resolver of p_resolvers) {
-                const resolved = await resolver.resolve(playlist, info.cache, forceInvalidation);
+                const resolved = await resolver.resolve(playlist, info.cache, info.proxyInfo, info.authenticatedAgent, forceInvalidation);
                 if (typeof resolved == "string") {
                     const embed = new builders.EmbedBuilder();
                     embed.setDescription(resolved);
@@ -85,7 +89,7 @@ export default {
             embed.setDescription(`Added **${videos.items.length} tracks** to the queue as a playlist.`);
             const queue = info.guild.queue;
             queue.tracks.push(added_playlist);
-            if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers);
+            if (info.guild.audioPlayer.state.status === voice.AudioPlayerStatus.Idle && info.guild.connection) await queue.play(info.resolvers, info.proxyInfo, info.authenticatedAgent);
             await interaction.editOriginal({embeds: [embed.toJSON()]});
         }
     }

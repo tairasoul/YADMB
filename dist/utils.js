@@ -4,7 +4,7 @@ import * as builders from "@oceanicjs/builders";
 import { Base64 as base64 } from "js-base64";
 import { debugLog } from './bot.js';
 export function getHighestResUrl(data) {
-    const thumbnails = data.video_details.thumbnails;
+    const thumbnails = data.videoDetails.thumbnails;
     let highestX = 0;
     let highestY = 0;
     let currentHighestUrl = "";
@@ -82,6 +82,7 @@ export function encode(array) {
 }
 export function decodeStr(str) {
     const decoded = base64.decode(str);
+    debugLog("logging decoded base64");
     debugLog(decoded);
     return JSON.parse(decoded);
 }
@@ -133,14 +134,14 @@ export function Pager(pages) {
     }
     return new PageHolder(PageClasses);
 }
-export async function queuedTrackPager(array, callback = () => { return new Promise((resolve) => resolve()); }, resolvers, cache, forceInvalidation = false) {
+export async function queuedTrackPager(array, proxyInfo, authenticatedAgent, callback = () => { return new Promise((resolve) => resolve()); }, resolvers, cache, forceInvalidation = false) {
     const pages = [];
     for (let i = 0; i < array.length; i++) {
         await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].tracks[0].url);
         let output;
         for (const pager of pagers) {
-            output = await pager.queuedPager(array[i], i, cache, forceInvalidation);
+            output = await pager.queuedPager(array[i], i, cache, proxyInfo, authenticatedAgent, forceInvalidation);
             if (output) {
                 pages.push(output);
                 break;
@@ -166,14 +167,14 @@ export function parseVolumeString(volume) {
     }
     return result;
 }
-export async function trackPager(array, callback = () => { return new Promise((resolve) => resolve()); }, resolvers, cache, forceInvalidation) {
+export async function trackPager(array, proxyInfo, authenticatedAgent, callback = () => { return new Promise((resolve) => resolve()); }, resolvers, cache, forceInvalidation) {
     const pages = [];
     for (let i = 0; i < array.length; i++) {
         await callback(`${array[i].name}`);
         const pagers = await resolvers.getPagers(array[i].url);
         let output;
         for (const pager of pagers) {
-            output = await pager.trackPager(array[i], i, cache, forceInvalidation);
+            output = await pager.trackPager(array[i], i, cache, proxyInfo, authenticatedAgent, forceInvalidation);
             if (output) {
                 pages.push(output);
                 break;

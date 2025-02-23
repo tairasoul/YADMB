@@ -1,6 +1,6 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import { Guild } from "../client";
+import { Guild } from "../classes/client";
 
 export default {
     name: "pause",

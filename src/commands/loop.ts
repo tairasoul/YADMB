@@ -1,6 +1,6 @@
 import * as oceanic from "oceanic.js";
 import * as builders from "@oceanicjs/builders";
-import { Guild, loopType } from "../client.js";
+import { Guild, loopType } from "../classes/client.js";
 
 const loopTypeStrs = {
     "none": "No longer looping anything.",

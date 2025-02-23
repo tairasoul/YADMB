@@ -1,5 +1,6 @@
 import playdl from "play-dl";
 import { createAudioResource } from "@discordjs/voice";
+import ytdl from "@distube/ytdl-core";
 import utils from "../../../../dist/utils.js";
 export const youtube = {
     name: "youtube-resolver",
@@ -7,21 +8,29 @@ export const youtube = {
     async available(url) {
         return [/https:\/\/(?:music|www)\.youtube\.com\/watch\?v=.*/, /https:\/\/youtu\.be\/.*/].find((reg) => reg.test(url)) != undefined;
     },
-    async resolve(url) {
-        const info = await playdl.video_info(url);
-        const stream = await playdl.stream_from_info(info, { discordPlayerCompatibility: true });
-        const resource = createAudioResource(stream.stream, {
-            inlineVolume: true,
-            inputType: stream.type
+    async resolve(url, proxyInfo, authenticatedAgent) {
+        let agent;
+        console.log("creating agent (if needed)");
+        if (proxyInfo)
+            agent = ytdl.createProxyAgent({ uri: `http://${proxyInfo.auth ? `${proxyInfo.auth}@` : ""}${proxyInfo.url}:${proxyInfo.port}` });
+        console.log("getting info");
+        const info = await ytdl.getInfo(url, { agent: agent ?? authenticatedAgent });
+        console.log("info available");
+        const stream = info.formats.filter(f => f.hasAudio && (!f.isLive || f.isHLS))
+            .sort((a, b) => Number(b.audioBitrate) - Number(a.audioBitrate) || Number(a.bitrate) - Number(b.bitrate))[0];
+        //const info = await playdl.video_info(url);
+        //const stream = await playdl.stream_from_info(info, { discordPlayerCompatibility: true });
+        const resource = createAudioResource(stream.url, {
+            inlineVolume: true
         });
         return {
             resource,
             info: {
-                channelName: info.video_details.channel?.name || "Could not get channel name.",
-                durationInMs: info.video_details.durationInSec * 1000,
+                channelName: info.videoDetails.ownerChannelName || "Could not get channel name.",
+                durationInMs: parseInt(info.videoDetails.lengthSeconds) * 1000,
                 fields: [
-                    { name: "Likes", value: info.video_details.likes.toString() },
-                    { name: "Views", value: info.video_details.views.toString() }
+                    { name: "Likes", value: info.videoDetails.likes?.toString() ?? "Could not retrieve likes" },
+                    { name: "Views", value: info.videoDetails.viewCount }
                 ],
                 highestResUrl: utils.getHighestResUrl(info)
             }

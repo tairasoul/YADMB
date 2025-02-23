@@ -8,10 +8,12 @@ import QueueHandler from "./queueSystem.js";
 import { NoSubscriberBehavior, createAudioPlayer } from "@discordjs/voice";
 import * as builders from "@oceanicjs/builders";
 import util from "node:util";
-const __dirname = path.dirname(decodeURIComponent(fileURLToPath(import.meta.url)));
-import { debugLog } from "./bot.js";
+const __dirname = path.join(path.dirname(decodeURIComponent(fileURLToPath(import.meta.url))), "..");
+import { debugLog } from "../bot.js";
 import Cache from "./cache.js";
 import ms from "ms";
+import ProxyHandler from "./proxyCycle.js";
+import ytdl from "@distube/ytdl-core";
 export default class MusicClient extends Client {
     m_guilds;
     commands;
@@ -29,13 +31,22 @@ export default class MusicClient extends Client {
     addonCommands = [];
     rawCommands;
     cache_database;
+    proxyCycle;
+    authenticatedAgent;
     constructor(options) {
         super(options);
-        this.m_guilds = {};
+        this.m_guilds = new Collection();
         this.commands = new Collection();
         this.autocomplete = new Collection();
         this.rawCommands = [];
         this.cache_database = new Cache(options.database_path, options.database_expiry_time);
+        if (options.should_proxy)
+            this.proxyCycle = new ProxyHandler(ms(options.proxy_cycle_interval), options.should_cycle_proxies);
+        if (options.use_cookies) {
+            const cookieFile = path.join(__dirname, "..", "cookies.json");
+            const agent = ytdl.createAgent(JSON.parse(fs.readFileSync(cookieFile, 'utf8')));
+            this.authenticatedAgent = agent;
+        }
         const intervalMs = ms(options.database_cleanup_interval);
         setInterval(() => {
             this.cache_database.removeInvalidFromAllTables();
@@ -120,7 +131,6 @@ export default class MusicClient extends Client {
         for (const command of this.rawCommands) {
             console.log(`registering global command ${command.data.name}`);
             this.commands.set(command.data.name, command);
-            console.log(`registered global command ${command.data.name}`);
             registered.push(command.data);
             /*try {
                 // @ts-ignore
@@ -146,9 +156,11 @@ export default class MusicClient extends Client {
             // @ts-ignore
             listener(interaction, {
                 resolvers: new ResolverUtils(this.resolvers),
-                guild: this.m_guilds[interaction.guildID],
+                guild: this.m_guilds.get(interaction.guildID),
                 client: this,
-                cache: this.cache_database
+                cache: this.cache_database,
+                proxyInfo: this.proxyCycle?.activeProxy,
+                authenticatedAgent: this.authenticatedAgent
             }));
         }
         else {
@@ -163,9 +175,11 @@ export default class MusicClient extends Client {
             // @ts-ignore
             listener(interaction, {
                 resolvers: new ResolverUtils(this.resolvers),
-                guild: this.m_guilds[interaction.guildID],
+                guild: this.m_guilds.get(interaction.guildID),
                 client: this,
-                cache: this.cache_database
+                cache: this.cache_database,
+                proxyInfo: this.proxyCycle?.activeProxy,
+                authenticatedAgent: this.authenticatedAgent
             }));
         }
         else {
@@ -180,24 +194,27 @@ export default class MusicClient extends Client {
                 noSubscriber: NoSubscriberBehavior.Pause
             }
         });
-        this.m_guilds[guild.id] = {
+        this.m_guilds.set(guild.id, {
             queue: new QueueHandler(audioPlayer),
             connection: null,
             voiceChannel: null,
             audioPlayer: audioPlayer,
             id: guild.id,
             leaveTimer: null
-        };
-        const cg = this.m_guilds[guild.id];
+        });
+        const cg = this.m_guilds.get(guild.id);
         cg.audioPlayer.on('error', (error) => {
             console.log(`an error occured with the audio player, ${error}`);
         });
         cg.audioPlayer.on("stateChange", () => {
+            debugLog("stateChange debug log, current state:");
+            debugLog(cg.audioPlayer.state.status);
             if (cg.audioPlayer.state.status === "idle") {
                 if (cg.queue.nextTrack() != null) {
+                    debugLog("logging queue's next track & index");
                     debugLog(util.inspect(cg.queue.tracks, false, 3, true));
                     debugLog(cg.queue.internalCurrentIndex);
-                    cg.queue.play(new ResolverUtils(this.resolvers));
+                    cg.queue.play(new ResolverUtils(this.resolvers), this.proxyCycle?.activeProxy, this.authenticatedAgent);
                 }
                 else {
                     cg.queue.currentInfo = null;
@@ -206,6 +223,6 @@ export default class MusicClient extends Client {
         });
     }
     removeGuild(guild) {
-        delete this.m_guilds[guild.id];
+        this.m_guilds.delete(guild.id);
     }
 }
